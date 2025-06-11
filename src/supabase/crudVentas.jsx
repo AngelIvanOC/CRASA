@@ -1,10 +1,10 @@
 import Swal from "sweetalert2";
 import { supabase } from "../index";
 
-const tabla = "compras";
-const tablaDetalle = "detalle_compras";
+const tabla = "ventas";
+const tablaDetalle = "detalle_ventas";
 
-export async function MostrarCompras() {
+export async function MostrarVentas() {
   const { data } = await supabase
     .from(tabla)
     .select(
@@ -22,9 +22,9 @@ export async function MostrarCompras() {
   return data;
 }
 
-export async function InsertarCompra(p) {
-  const { data: compraExistente, error: errorVerificacion } = await supabase
-    .from("compras")
+export async function InsertarVenta(p) {
+  const { data: ventaExistente, error: errorVerificacion } = await supabase
+    .from(tabla)
     .select("id")
     .eq("codigo", p.codigo)
     .maybeSingle();
@@ -38,17 +38,17 @@ export async function InsertarCompra(p) {
     return null;
   }
 
-  if (compraExistente) {
+  if (ventaExistente) {
     Swal.fire({
       icon: "warning",
-      title: "Compra duplicada",
-      text: "Ya existe una compra con ese código.",
+      title: "Venta duplicada",
+      text: "Ya existe una venta con ese código.",
     });
     return null;
   }
 
   const { data, error } = await supabase
-    .from("compras")
+    .from(tabla)
     .insert(p)
     .select("id")
     .single();
@@ -65,7 +65,7 @@ export async function InsertarCompra(p) {
   return data?.id; // ✅ regresa el id insertado
 }
 
-export async function EditarCompra(p) {
+export async function EditarVenta(p) {
   const { error } = await supabase.from(tabla).update(p).eq("id", p.id);
 
   if (error) {
@@ -79,7 +79,7 @@ export async function EditarCompra(p) {
   return true;
 }
 
-export async function MostrarDetalleCompra(compra_id) {
+export async function MostrarDetalleVenta(venta_id) {
   const { data } = await supabase
     .from(tablaDetalle)
     .select(
@@ -91,15 +91,15 @@ export async function MostrarDetalleCompra(compra_id) {
       productos(id, codigo, nombre, racks(id, codigo_rack))
     `
     )
-    .eq("compra_id", compra_id);
+    .eq("venta_id", venta_id);
   return data;
 }
 
-export async function InsertarProductosCompra(p) {
+export async function InsertarProductosVenta(p) {
   // Verificar si ya existe una compra con ese código
 
   const { error } = await supabase.from(tablaDetalle).insert({
-    compra_id: p.compra_id,
+    venta_id: p.venta_id,
     producto_id: p.producto_id,
     cantidad: p.cantidad,
     fecha_caducidad: p.fecha_caducidad,
@@ -118,12 +118,12 @@ export async function InsertarProductosCompra(p) {
   return true;
 }
 
-export async function EliminarCompra(p) {
+export async function EliminarVenta(p) {
   // Primero eliminar el detalle
   const { error: errorDetalle } = await supabase
     .from(tablaDetalle)
     .delete()
-    .eq("compra_id", p.id);
+    .eq("venta_id", p.id);
 
   if (errorDetalle) {
     throw errorDetalle;

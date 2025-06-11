@@ -3,21 +3,21 @@ import {
   Btnsave,
   Title,
   Buscador,
-  TablaProductosCompra,
+  TablaProductosVenta,
   RegistrarProductos,
 } from "../../index";
 import { v } from "../../styles/variables";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export function ProductosCompraTemplate({
-  detalleCompra,
+export function ProductosVentaTemplate({
+  detalleVenta,
   showBackButton = false,
   backRoute = "/",
 }) {
   const navigate = useNavigate();
   const [openRegistro, SetopenRegistro] = useState(false);
-  //const { detalleCompra } = useComprasStore();
+  //const { detalleVenta } = useVentasStore();
   const [accion, setAccion] = useState("");
   const [dataSelect, setdataSelect] = useState([]);
 
@@ -55,8 +55,8 @@ export function ProductosCompraTemplate({
             color="#fff"
           />
         </section>
-        <TablaProductosCompra
-          data={detalleCompra}
+        <TablaProductosVenta
+          data={detalleVenta}
           SetopenRegistro={SetopenRegistro}
           setdataSelect={setdataSelect}
           setAccion={setAccion}

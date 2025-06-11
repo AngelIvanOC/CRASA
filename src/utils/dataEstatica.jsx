@@ -32,14 +32,9 @@ export const LinksArray = [
     to: "/almacen",
   },
   {
-    label: "Compras",
-    icon: "fa6-solid:file-invoice-dollar",
-    to: "/compras",
-  },
-  {
     label: "Ventas",
-    icon: "fa6-solid:dollar-sign",
-    to: "/reportes",
+    icon: "fa6-solid:file-invoice-dollar",
+    to: "/ventas",
   },
   {
     label: "Racks",

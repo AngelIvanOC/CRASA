@@ -17,41 +17,41 @@ export const uploadPdfToSupabase = async (pdfFile) => {
   return urlData.publicUrl;
 };
 
-export const insertCompraWithProducts = async (
-  compraData,
+export const insertVentaWithProducts = async (
+  ventaData,
   extractedData,
-  insertarCompra
+  insertarVenta
 ) => {
   // 1. Subir PDF si existe
-  const pdfUrl = await uploadPdfToSupabase(compraData.pdfFile);
+  const pdfUrl = await uploadPdfToSupabase(ventaData.pdfFile);
 
-  // 2. Insertar compra principal
-  const compraInsertData = {
-    codigo: compraData.codigo,
-    marca_id: compraData.marca_id || null,
-    cantidad_productos: compraData.cantidad_productos || 0,
-    cantidad_total: compraData.cantidad_total || 0,
-    fecha: compraData.fecha || null,
+  // 2. Insertar venta principal
+  const ventaInsertData = {
+    codigo: ventaData.codigo,
+    marca_id: ventaData.marca_id || null,
+    cantidad_productos: ventaData.cantidad_productos || 0,
+    cantidad_total: ventaData.cantidad_total || 0,
+    fecha: ventaData.fecha || null,
     factura_url: pdfUrl,
   };
 
-  const idCompraNueva = await insertarCompra(compraInsertData);
-  if (!idCompraNueva) {
-    throw new Error("No se pudo insertar la compra principal");
+  const idVentaNueva = await insertarVenta(ventaInsertData);
+  if (!idVentaNueva) {
+    throw new Error("No se pudo insertar la venta principal");
   }
 
   // 3. Insertar productos si existen
   if (extractedData?.productos?.length > 0) {
     await insertProductsFromExtractedData(
       extractedData.productos,
-      idCompraNueva
+      idVentaNueva
     );
   }
 
-  return idCompraNueva;
+  return idVentaNueva;
 };
 
-const insertProductsFromExtractedData = async (productos, compraId) => {
+const insertProductsFromExtractedData = async (productos, ventaId) => {
   const mapaMarcas = {
     CRASA: 1,
     JUMEX: 2,
@@ -96,11 +96,11 @@ const insertProductsFromExtractedData = async (productos, compraId) => {
         productoId = nuevoProducto.id;
       }
 
-      // Insertar detalle de compra
+      // Insertar detalle de venta
       const { error: errorDetalle } = await supabase
-        .from("detalle_compras")
+        .from("detalle_ventas")
         .insert({
-          compra_id: compraId,
+          venta_id: ventaId,
           producto_id: productoId,
           cantidad: producto.cantidad || 0,
           fecha_caducidad: null,

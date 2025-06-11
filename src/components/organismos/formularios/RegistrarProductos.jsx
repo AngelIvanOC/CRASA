@@ -242,7 +242,7 @@ export function RegistrarProductos({
               <Btnsave
                 icono={<v.iconoguardar />}
                 titulo="Guardar"
-                bgcolor="#F9D70B"
+                bgcolor={v.colorBotones}
               />
             </section>
           </form>

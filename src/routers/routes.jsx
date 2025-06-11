@@ -3,7 +3,7 @@ import {
   Almacen,
   Categorias,
   Configuracion,
-  Compras,
+  Ventas,
   Dashboard,
   Home,
   Racks,
@@ -13,7 +13,7 @@ import {
   useEmpresaStore,
   UserAuth,
   useUsuariosStore,
-  ProductosCompra,
+  ProductosVenta,
 } from "../index";
 import { useQuery } from "@tanstack/react-query";
 export function MyRoutes() {
@@ -47,10 +47,10 @@ export function MyRoutes() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/almacen" element={<Almacen />} />
         <Route path="/racks" element={<Racks />} />
-        <Route path="/compras" element={<Compras />} />
+        <Route path="/ventas" element={<Ventas />} />
         <Route
-          path="/compras/:compraId/productos"
-          element={<ProductosCompra />}
+          path="/ventas/:ventaId/productos"
+          element={<ProductosVenta />}
         />{" "}
       </Route>
       <Route path="/login" element={<Login />} />

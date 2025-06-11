@@ -1,9 +1,9 @@
 import styled from "styled-components";
-import { useComprasStore } from "../../index";
+import { useVentasStore } from "../../index";
 import { v } from "../../styles/variables";
 
-export function DetalleCompraModal({ isOpen, onClose }) {
-  const { detalleCompra } = useComprasStore();
+export function DetalleVentaModal({ isOpen, onClose }) {
+  const { detalleVenta } = useVentasStore();
 
   if (!isOpen) return null;
 
@@ -11,7 +11,7 @@ export function DetalleCompraModal({ isOpen, onClose }) {
     <ModalOverlay>
       <ModalContainer>
         <ModalHeader>
-          <h3>Detalle de Compra</h3>
+          <h3>Detalle de Venta</h3>
           <button onClick={onClose}>×</button>
         </ModalHeader>
 
@@ -27,7 +27,7 @@ export function DetalleCompraModal({ isOpen, onClose }) {
               </tr>
             </thead>
             <tbody>
-              {detalleCompra?.map((item) => (
+              {detalleVenta?.map((item) => (
                 <tr key={item.id}>
                   <td>{item.productos?.codigo || "-"}</td>
                   <td>{item.productos?.nombre || "-"}</td>

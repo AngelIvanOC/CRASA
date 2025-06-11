@@ -2,7 +2,7 @@ import React from "react";
 import { InputText } from "../../index";
 import { v } from "../../styles/variables";
 
-export const CompraForm = ({
+export const VentaForm = ({
   register,
   errors,
   marcas,

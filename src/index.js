@@ -61,16 +61,16 @@ export * from "./components/templates/AlmacenTemplate";
 export * from "./components/organismos/tablas/TablaProductos";
 export * from "./components/organismos/formularios/RegistrarProductos";
 export * from "./supabase/crudMarcas";
-export * from "./supabase/crudCompras";
-export * from "./store/ComprasStore";
-export * from "./pages/Compras";
-export * from "./components/templates/ComprasTemplate";
-export * from "./components/organismos/DetalleCompraModal";
-export * from "./components/organismos/tablas/TablaCompras";
-export * from "./pages/ProductosCompra";
-export * from "./components/templates/ProductosCompraTemplate";
-export * from "./components/organismos/tablas/TablaProductosCompra";
-export * from "./components/organismos/formularios/RegistrarCompra";
+export * from "./supabase/crudVentas";
+export * from "./store/VentasStore";
+export * from "./pages/Ventas";
+export * from "./components/templates/VentasTemplate";
+export * from "./components/organismos/DetalleVentaModal";
+export * from "./components/organismos/tablas/TablaVentas";
+export * from "./pages/ProductosVenta";
+export * from "./components/templates/ProductosVentaTemplate";
+export * from "./components/organismos/tablas/TablaProductosVenta";
+export * from "./components/organismos/formularios/RegistrarVenta";
 
 //Racks
 export * from "./supabase/crudRacks";
@@ -83,5 +83,5 @@ export * from "./components/organismos/formularios/RegistrarRacks";
 //Facturas
 export * from "./utils/invoiceParsers";
 export * from "./components/moleculas/PdfUploader";
-export * from "./components/moleculas/CompraForm";
-export * from "./services/compraService";
+export * from "./components/moleculas/VentaForm";
+export * from "./services/ventaService";

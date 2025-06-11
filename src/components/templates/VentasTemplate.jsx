@@ -1,21 +1,21 @@
 import styled from "styled-components";
 import {
   Title,
-  useComprasStore,
-  TablaCompras,
+  useVentasStore,
+  TablaVentas,
   Btnsave,
   Buscador,
-  RegistrarCompra,
+  RegistrarVenta,
 } from "../../index";
 import { v } from "../../styles/variables";
 import { useState } from "react";
 
-export function ComprasTemplate() {
+export function VentasTemplate() {
   const [modalOpen, setModalOpen] = useState(false);
   const [openRegistro, SetopenRegistro] = useState(false);
   const [accion, setAccion] = useState("");
   const [dataSelect, setdataSelect] = useState([]);
-  const { dataCompras } = useComprasStore();
+  const { dataVentas } = useVentasStore();
 
   function nuevoRegistro() {
     SetopenRegistro(!openRegistro);
@@ -26,7 +26,7 @@ export function ComprasTemplate() {
   return (
     <Container>
       {openRegistro && (
-        <RegistrarCompra
+        <RegistrarVenta
           onClose={() => SetopenRegistro(!openRegistro)}
           dataSelect={dataSelect}
           accion={accion}
@@ -34,7 +34,7 @@ export function ComprasTemplate() {
       )}
 
       <Title className="titulo" $colortexto="#9291A5">
-        <img src={v.emojiCompras} alt="" /> COMPRAS
+        <img src={v.emojiCompras} alt="" /> VENTAS
       </Title>
 
       <section className="main">
@@ -44,14 +44,14 @@ export function ComprasTemplate() {
           <Btnsave
             funcion={nuevoRegistro}
             bgcolor={v.colorBotones}
-            titulo="Nueva Compra"
+            titulo="Nueva Venta"
             icono={<v.iconoagregar />}
             color="#fff"
           />
         </section>
 
-        <TablaCompras
-          data={dataCompras}
+        <TablaVentas
+          data={dataVentas}
           onVerDetalle={() => setModalOpen(true)}
           SetopenRegistro={SetopenRegistro}
           setdataSelect={setdataSelect}

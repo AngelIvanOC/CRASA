@@ -5,23 +5,23 @@ import { useMutation } from "@tanstack/react-query";
 import { Spinner, supabase } from "../../../index";
 import {
   Btnsave,
-  useComprasStore,
-  CompraForm,
+  useVentasStore,
+  VentaForm,
   PdfUploader,
 } from "../../../index";
 import { v } from "../../../styles/variables";
 
 // Importar nuevos módulos
 import { usePdfReader } from "../../../hooks/usePdfReader";
-import { insertCompraWithProducts } from "../../../services/compraService";
+import { insertVentaWithProducts } from "../../../services/ventaService";
 
-export function RegistrarCompra({
+export function RegistrarVenta({
   onClose,
   dataSelect,
   accion,
   setIsExploding,
 }) {
-  const { insertarCompra } = useComprasStore();
+  const { insertarVenta } = useVentasStore();
   const [isPending, setIsPending] = useState(false);
   const [marcas, setMarcas] = useState([]);
 
@@ -40,14 +40,14 @@ export function RegistrarCompra({
   // Mutation para insertar
   const { mutate: doInsertar } = useMutation({
     mutationFn: (data) =>
-      insertCompraWithProducts(
+      insertVentaWithProducts(
         { ...data, pdfFile },
         extractedData,
-        insertarCompra
+        insertarVenta
       ),
-    mutationKey: "insertar compra",
+    mutationKey: "insertar venta",
     onError: (err) => {
-      console.error("Error al insertar compra:", err);
+      console.error("Error al insertar venta:", err);
       setIsPending(false);
     },
     onSuccess: () => {
@@ -134,9 +134,7 @@ export function RegistrarCompra({
           <div className="headers">
             <section>
               <h1>
-                {accion === "Editar"
-                  ? "Editar compra"
-                  : "Registrar nueva compra"}
+                {accion === "Editar" ? "Editar venta" : "Registrar nueva venta"}
               </h1>
             </section>
             <section>
@@ -155,7 +153,7 @@ export function RegistrarCompra({
 
           <form className="formulario" onSubmit={handleSubmit(handlesub)}>
             {/* Componente del formulario */}
-            <CompraForm
+            <VentaForm
               register={register}
               errors={errors}
               marcas={marcas}
@@ -166,7 +164,7 @@ export function RegistrarCompra({
             <Btnsave
               icono={<v.iconoguardar />}
               titulo="Guardar"
-              bgcolor="#F9D70B"
+              bgcolor={v.colorBotones}
             />
           </form>
         </div>

@@ -1,132 +1,132 @@
 import styled from "styled-components";
 import {
-  ContentAccionesTabla,
-  useCategoriasStore,
+  useVentasStore,
   Paginacion,
-  ImagenContent,
-  Icono,
+  ContentAccionesTabla,
 } from "../../../index";
-import Swal from "sweetalert2";
 import { v } from "../../../styles/variables";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { FaEye } from "react-icons/fa";
+import { FaCaretDown, FaCaretUp } from "react-icons/fa6";
 import {
-  flexRender,
+  useReactTable,
   getCoreRowModel,
+  flexRender,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable,
 } from "@tanstack/react-table";
-import { FaCaretDown, FaCaretUp } from "react-icons/fa6";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
-export function TablaProductosCompra({
+export function TablaVentas({
   data,
+  onVerDetalle,
   SetopenRegistro,
   setdataSelect,
   setAccion,
 }) {
-  if (data == null) return;
-  const [pagina, setPagina] = useState(1);
+  const { dataVentas, mostrarVentas, eliminarVenta } = useVentasStore();
+  const [selectedVenta, setSelectedVenta] = useState(null);
   const [datas, setData] = useState(data);
   const [columnFilters, setColumnFilters] = useState([]);
 
-  const { eliminarCategoria } = useCategoriasStore();
+  const navigate = useNavigate();
 
-  function eliminar(p) {
-    if (p.nombre === "General") {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Este registro no se permite modificar ya que es valor por defecto.",
-        footer: '<a href="">...</a>',
-      });
-      return;
-    }
-    Swal.fire({
-      title: "¿Estás seguro(a)(e)?",
-      text: "Una vez eliminado, ¡no podrá recuperar este registro!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Si, eliminar",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        await eliminarCategoria({ id: p.id });
-      }
-    });
-  }
+  useEffect(() => {
+    mostrarVentas();
+  }, []);
+
+  const handleVerDetalle = (venta) => {
+    navigate(`/ventas/${venta.id}/productos`);
+  };
 
   function editar(data) {
-    if (data.nombre === "General") {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Este registro no se permite modificar ya que es valor por defecto.",
-        footer: '<a href="">...</a>',
-      });
-      return;
-    }
     SetopenRegistro(true);
     setdataSelect(data);
     setAccion("Editar");
   }
 
+  function eliminar(venta) {
+    Swal.fire({
+      title: "¿Estás seguro(a)?",
+      text: "Una vez eliminada, ¡no podrá recuperar esta venta y todos sus productos asociados!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          // Usar el store de ventas para eliminar
+          const { eliminarVenta } = useVentasStore.getState();
+          await eliminarVenta({ id: venta.id });
+
+          Swal.fire({
+            icon: "success",
+            title: "¡Eliminada!",
+            text: "La venta ha sido eliminada correctamente.",
+            timer: 2000,
+            showConfirmButton: false,
+          });
+        } catch (error) {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Hubo un problema al eliminar la venta.",
+          });
+        }
+      }
+    });
+  }
+
   const columns = [
     {
-      accessorKey: "productos.codigo",
-      header: "#",
+      accessorKey: "codigo",
+      header: "# PEDIDO",
       cell: (info) => <span>{info.getValue()}</span>,
-      enableColumnFilter: true,
-      filterFn: (row, columnId, filterStatuses) => {
-        if (filterStatuses.length === 0) return true;
-        const status = row.getValue(columnId);
-        return filterStatuses.includes(status?.id);
-      },
     },
     {
-      accessorKey: "productos.nombre",
-      header: "NOMBRE",
-      cell: (info) => <span>{info.getValue()}</span>,
-      enableColumnFilter: true,
-      filterFn: (row, columnId, filterStatuses) => {
-        if (filterStatuses.length === 0) return true;
-        const status = row.getValue(columnId);
-        return filterStatuses.includes(status?.id);
-      },
+      accessorKey: "marcas.nombre",
+      header: "MARCA",
+      cell: (info) => <span>{info.getValue() || "-"}</span>,
     },
     {
-      accessorKey: "cantidad",
+      accessorKey: "cantidad_productos",
       header: "CANTIDAD",
-      cell: (info) => <span>{info.getValue()}</span>,
-      enableColumnFilter: true,
-      filterFn: (row, columnId, filterStatuses) => {
-        if (filterStatuses.length === 0) return true;
-        const status = row.getValue(columnId);
-        return filterStatuses.includes(status?.id);
-      },
+      cell: (info) => <span>{info.getValue() || 0}</span>,
     },
     {
-      accessorKey: "productos.racks.codigo_rack",
-      header: "UBICACION",
-      cell: (info) => <span>{info.getValue()}</span>,
-      enableColumnFilter: false,
-      filterFn: (row, columnId, filterStatuses) => {
-        if (filterStatuses.length === 0) return true;
-        const status = row.getValue(columnId);
-        return filterStatuses.includes(status?.id);
-      },
+      accessorKey: "cantidad_total",
+      header: "CANT. TOTAL",
+      cell: (info) => <span>{info.getValue() || 0}</span>,
     },
     {
-      accessorKey: "productos.fecha",
-      header: "CADUCIDAD",
-      cell: (info) => <span>{info.getValue()}</span>,
-      enableColumnFilter: false,
-      filterFn: (row, columnId, filterStatuses) => {
-        if (filterStatuses.length === 0) return true;
-        const status = row.getValue(columnId);
-        return filterStatuses.includes(status?.id);
-      },
+      accessorKey: "fecha",
+      header: "FECHA",
+      cell: (info) => (
+        <span>{new Date(info.getValue()).toLocaleDateString()}</span>
+      ),
+    },
+    {
+      accessorKey: "factura_url",
+      header: "FACTURA",
+      enableSorting: false,
+      cell: (info) =>
+        info.getValue() ? (
+          <a
+            href={info.getValue()}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-ver-factura"
+          >
+            <FaEye />
+          </a>
+        ) : (
+          <span>-</span>
+        ),
     },
     {
       accessorKey: "acciones",
@@ -136,23 +136,15 @@ export function TablaProductosCompra({
         <ContentAccionesTabla
           funcionEditar={() => editar(info.row.original)}
           funcionEliminar={() => eliminar(info.row.original)}
+          funcionVer={() => handleVerDetalle(info.row.original)}
         />
       ),
-      enableColumnFilter: true,
-      filterFn: (row, columnId, filterStatuses) => {
-        if (filterStatuses.length === 0) return true;
-        const status = row.getValue(columnId);
-        return filterStatuses.includes(status?.id);
-      },
     },
   ];
 
   const table = useReactTable({
-    data,
+    data: dataVentas || [],
     columns,
-    state: {
-      columnFilters,
-    },
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -313,24 +305,28 @@ const Container = styled.div`
 
           /* Distribución específica por columna */
           &:nth-child(1) {
-            width: 5%;
-          } /* Código */
-          &:nth-child(2) {
-            width: 40%;
-          } /* Nombre */
-          &:nth-child(3) {
             width: 15%;
-          } /* Cantidad */
+          } /* # PEDIDO */
+          &:nth-child(2) {
+            width: 20%;
+          } /* MARCA */
+          &:nth-child(3) {
+            width: 12%;
+          } /* CANTIDAD */
           &:nth-child(4) {
             width: 15%;
-          } /* Ubicación */
+          } /* CANTIDAD TOTAL */
           &:nth-child(5) {
-            width: 17%;
-          } /* Fecha Caducidad */
+            width: 15%;
+          } /* FECHA */
           &:nth-child(6) {
-            width: 8%;
+            width: 13%;
+            text-align: center;
+          } /* FACTURA */
+          &:nth-child(7) {
+            width: 10%;
             text-align: center; /* Centrar acciones */
-          } /* Acciones */
+          } /* ACCIONES */
         }
       }
     }
@@ -343,22 +339,25 @@ const Container = styled.div`
 
       th {
         &:nth-child(1) {
-          width: 5%;
+          width: 15%;
         }
         &:nth-child(2) {
-          width: 40%;
+          width: 20%;
         }
         &:nth-child(3) {
-          width: 15%;
+          width: 12%;
         }
         &:nth-child(4) {
           width: 15%;
         }
         &:nth-child(5) {
-          width: 17%;
+          width: 15%;
         }
         &:nth-child(6) {
-          width: 8%;
+          width: 13%;
+        }
+        &:nth-child(7) {
+          width: 10%;
         }
       }
     }
@@ -386,6 +385,18 @@ const Container = styled.div`
         &:hover {
           opacity: 1;
         }
+      }
+    }
+
+    /* Estilos específicos para el botón de factura */
+    .btn-ver-factura {
+      color: #023e8f;
+      cursor: pointer;
+      font-size: 16px;
+      transition: color 0.2s ease;
+
+      &:hover {
+        color: ${(props) => props.theme.colorPrincipal};
       }
     }
   }
