@@ -4,14 +4,14 @@ import Swal from "sweetalert2";
 
 export const useAuthStore = create((set) => ({
   loading: false,
-  
+
   loginGoogle: async () => {
     try {
       set({ loading: true });
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
       });
-      
+
       if (error) {
         Swal.fire({
           icon: "error",
@@ -19,6 +19,7 @@ export const useAuthStore = create((set) => ({
           text: error.message,
         });
       }
+      // La redirección la maneja AuthContext automáticamente
     } catch (error) {
       console.error("Error en login Google:", error);
     } finally {
@@ -29,7 +30,7 @@ export const useAuthStore = create((set) => ({
   loginDirecto: async (email, password) => {
     try {
       set({ loading: true });
-      
+
       // Validar que los campos no estén vacíos
       if (!email || !password) {
         Swal.fire({
@@ -58,7 +59,7 @@ export const useAuthStore = create((set) => ({
       // Si el login es exitoso, verificar si el usuario existe en la tabla usuarios
       if (data.user) {
         const usuario = await MostrarUsuarios({ id_auth: data.user.id });
-        
+
         if (!usuario) {
           // Si no existe en la tabla usuarios, puedes crear un registro o mostrar error
           Swal.fire({
@@ -77,7 +78,8 @@ export const useAuthStore = create((set) => ({
           timer: 1500,
           showConfirmButton: false,
         });
-        
+
+        // La redirección la maneja AuthContext automáticamente
         return true;
       }
     } catch (error) {
@@ -99,6 +101,7 @@ export const useAuthStore = create((set) => ({
       if (error) {
         console.error("Error al cerrar sesión:", error);
       }
+      // La redirección al login la maneja AuthContext automáticamente
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
     }

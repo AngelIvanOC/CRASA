@@ -28,12 +28,8 @@ export function LoginTemplate() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const success = await loginDirecto(formData.email, formData.password);
-
-    if (success) {
-      // Aquí puedes redirigir al usuario o hacer cualquier acción post-login
-      console.log("Login exitoso");
-    }
+    await loginDirecto(formData.email, formData.password);
+    // La redirección la maneja AuthContext automáticamente
   };
 
   return (
