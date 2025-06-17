@@ -109,7 +109,6 @@ const Container = styled.div`
   flex-direction: column;
   padding: 0 10px;
   color: ${({ theme }) => theme.text};
-  background-color: #000;
   .card {
     display: flex;
     flex-direction: column;
