@@ -1,3 +1,4 @@
+import { useState } from "react";
 import styled from "styled-components";
 import {
   Title,
@@ -11,7 +12,29 @@ import { v } from "../../styles/variables";
 import { Device } from "../../styles/breakpoints";
 
 export function LoginTemplate() {
-  const { loginGoogle } = useAuthStore();
+  const { loginGoogle, loginDirecto, loading } = useAuthStore();
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const success = await loginDirecto(formData.email, formData.password);
+
+    if (success) {
+      // Aquí puedes redirigir al usuario o hacer cualquier acción post-login
+      console.log("Login exitoso");
+    }
+  };
 
   return (
     <Container>
@@ -21,9 +44,19 @@ export function LoginTemplate() {
           <span>CRASA</span>
         </ContentLogo>
         <Title $paddingbottom="40px">Ingresar</Title>
-        <form action="">
+
+        <form onSubmit={handleSubmit}>
           <InputText2>
-            <input className="form__field" placeholder="email" type="text" />
+            <input
+              className="form__field"
+              placeholder="email"
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              required
+              disabled={loading}
+            />
           </InputText2>
 
           <InputText2>
@@ -31,19 +64,26 @@ export function LoginTemplate() {
               className="form__field"
               placeholder="contraseña"
               type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleInputChange}
+              required
+              disabled={loading}
             />
           </InputText2>
 
           <Btnsave
-            titulo="INGRESAR"
+            type="submit"
+            titulo={loading ? "INGRESANDO..." : "INGRESAR"}
             bgcolor="#1CB0F6"
             color="255, 255, 255"
             width="100%"
+            disabled={loading}
           />
         </form>
 
         <Linea>
-          <span>0</span>
+          <span>o</span>
         </Linea>
 
         <Btnsave
@@ -51,6 +91,7 @@ export function LoginTemplate() {
           titulo="Google"
           bgcolor="#fff"
           icono={<v.iconogoogle />}
+          disabled={loading}
         />
       </div>
 
@@ -68,6 +109,7 @@ const Container = styled.div`
   flex-direction: column;
   padding: 0 10px;
   color: ${({ theme }) => theme.text};
+  background-color: #000;
   .card {
     display: flex;
     flex-direction: column;
