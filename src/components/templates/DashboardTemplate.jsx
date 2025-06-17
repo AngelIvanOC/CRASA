@@ -1,24 +1,77 @@
 import styled from "styled-components";
+import { useEffect } from "react";
 import { useAuthStore } from "../../store/AuthStore";
 import { UserAuth } from "../../context/AuthContext";
 import { CardSmall } from "../organismos/cards/CardSmall";
+import { useDashboardStore } from "../../store/DashboardStore";
 import { v } from "../../styles/variables";
+import { Device } from "../../styles/breakpoints";
 
 export function DashboardTemplate() {
   const { cerrarSesion } = useAuthStore();
   const { user } = UserAuth();
+
+  // Estados del dashboard store
+  const {
+    dataVentas,
+    dataRacks,
+    dataCompras,
+    dataProductos,
+    loadingVentas,
+    loadingRacks,
+    loadingCompras,
+    loadingProductos,
+    loading,
+    cargarDatosDashboard,
+  } = useDashboardStore();
+
+  // Cargar datos al montar el componente
+  useEffect(() => {
+    cargarDatosDashboard();
+  }, [cargarDatosDashboard]);
+
   return (
     <Container>
       <section className="contenido">
         <section className="area1">
-          <CardSmall titulo="Compras" />
-          <CardSmall titulo="Ventas" />
-          <CardSmall titulo="Ventas" />
-          <CardSmall titulo="Ventas" />
+          <CardSmall
+            titulo="Ventas"
+            data={dataVentas}
+            loading={loadingVentas}
+            emptyMessage="No hay ventas registradas"
+            emoji={v.emojiAlmacen}
+          />
+          <CardSmall
+            titulo={
+              <span>
+                Racks <img src={v.emojiRacks} />
+              </span>
+            }
+            data={dataRacks}
+            loading={loadingRacks}
+            emptyMessage="No hay racks registrados"
+            emoji={v.emojiRacks}
+          />
+          <CardSmall
+            titulo={
+              <span>
+                Compras <img src={v.emojiRacks} />
+              </span>
+            }
+            data={dataCompras}
+            loading={loadingCompras}
+            emptyMessage="No hay compras registradas"
+          />
+          <CardSmall
+            titulo="Productos"
+            data={dataProductos}
+            loading={loadingProductos}
+            emptyMessage="No hay productos registrados"
+          />
         </section>
 
         <section className="area2">
-          <CardSmall titulo="Proximos" />
+          <CardSmall titulo="Próximos" />
           <CardSmall titulo="Pedidos" />
           <div className="span-2">
             <CardSmall titulo="Movimientos" />
@@ -27,9 +80,9 @@ export function DashboardTemplate() {
 
         <section className="main">
           <div className="span-1">
-            <CardSmall titulo="Proximos" />
+            <CardSmall titulo="Estadísticas" />
           </div>
-          <CardSmall titulo="Pedidos" />
+          <CardSmall titulo="Alertas" />
         </section>
       </section>
     </Container>
@@ -40,13 +93,11 @@ const Container = styled.div`
   height: 100vh;
   display: flex;
   flex-direction: column;
-  //justify-content: center;
   padding: 0px 30px 0 0;
   justify-content: center;
 
   .contenido {
     height: 90vh;
-    //justify-content: center;
     display: grid;
     grid-template:
       "area1" 2fr

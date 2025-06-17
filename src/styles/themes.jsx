@@ -28,6 +28,7 @@ export const Light = {
   bgtotal: "#fff",
   bgtotalFuerte: "#f7f9fd",
   bgtotalTransparente: "rgba(247, 249, 253, 0.75)",
+  bordeBotonPag: "rgba(50, 50, 50, 0.5)",
 
   bgtgderecha: "#eeeeee",
   colorToggle: "#F9743B",
@@ -78,6 +79,7 @@ export const Dark = {
   bgtotal: "#131F24",
   bgtotalFuerte: "#0e161a",
   bgtotalTransparente: "rgba(14,22,26, 0.75)",
+  bordeBotonPag: "rgba(255, 255, 255, 0.5)",
 
   colorToggle: "rgb(52, 131, 235)",
   translateToggle: "26px",

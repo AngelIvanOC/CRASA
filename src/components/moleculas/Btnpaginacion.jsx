@@ -1,5 +1,7 @@
 import styled from "styled-components";
 import { Icono } from "../../index";
+import { Device } from "../../styles/breakpoints";
+
 export function Btnpaginacion({
   funcion,
   titulo,
@@ -30,12 +32,12 @@ export function Btnpaginacion({
 const Container = styled.button`
   display: flex;
   border-radius: 10px;
-  background-color: ${(props) => props.$bgcolor};
-  border: 2px solid rgba(50, 50, 50, 0.2);
+  border: 2px solid ${({ theme }) => theme.bordeBotonPag};
   cursor: pointer;
   transition: 0.2s;
   transition-timing-function: linear;
-  color: rgb(${(props) => props.$color});
+  color: ${({ theme }) => theme.bordeBotonPag};
+  background-color: ${({ theme }) => theme.bgtotal};
   align-items: center;
   justify-content: center;
   .content {

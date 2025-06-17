@@ -355,6 +355,9 @@ const Container = styled.div`
         }
         &:nth-child(6) {
           width: 13%;
+          .header-content {
+            justify-content: center;
+          }
         }
         &:nth-child(7) {
           width: 10%;
