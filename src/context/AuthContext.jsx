@@ -1,13 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import {
-  supabase,
-  MostrarUsuarios,
-  InsertarEmpresa,
-  InsertarAdmin,
-  MostrarTipoDocumentos,
-  MostrarRolesXnombre,
-} from "../index";
+import { supabase, MostrarUsuarios } from "../index";
 
 const AuthContext = createContext();
 
@@ -32,7 +25,7 @@ export const AuthContextProvider = ({ children }) => {
         // AQUÍ ESTÁ LA CLAVE: Redirigir después de login exitoso
         // Solo redirigir si estamos en la página de login
         if (location.pathname === "/login") {
-          navigate("/"); // o la ruta principal que quieras
+          navigate("/dashboard"); // o la ruta principal que quieras
           // Puedes cambiar "/" por "/dashboard" o la ruta que prefieras
         }
       }
@@ -49,7 +42,7 @@ export const AuthContextProvider = ({ children }) => {
       if (response) {
         return;
       } else {
-        const responseEmpresa = await InsertarEmpresa({
+        /*const responseEmpresa = await InsertarEmpresa({
           id_auth: id_auth,
         });
         const responseTipoDoc = await MostrarTipoDocumentos({
@@ -64,7 +57,7 @@ export const AuthContextProvider = ({ children }) => {
           fecharegistro: new Date(),
           id_auth: id_auth,
         };
-        await InsertarAdmin(pUser);
+        await InsertarAdmin(pUser);*/
       }
     } catch (error) {
       console.error("Error al insertar datos:", error);

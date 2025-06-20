@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+{
+  /*import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { v } from "../../../styles/variables";
 import {
@@ -265,3 +266,5 @@ const PictureContainer = styled.div`
     display: none;
   }
 `;
+*/
+}

@@ -1,4 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
+{
+  /*import { useQuery } from "@tanstack/react-query";
 import {
   CategoriasTemplate,
   Spinner,
@@ -21,4 +22,6 @@ export function Categorias() {
     return <span>Error...</span>;
   }
   return <CategoriasTemplate />;
+}
+*/
 }

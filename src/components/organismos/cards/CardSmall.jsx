@@ -5,7 +5,7 @@ import { v } from "../../../styles/variables";
 export function CardSmall({
   funcion,
   titulo,
-  data = [], // Datos dinámicos
+  data = [],
   bgcolor,
   icono,
   url,
@@ -15,6 +15,8 @@ export function CardSmall({
   width,
   loading = false,
   emptyMessage = "No hay datos disponibles",
+  children,
+  headerButton, // 👈 NUEVO PROP para el botón del header
 }) {
   return (
     <Container
@@ -26,9 +28,15 @@ export function CardSmall({
       onClick={funcion}
     >
       <section className="content">
-        <h2>{titulo}</h2>
+        {/* Header con título y botón opcional */}
+        <div className="header">
+          <h2>{titulo}</h2>
+          {headerButton && <div className="header-button">{headerButton}</div>}
+        </div>
 
-        {loading ? (
+        {children ? (
+          children // 👈 MOSTRAR EL CHILD CUSTOMIZADO
+        ) : loading ? (
           <div className="loading">
             <p>Cargando...</p>
           </div>
@@ -75,6 +83,36 @@ const Container = styled.div`
     padding: 10px 0;
   }
 
+  /* 👈 NUEVO: Estilos para el header */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+
+    h2 {
+      display: inline-block;
+      margin: 0;
+      padding: 0;
+      font-size: 20px;
+      font-weight: 600;
+      img {
+        width: 20px;
+      }
+    }
+
+    .header-button {
+      button {
+        .content {
+          flex-direction: row;
+          padding-top: 0;
+          padding-bottom: 0;
+        }
+      }
+    }
+  }
+
+  /* 👈 MANTENER h2 para compatibilidad cuando no hay headerButton */
   h2 {
     margin: 0 0 10px 0;
     padding: 0;

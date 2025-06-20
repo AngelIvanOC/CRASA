@@ -12,7 +12,7 @@ import { v } from "../../styles/variables";
 import { Device } from "../../styles/breakpoints";
 
 export function LoginTemplate() {
-  const { loginGoogle, loginDirecto, loading } = useAuthStore();
+  const { loginDirecto, loading } = useAuthStore();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -29,7 +29,6 @@ export function LoginTemplate() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     await loginDirecto(formData.email, formData.password);
-    // La redirección la maneja AuthContext automáticamente
   };
 
   return (
@@ -77,18 +76,6 @@ export function LoginTemplate() {
             disabled={loading}
           />
         </form>
-
-        <Linea>
-          <span>o</span>
-        </Linea>
-
-        <Btnsave
-          funcion={loginGoogle}
-          titulo="Google"
-          bgcolor="#fff"
-          icono={<v.iconogoogle />}
-          disabled={loading}
-        />
       </div>
 
       <Footer />
