@@ -1,8 +1,10 @@
 export const parseInvoiceData = (text) => {
+  const primeraLinea = text.split("\n")[0].trim();
+
+  if (/^CRASA/i.test(primeraLinea)) return parseCrasa(text);
   if (/Con Alimentos S.A. de C.V./i.test(text)) return parseCon(text);
-  if (/CRASA/i.test(text)) return parseCrasa(text);
-  if (/JUMEX/i.test(text)) return parseJumex(text);
   if (/lacostena/i.test(text)) return parseCostena(text);
+  if (/JUMEX/i.test(text)) return parseJumex(text);
 
   console.warn("Formato de factura desconocido");
   return null;
@@ -152,6 +154,18 @@ const parseCrasa = (text) => {
 
   const productos = [];
 
+  const palabrasProhibidas = [
+    "INFORMACION BANCARIA",
+    "Tipo de moneda",
+    "Serie",
+    "RFC",
+    "Referencia",
+    "Folio",
+    "Uso del",
+  ];
+
+  const regexProhibido = new RegExp(`^(${palabrasProhibidas.join("|")})`, "i");
+
   // Dividir en líneas y limpiar
   const lineas = text
     .split("\n")
@@ -162,7 +176,7 @@ const parseCrasa = (text) => {
     const linea = lineas[i];
 
     // Patrón 1: C#### - DESCRIPCION (puede continuar en líneas siguientes)
-    const patron1 = linea.match(/^C(\d{4,5})\s*-\s*(.+)$/);
+    const patron1 = linea.match(/^C?(\d{3,7})\s*-\s*(.+)$/);
     if (patron1) {
       const codigo = parseInt(patron1[1]);
       let descripcion = patron1[2].trim();
@@ -179,7 +193,7 @@ const parseCrasa = (text) => {
           siguienteLinea.match(/^[\d.]+\s+Kg$/) || // Peso
           siguienteLinea.match(/^\d{8}$/) || // Código SAT
           siguienteLinea === "Caj XBX" || // Indicador cantidad
-          siguienteLinea.match(/^C\d{4,5}/) || // Siguiente producto
+          siguienteLinea.match(/^C?\d{3,7}/) || // Siguiente producto
           siguienteLinea.includes("Obj. Imp:") // Objeto impuesto
         ) {
           break;
@@ -206,6 +220,15 @@ const parseCrasa = (text) => {
 
       const cantidad = buscarCantidad(lineas, i);
 
+      // Validar que la descripción no esté vacía ni empiece con número
+      if (
+        !descripcion ||
+        /^\d/.test(descripcion) ||
+        regexProhibido.test(descripcion)
+      ) {
+        continue;
+      }
+
       productos.push({
         codigo: codigo,
         descripcion: normalizeText(descripcion),
@@ -216,13 +239,21 @@ const parseCrasa = (text) => {
     }
 
     // Patrón 2: C#### solo (descripción en líneas siguientes)
-    const patron2 = linea.match(/^C(\d{4,5})$/);
+    const patron2 = linea.match(/^C?(\d{3,7})$/);
     if (patron2) {
       const codigo = parseInt(patron2[1]);
 
       // Recoger descripción de las siguientes líneas hasta encontrar un delimitador
       const descripcion = construirDescripcion(lineas, i + 1);
       const cantidad = buscarCantidad(lineas, i);
+
+      if (
+        !descripcion ||
+        /^\d/.test(descripcion) ||
+        regexProhibido.test(descripcion)
+      ) {
+        continue;
+      }
 
       productos.push({
         codigo: codigo,
@@ -293,6 +324,7 @@ const parseCrasa = (text) => {
     .sort((a, b) => a.codigo - b.codigo);
 
   const cantidadProductos = productosUnicos.length;
+  console.log(productosUnicos);
   const cantidadTotal = productosUnicos.reduce((sum, p) => sum + p.cantidad, 0);
 
   console.log(`Productos extraídos: ${cantidadProductos}`);

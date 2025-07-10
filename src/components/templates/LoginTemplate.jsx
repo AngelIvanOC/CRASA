@@ -8,11 +8,13 @@ import {
   Footer,
   useAuthStore,
 } from "../../index";
+import { useNavigate } from "react-router-dom";
 import { v } from "../../styles/variables";
 import { Device } from "../../styles/breakpoints";
 
 export function LoginTemplate() {
   const { loginDirecto, loading } = useAuthStore();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -28,7 +30,10 @@ export function LoginTemplate() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await loginDirecto(formData.email, formData.password);
+    const success = await loginDirecto(formData.email, formData.password);
+    if (success) {
+      navigate("/"); // o la ruta que corresponda
+    }
   };
 
   return (

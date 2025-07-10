@@ -1,15 +1,12 @@
 import styled from "styled-components";
 import {
   ContentAccionesTabla,
-  useProductosStore,
   Paginacion,
+  ImagenContent,
   Icono,
 } from "../../../index";
-import Swal from "sweetalert2";
 import { v } from "../../../styles/variables";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-
 import {
   flexRender,
   getCoreRowModel,
@@ -19,101 +16,44 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { FaCaretDown, FaCaretUp } from "react-icons/fa6";
-import { useCajasStore } from "../../../store/useCajasStore"; // al inicio
 
-export function TablaProductos({
-  data,
-  SetopenRegistro,
-  setdataSelect,
-  setAccion,
-}) {
-  if (data == null) return;
-
-  const [pagina, setPagina] = useState(1);
-  const [datas, setData] = useState(data);
+export function TablaCajas({ data }) {
   const [columnFilters, setColumnFilters] = useState([]);
-  const { eliminarProducto } = useProductosStore();
-
-  const navigate = useNavigate();
-
-  function eliminar(p) {
-    Swal.fire({
-      title: "¿Estás seguro?",
-      text: "¡No podrás revertir esto!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Sí, eliminarlo",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        await eliminarProducto({ id: p.id });
-      }
-    });
-  }
-
-  function editar(data) {
-    SetopenRegistro(true);
-    setdataSelect(data);
-    setAccion("Editar");
-  }
-
-  function verCajas(producto) {
-    useCajasStore.getState().obtenerCajasPorProducto(producto.id);
-  }
-
-  const handleVerCajas = (producto) => {
-    navigate(`/almacen/${producto.id}/cajas`);
-  };
 
   const columns = [
     {
-      accessorKey: "codigo",
-      header: "#",
-      cell: (info) => <span>{info.getValue()}</span>,
-    },
-    {
-      accessorKey: "nombre",
-      header: "NOMBRE",
-      cell: (info) => <span>{info.getValue()}</span>,
-    },
-    {
-      accessorKey: "marcas.nombre",
-      header: "MARCA",
+      accessorKey: "codigo_barras",
+      header: "CÓDIGO BARRAS",
       cell: (info) => <span>{info.getValue() || "-"}</span>,
-    },
-    {
-      accessorKey: "cajas",
-      header: "CAJAS",
-      cell: (info) => <span>{info.getValue() || 0}</span>,
     },
     {
       accessorKey: "cantidad",
       header: "CANTIDAD",
-      cell: (info) => <span>{info.getValue() || 0}</span>,
+      cell: (info) => <span>{info.getValue()}</span>,
     },
     {
-      accessorKey: "racks.codigo_rack",
-      header: "RACK",
+      accessorKey: "fecha_caducidad",
+      header: "CADUCIDAD",
       cell: (info) => <span>{info.getValue() || "-"}</span>,
     },
     {
-      accessorKey: "acciones",
-      header: "",
-      enableSorting: false,
-      cell: (info) => (
-        <ContentAccionesTabla
-          funcionEditar={() => editar(info.row.original)}
-          funcionEliminar={() => eliminar(info.row.original)}
-          funcionVer={() => handleVerCajas(info.row.original)}
-        />
-      ),
+      accessorKey: "racks.codigo_rack",
+      header: "UBICACIÓN",
+      cell: (info) => <span>{info.getValue() || "-"}</span>,
+    },
+    {
+      accessorKey: "fecha_entrada",
+      header: "ENTRADA",
+      cell: (info) => <span>{info.getValue()?.split("T")[0] || "-"}</span>,
     },
   ];
 
   const table = useReactTable({
-    data,
+    data: data || [],
     columns,
+    state: {
+      columnFilters,
+    },
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -123,19 +63,6 @@ export function TablaProductos({
       pagination: {
         pageSize: 10,
       },
-    },
-    meta: {
-      updateData: (rowIndex, columnId, value) =>
-        setData((prev) =>
-          prev.map((row, index) =>
-            index === rowIndex
-              ? {
-                  ...prev[rowIndex],
-                  [columnId]: value,
-                }
-              : row
-          )
-        ),
     },
   });
 
@@ -239,7 +166,7 @@ const Container = styled.div`
             align-items: center;
             line-height: 1;
             color: gray;
-            /* Estilos para los iconos activos */
+
             .active {
               color: black;
             }
@@ -254,52 +181,43 @@ const Container = styled.div`
       overflow-y: auto;
       width: 100%;
 
-      scrollbar-width: none; /* Firefox */
+      scrollbar-width: none;
       &::-webkit-scrollbar {
-        display: none; /* Chrome, Safari y Edge */
+        display: none;
       }
 
       tr {
-        display: table; /* CLAVE: Mantener comportamiento de tabla */
-        width: 100%; /* CLAVE: Forzar ancho completo */
-        table-layout: fixed; /* CLAVE: Layout fijo para distribución equitativa */
+        display: table;
+        width: 100%;
+        table-layout: fixed;
         border-bottom: 1px solid #eaecf0;
 
         td {
           padding: 9px 15px;
           text-align: left;
           color: ${(props) => props.theme.textsecundario};
-          display: table-cell; /* CLAVE: Mantener comportamiento de celda */
+          display: table-cell;
           vertical-align: middle;
 
-          /* Distribución específica por columna */
           &:nth-child(1) {
-            width: 10%;
-          } /* Código */
+            width: 20%;
+          }
           &:nth-child(2) {
-            width: 40%;
-          } /* Nombre */
+            width: 10%;
+          }
           &:nth-child(3) {
-            width: 15%;
-          } /* Marca */
+            width: 20%;
+          }
           &:nth-child(4) {
-            width: 10%;
-          } /* Cajas */
+            width: 20%;
+          }
           &:nth-child(5) {
-            width: 10%;
-          } /* Cantidad */
-          &:nth-child(6) {
-            width: 7%;
-          } /* Racks */
-          &:nth-child(7) {
-            width: 8%;
-            text-align: center; /* Centrar acciones */
-          } /* Acciones */
+            width: 20%;
+          }
         }
       }
     }
 
-    /* Asegurar que thead tenga la misma distribución */
     thead tr {
       display: table;
       width: 100%;
@@ -307,30 +225,23 @@ const Container = styled.div`
 
       th {
         &:nth-child(1) {
-          width: 10%;
+          width: 20%;
         }
         &:nth-child(2) {
-          width: 40%;
+          width: 10%;
         }
         &:nth-child(3) {
-          width: 15%;
+          width: 20%;
         }
         &:nth-child(4) {
-          width: 10%;
+          width: 20%;
         }
         &:nth-child(5) {
-          width: 10%;
-        }
-        &:nth-child(6) {
-          width: 7%;
-        }
-        &:nth-child(7) {
-          width: 8%;
+          width: 20%;
         }
       }
     }
 
-    /* Estilos para el resizer */
     .resizer {
       position: absolute;
       right: 0;

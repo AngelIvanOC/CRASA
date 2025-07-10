@@ -4,6 +4,8 @@ import {
   MostrarRacksPorMarca,
   MostrarComprasPorMarca,
   MostrarProductosPorMarca,
+  MostrarProximosACaducar,
+  MostrarPedidosActivos
 } from "../supabase/crudDashboard";
 
 export const useDashboardStore = create((set, get) => ({
@@ -12,12 +14,16 @@ export const useDashboardStore = create((set, get) => ({
   dataRacks: [],
   dataCompras: [],
   dataProductos: [],
+  dataCaducar: [],
+  dataPedidosActivos: [],
 
   // Estados de carga
   loadingVentas: false,
   loadingRacks: false,
   loadingCompras: false,
   loadingProductos: false,
+  loadingCaducar: false,
+  loadingPedidosActivos: false,
 
   // Estado general de carga
   loading: false,
@@ -86,6 +92,32 @@ export const useDashboardStore = create((set, get) => ({
     }
   },
 
+  mostrarProximosCaducar: async () => {
+    set({ loadingCaducar: true });
+    try {
+      const data = await MostrarProximosACaducar();
+      set({ dataCaducar: data });
+    } catch (error) {
+      console.error("Error al cargar próximos a caducar:", error);
+      set({ dataCaducar: [] });
+    } finally {
+      set({ loadingCaducar: false });
+    }
+  },
+
+  mostrarPedidosActivos: async () => {
+    set({ loadingPedidosActivos: true });
+    try {
+      const data = await MostrarPedidosActivos();
+      set({ dataPedidosActivos: data });
+    } catch (error) {
+      console.error("Error al mostrar pedidos activos:", error);
+      set({ dataPedidosActivos: [] });
+    } finally {
+      set({ loadingPedidosActivos: false });
+    }
+  },
+
   // Función para cargar todos los datos del dashboard
   cargarDatosDashboard: async () => {
     set({ loading: true });
@@ -94,6 +126,8 @@ export const useDashboardStore = create((set, get) => ({
       mostrarRacksPorMarca,
       mostrarComprasPorMarca,
       mostrarProductosPorMarca,
+      mostrarProximosCaducar,
+      mostrarPedidosActivos,
     } = get();
 
     try {
@@ -102,6 +136,8 @@ export const useDashboardStore = create((set, get) => ({
         mostrarRacksPorMarca(),
         mostrarComprasPorMarca(),
         mostrarProductosPorMarca(),
+        mostrarProximosCaducar(),
+        mostrarPedidosActivos(),
       ]);
     } catch (error) {
       console.error("Error al cargar datos del dashboard:", error);

@@ -24,7 +24,7 @@ export const LinksArray = [
   {
     label: "Dashboard",
     icon: "fa6-solid:chart-line",
-    to: "/dashboard",
+    to: "/",
   },
   {
     label: "Almacen",
@@ -51,7 +51,7 @@ export const SecondarylinksArray = [
   {
     label: "Salir",
     icon: "mingcute:align-arrow-left-fill",
-    to: "/",
+    to: "/salir",
   },
 ];
 //temas

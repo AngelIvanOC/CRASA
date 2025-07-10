@@ -81,3 +81,8 @@ export * from "./utils/invoiceParsers";
 export * from "./components/moleculas/PdfUploader";
 export * from "./components/moleculas/VentaForm";
 export * from "./services/ventaService";
+
+//Cajas
+export * from "./pages/CajasProducto";
+export * from "./components/templates/CajasProductoTemplate";
+export * from "./components/organismos/tablas/TablaCajas";

@@ -9,32 +9,24 @@ export const AuthContextProvider = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [loadingSession, setLoadingSession] = useState(true);
+
   useEffect(() => {
-    const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session == null) {
-        setUser(null);
-        // Si no hay sesión y no estamos en login, redirigir
-        if (location.pathname !== "/login") {
-          navigate("/login");
-        }
+    const checkSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (session?.user) {
+        setUser(session.user);
       } else {
-        setUser(session?.user);
-        console.log("session", session.user.id);
-        await insertarDatos(session?.user.id, session?.user.email);
-
-        // AQUÍ ESTÁ LA CLAVE: Redirigir después de login exitoso
-        // Solo redirigir si estamos en la página de login
-        if (location.pathname === "/login") {
-          navigate("/dashboard"); // o la ruta principal que quieras
-          // Puedes cambiar "/" por "/dashboard" o la ruta que prefieras
-        }
+        setUser(null);
       }
-    });
-
-    return () => {
-      data.subscription.unsubscribe();
+      setLoadingSession(false); // <- ya está lista la sesión
     };
-  }, [navigate, location.pathname]);
+
+    checkSession();
+  }, []);
 
   const insertarDatos = async (id_auth, correo) => {
     try {

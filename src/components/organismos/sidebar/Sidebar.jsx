@@ -3,8 +3,13 @@ import { LinksArray, SecondarylinksArray, ToggleTema } from "../../../index";
 import { v } from "../../../styles/variables";
 import { NavLink } from "react-router-dom";
 import { Icon } from "@iconify/react";
+import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../../../store/AuthStore";
 
 export function Sidebar({ state, setState }) {
+  const { cerrarSesion } = useAuthStore();
+  const navigate = useNavigate();
+
   return (
     <Main $isopen={state.toString()}>
       <Container $isopen={state.toString()} className={state ? "active" : ""}>
@@ -42,6 +47,12 @@ export function Sidebar({ state, setState }) {
           <div
             className={state ? "LinkContainer active" : "LinkContainer"}
             key={label}
+            onClick={() => {
+              if (label === "Salir") {
+                cerrarSesion(); // Ejecuta tu función
+                navigate("/login"); // Opcional: Redirige al login
+              }
+            }}
           >
             <NavLink
               to={to}

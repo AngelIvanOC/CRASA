@@ -192,6 +192,7 @@ export function RegistrarProductos({
                   <label className="form__label">Marca</label>
                 </InputText>
               </article>
+              {/** 
 
               <article>
                 <InputText icono={<v.iconoFlechabajo />}>
@@ -238,7 +239,7 @@ export function RegistrarProductos({
                   <label className="form__label">Rack</label>
                 </InputText>
               </article>
-
+*/}
               <Btnsave
                 icono={<v.iconoguardar />}
                 titulo="Guardar"

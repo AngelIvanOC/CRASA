@@ -12,11 +12,13 @@ import {
   UserAuth,
   useUsuariosStore,
   ProductosVenta,
+  CajasProducto,
 } from "../index";
 import { useQuery } from "@tanstack/react-query";
 export function MyRoutes() {
-  const { user } = UserAuth();
+  const { user, loadingSession } = UserAuth();
   const { dataUsuarios, mostrarusuarios } = useUsuariosStore();
+
   //const { mostrarempresa, dataempresa } = useEmpresaStore();
   const { isLoading, error } = useQuery({
     queryKey: "mostrar usuarios",
@@ -30,6 +32,10 @@ export function MyRoutes() {
     refetchOnWindowFocus: false,
   });*/
 
+  if (loadingSession) {
+    return <Spinner />; // spinner global mientras Supabase decide
+  }
+
   if (isLoading) {
     return <Spinner />;
   }
@@ -39,11 +45,11 @@ export function MyRoutes() {
   return (
     <Routes>
       <Route element={<ProtectedRoute user={user} redirectTo="/login" />}>
-        <Route path="/" element={<Home />} />
         <Route path="/configuracion" element={<Configuracion />} />
         {/*<Route path="/configuracion/categorias" element={<Categorias />} />*/}
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/" element={<Dashboard />} />
         <Route path="/almacen" element={<Almacen />} />
+        <Route path="/almacen/:productoId/cajas" element={<CajasProducto />} />
         <Route path="/racks" element={<Racks />} />
         <Route path="/ventas" element={<Ventas />} />
         <Route

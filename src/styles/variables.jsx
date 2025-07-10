@@ -13,9 +13,17 @@ import { FaReact } from "react-icons/fa";
 import { BsArrowDown, BsArrowUpShort } from "react-icons/bs";
 import { FaBalanceScale } from "react-icons/fa";
 import logo from "../assets/crasa.avif";
-import emojiAlmacen from "../assets/emojiAlmacen.svg";
+import compras from "../assets/compras.svg";
 import emojiCompras from "../assets/emojiCompras.svg";
+
+import racks from "../assets/racks.svg";
 import emojiRacks from "../assets/emojiRacks.svg";
+
+import ventas from "../assets/ventas.svg";
+import emojiVentas from "../assets/emojiVentas.svg";
+
+import emojiAlmacen from "../assets/emojiAlmacen.svg";
+
 import { FcGoogle } from "react-icons/fc";
 
 import { FaBars } from "react-icons/fa6";
@@ -117,9 +125,16 @@ export const v = {
   felchaizquierdalarga: FaArrowLeft,
   balance: FaBalanceScale,
   logo: logo,
-  emojiAlmacen: emojiAlmacen,
+  compras: compras,
   emojiCompras: emojiCompras,
+
+  racks: racks,
   emojiRacks: emojiRacks,
+
+  ventas: ventas,
+  emojiVentas: emojiVentas,
+
+  emojiAlmacen: emojiAlmacen,
   iconogoogle: FcGoogle,
   iconocerrar: RiCloseLine,
   iconoguardar: BiSave,

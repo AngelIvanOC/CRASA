@@ -151,6 +151,25 @@ export function RegistrarVenta({
             />
           )}
 
+          {extractedData?.rawText && (
+            <div
+              style={{
+                whiteSpace: "pre-wrap",
+                maxHeight: "200px",
+                overflowY: "auto",
+                backgroundColor: "#f5f5f5",
+                padding: "10px",
+                borderRadius: "8px",
+                marginTop: "15px",
+              }}
+            >
+              <h3 style={{ marginBottom: "8px", color: "#666" }}>
+                Texto extraído del PDF:
+              </h3>
+              <p>{extractedData.rawText}</p>
+            </div>
+          )}
+
           <form className="formulario" onSubmit={handleSubmit(handlesub)}>
             {/* Componente del formulario */}
             <VentaForm
