@@ -151,6 +151,7 @@ export function RegistrarVenta({
             />
           )}
 
+          {/** 
           {extractedData?.rawText && (
             <div
               style={{
@@ -169,7 +170,7 @@ export function RegistrarVenta({
               <p>{extractedData.rawText}</p>
             </div>
           )}
-
+*/}
           <form className="formulario" onSubmit={handleSubmit(handlesub)}>
             {/* Componente del formulario */}
             <VentaForm

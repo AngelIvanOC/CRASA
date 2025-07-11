@@ -11,7 +11,7 @@ export const parseInvoiceData = (text) => {
 };
 
 const parseJumex = (text) => {
-  console.log(text);
+  //console.log(text);
   const pedidoMatch = text.match(/Folio [\s\n]*(\d+)/i);
   const fechaMatch = text.match(/(\d{4}-\d{2}-\d{2})T\d{2}:\d{2}:\d{2}/);
   const totalMatch = text.match(/Total[\s\n\$]*([\d,]+\.\d{2})/);
@@ -75,7 +75,7 @@ const parseJumex = (text) => {
 };
 
 const parseCon = (text) => {
-  console.log("texto extraido", text);
+  //console.log("texto extraido", text);
   const pedidoMatch = text.match(/\s*\n*\n(\d{10})/);
   const fechaMatch = text.match(/(\d{4}-\d{2}-\d{2})T\d{2}:\d{2}:\d{2}/);
   const totalMatch = text.match(/Total[\s\n\$]*([\d,]+\.\d{2})/);
@@ -343,7 +343,7 @@ const parseCrasa = (text) => {
 };
 
 const parseCostena = (text) => {
-  console.log(text);
+  //console.log(text);
 
   const pedidoMatch = text.match(/\s*\n*\s*(\d{10})/);
   const fechaMatch = text.match(/(\d{4}-\d{2}-\d{2})T\d{2}:\d{2}:\d{2}/);

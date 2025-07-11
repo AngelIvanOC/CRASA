@@ -1,7 +1,9 @@
 import styled from "styled-components";
 import { useEffect } from "react";
 import { CardSmall } from "../organismos/cards/CardSmall";
+import { CardPedidosFecha } from "../organismos/cards/CardPedidosFecha";
 import { useDashboardStore } from "../../store/DashboardStore";
+import { CardEntradas } from "../organismos/cards/CardEntradas";
 import { v } from "../../styles/variables";
 import { Device } from "../../styles/breakpoints";
 
@@ -14,12 +16,18 @@ export function DashboardTemplate() {
     dataProductos,
     dataCaducar,
     dataPedidosActivos,
+    dataMovimientos,
+    dataPedidosFecha,
+    dataEntradas,
     loadingVentas,
     loadingRacks,
     loadingCompras,
     loadingProductos,
     loadingCaducar,
     loadingPedidosActivos,
+    loadingMovimientos,
+    loadingPedidosFecha,
+    loadingEntradas,
     loading,
     cargarDatosDashboard,
   } = useDashboardStore();
@@ -163,15 +171,48 @@ export function DashboardTemplate() {
             )}
           </CardSmall>
           <div className="span-2">
-            <CardSmall titulo="Movimientos" />
+            <CardSmall
+              titulo="Movimientos Recientes"
+              loading={loadingMovimientos}
+            >
+              {dataMovimientos.length > 0 ? (
+                <div className="movimientos-table">
+                  <div className="table-header">
+                    <span># Codigo</span>
+                    <span>Cantidad</span>
+                    <span>Almacén</span>
+                    <span>Día</span>
+                    <span>Tipo</span>
+                  </div>
+                  {dataMovimientos.map((mov, index) => (
+                    <div key={index} className="table-row">
+                      <span className="pedido">{mov.pedido}</span>
+                      <span className="cantidad">{mov.cantidad}</span>
+                      <span className="almacen">{mov.marca}</span>
+                      <span className="dia">{mov.dia}</span>
+                      <span className={`tipo ${mov.tipo}`}>
+                        {mov.tipo === "entrada" ? "📦" : "📤"}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="empty">
+                  <p>No hay movimientos recientes</p>
+                </div>
+              )}
+            </CardSmall>
           </div>
         </section>
 
         <section className="main">
           <div className="span-1">
-            <CardSmall titulo="Estadísticas" />
+            <CardPedidosFecha
+              data={dataPedidosFecha}
+              loading={loadingPedidosFecha}
+            />
           </div>
-          <CardSmall titulo="Alertas" />
+          <CardEntradas data={dataEntradas} loading={loadingEntradas} />
         </section>
       </section>
     </Container>
@@ -209,6 +250,49 @@ const Container = styled.div`
       gap: 15px;
       .span-2 {
         grid-column: span 2;
+
+        .movimientos-table {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          font-size: 11px;
+
+          .table-header {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr 1fr 0.5fr;
+            gap: 8px;
+            padding: 0 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            color: #9291a5;
+            font-size: 15px;
+            text-transform: uppercase;
+          }
+
+          .table-row {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr 1fr 0.5fr;
+            gap: 8px;
+            padding: 0 12px;
+            align-items: center;
+            color: #000;
+            font-size: 14px;
+            font-weight: bold;
+
+            .tipo {
+              text-align: center;
+              font-size: 14px;
+
+              &.entrada {
+                filter: hue-rotate(200deg);
+              }
+
+              &.venta {
+                filter: hue-rotate(0deg);
+              }
+            }
+          }
+        }
       }
     }
 

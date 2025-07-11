@@ -5,7 +5,10 @@ import {
   MostrarComprasPorMarca,
   MostrarProductosPorMarca,
   MostrarProximosACaducar,
-  MostrarPedidosActivos
+  MostrarPedidosActivos,
+  MostrarMovimientosRecientes,
+  MostrarPedidosPorFecha,
+  MostrarEntradasPorSemana,
 } from "../supabase/crudDashboard";
 
 export const useDashboardStore = create((set, get) => ({
@@ -16,6 +19,9 @@ export const useDashboardStore = create((set, get) => ({
   dataProductos: [],
   dataCaducar: [],
   dataPedidosActivos: [],
+  dataMovimientos: [],
+  dataPedidosFecha: [],
+  dataEntradas: [],
 
   // Estados de carga
   loadingVentas: false,
@@ -24,6 +30,9 @@ export const useDashboardStore = create((set, get) => ({
   loadingProductos: false,
   loadingCaducar: false,
   loadingPedidosActivos: false,
+  loadingMovimientos: false,
+  loadingPedidosFecha: false,
+  loadingEntradas: false,
 
   // Estado general de carga
   loading: false,
@@ -118,6 +127,49 @@ export const useDashboardStore = create((set, get) => ({
     }
   },
 
+  mostrarMovimientosRecientes: async () => {
+    set({ loadingMovimientos: true });
+    try {
+      const data = await MostrarMovimientosRecientes();
+      set({ dataMovimientos: data });
+    } catch (error) {
+      console.error("Error al cargar movimientos recientes:", error);
+      set({ dataMovimientos: [] });
+    } finally {
+      set({ loadingMovimientos: false });
+    }
+  },
+
+  mostrarPedidosPorFecha: async () => {
+    set({ loadingPedidosFecha: true });
+    try {
+      const response = await MostrarPedidosPorFecha();
+      set({ dataPedidosFecha: response });
+      return response;
+    } catch (error) {
+      console.error("Error al mostrar pedidos por fecha:", error);
+      set({ dataPedidosFecha: [] });
+      return [];
+    } finally {
+      set({ loadingPedidosFecha: false });
+    }
+  },
+
+  mostrarEntradasPorSemana: async () => {
+    set({ loadingEntradas: true });
+    try {
+      const response = await MostrarEntradasPorSemana();
+      set({ dataEntradas: response });
+      return response;
+    } catch (error) {
+      console.error("Error al mostrar entradas por semana:", error);
+      set({ dataEntradas: { data: [], total: 0 } });
+      return { data: [], total: 0 };
+    } finally {
+      set({ loadingEntradas: false });
+    }
+  },
+
   // Función para cargar todos los datos del dashboard
   cargarDatosDashboard: async () => {
     set({ loading: true });
@@ -128,6 +180,9 @@ export const useDashboardStore = create((set, get) => ({
       mostrarProductosPorMarca,
       mostrarProximosCaducar,
       mostrarPedidosActivos,
+      mostrarMovimientosRecientes,
+      mostrarPedidosPorFecha,
+      mostrarEntradasPorSemana,
     } = get();
 
     try {
@@ -138,6 +193,9 @@ export const useDashboardStore = create((set, get) => ({
         mostrarProductosPorMarca(),
         mostrarProximosCaducar(),
         mostrarPedidosActivos(),
+        mostrarMovimientosRecientes(),
+        mostrarPedidosPorFecha(),
+        mostrarEntradasPorSemana(),
       ]);
     } catch (error) {
       console.error("Error al cargar datos del dashboard:", error);

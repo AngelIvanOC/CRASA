@@ -94,7 +94,7 @@ const Container = styled.div`
       display: inline-block;
       margin: 0;
       padding: 0;
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 600;
       img {
         width: 20px;
