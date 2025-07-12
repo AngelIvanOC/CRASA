@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { v } from "../../../styles/variables";
 import styled from "styled-components";
 import { Btnpaginacion } from "../../../index";
+import { Device } from "../../../index";
 
 export const Paginacion = ({ table }) => {
   const opciones = [10, 20, 30, 50, 100]; // Opciones de filas por página
@@ -111,20 +112,5 @@ const Container = styled.div`
   .info-registros {
     font-size: 14px;
     color: ${({ theme }) => theme.textsecundario};
-  }
-
-  /* Responsive */
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 10px;
-
-    .filas-por-pagina,
-    .info-registros {
-      order: 3;
-    }
-
-    .paginacion {
-      order: 2;
-    }
   }
 `;

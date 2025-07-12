@@ -7,6 +7,9 @@ import {
 import { v } from "../../../styles/variables";
 import { useState, useEffect } from "react";
 import { FaEye } from "react-icons/fa";
+import { Icon } from "@iconify/react";
+import { Device } from "../../../index";
+
 import { FaCaretDown, FaCaretUp } from "react-icons/fa6";
 import {
   useReactTable,
@@ -85,7 +88,7 @@ export function TablaVentas({
   const columns = [
     {
       accessorKey: "codigo",
-      header: "# PEDIDO",
+      header: "# CODIGO",
       cell: (info) => <span>{info.getValue()}</span>,
     },
     {
@@ -100,7 +103,7 @@ export function TablaVentas({
     },
     {
       accessorKey: "cantidad_total",
-      header: "CANT. TOTAL",
+      header: "TOTAL",
       cell: (info) => <span>{info.getValue() || 0}</span>,
     },
     {
@@ -122,7 +125,7 @@ export function TablaVentas({
             rel="noopener noreferrer"
             className="btn-ver-factura"
           >
-            <FaEye />
+            <Icon icon="line-md:document-twotone" />
           </a>
         ) : (
           <span>-</span>
@@ -233,13 +236,13 @@ export function TablaVentas({
 }
 
 const Container = styled.div`
-  height: 80vh;
+  height: 70vh;
 
   .responsive-table {
     width: 100%;
     border-collapse: collapse;
     font-family: Arial, sans-serif;
-    height: 75vh;
+    height: 55vh;
 
     thead {
       background-color: ${({ theme }) => theme.bgtotalFuerte};
@@ -281,7 +284,7 @@ const Container = styled.div`
 
     tbody {
       display: block;
-      max-height: 65vh;
+      max-height: 55vh;
       overflow-y: auto;
       width: 100%;
 
@@ -400,6 +403,18 @@ const Container = styled.div`
 
       &:hover {
         color: ${(props) => props.theme.colorPrincipal};
+      }
+    }
+  }
+
+  @media ${Device.tablet} {
+    height: 80vh;
+
+    .responsive-table {
+      height: 75vh;
+
+      tbody {
+        max-height: 65vh;
       }
     }
   }

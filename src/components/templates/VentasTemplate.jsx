@@ -9,6 +9,7 @@ import {
 } from "../../index";
 import { v } from "../../styles/variables";
 import { useState } from "react";
+import { Device } from "../../index";
 
 export function VentasTemplate() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -63,11 +64,11 @@ export function VentasTemplate() {
 }
 
 const Container = styled.div`
-  height: 100vh;
   display: flex;
   flex-direction: column;
   //justify-content: center;
-  padding: 0px 30px 0 0;
+  padding: 0 10px;
+  height: calc(100vh - 70px);
 
   .titulo {
     top: 0;
@@ -94,5 +95,10 @@ const Container = styled.div`
       height: 10vh;
       box-sizing: border-box;
     }
+  }
+
+  @media ${Device.tablet} {
+    height: 100vh;
+    padding: 0px 30px 0 0;
   }
 `;

@@ -23,7 +23,7 @@ export function ContentAccionesTabla({
           funcion={funcionEliminar}
           fontSize="20px"
           color="#f76e8e"
-          icono={<Icon icon="fluent-emoji-high-contrast:skull" />}
+          icono={<Icon icon="material-symbols:delete" />}
         />
       )}
       {funcionVer && (
@@ -40,7 +40,6 @@ export function ContentAccionesTabla({
 
 const Container = styled.div`
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
   gap: 10px;
   @media (max-width: 48em) {
