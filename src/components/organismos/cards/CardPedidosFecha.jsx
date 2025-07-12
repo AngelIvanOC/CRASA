@@ -21,7 +21,7 @@ export function CardPedidosFecha({ data, loading }) {
       <section className="content">
         {/* Header con título */}
         <div className="header">
-          <h2>Pedidos/Año</h2>
+          <h2>Pedidos/AñoAndy</h2>
         </div>
 
         {loading ? (
