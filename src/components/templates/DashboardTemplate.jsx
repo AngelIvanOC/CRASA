@@ -123,6 +123,8 @@ const Container = styled.div`
   .contenido {
     display: flex;
     flex-direction: column;
+    padding: 10px 10px;
+    gap: 15px;
   }
 
   .area1,
@@ -134,15 +136,16 @@ const Container = styled.div`
   }
 
   .main .span-1 {
-    min-height: 200px;
-  }
-
-  .main .span-1 {
     grid-column: auto;
   }
 
   .area2 .span-2 {
     grid-column: auto;
+  }
+
+  .main .span-1 {
+    min-height: 200px;
+    min-width: 200px;
   }
 
   @media ${Device.laptop} {

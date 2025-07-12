@@ -8,6 +8,7 @@ import {
   Tooltip,
 } from "recharts";
 import styled from "styled-components";
+import { Device } from "../../../styles/breakpoints";
 
 export function CardPedidosFecha({ data, loading }) {
   // Formatear datos para el gráfico
@@ -83,10 +84,10 @@ export function CardPedidosFecha({ data, loading }) {
 const Container = styled.div`
   background-color: ${({ theme }) => theme.bgtotal};
   border-radius: 10px;
-  height: 100%;
   box-shadow: -4px 0px 4px -2px rgba(0, 0, 0, 0.25),
     2px 2px 4px 0px rgba(0, 0, 0, 0.25);
   padding: 0 10px;
+  height: 200px;
 
   .content {
     height: 100%;
@@ -141,6 +142,10 @@ const Container = styled.div`
       opacity: 0.5;
     }
   }
+
+  @media ${Device.laptop} {
+    height: 100%;
+  }
 `;
 
 const ChartContainer = styled.div`
@@ -154,5 +159,9 @@ const ChartContainer = styled.div`
     .recharts-cartesian-grid-vertical line {
       stroke: #f0f0f0;
     }
+  }
+
+  @media ${Device.laptop} {
+    min-height: 100px;
   }
 `;
