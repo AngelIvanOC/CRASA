@@ -73,7 +73,10 @@ export async function MostrarComprasPorMarca() {
         `
         id,
         nombre,
-        compras(id)
+        productos(
+          nombre,
+          cajas (id)
+        )
       `
       )
       .order("nombre");
@@ -82,10 +85,16 @@ export async function MostrarComprasPorMarca() {
       console.warn("Tabla compras no encontrada o sin datos");
       return [];
     }
-    const comprasProcesadas = data.map((marca) => ({
-      nombre: marca.nombre,
-      cantidad: marca.compras.length,
-    }));
+    const comprasProcesadas = data.map((marca) => {
+      const totalCajas = marca.productos?.reduce((acc, producto) => {
+        return acc + (producto.cajas?.length || 0);
+      }, 0);
+
+      return {
+        nombre: marca.nombre,
+        cantidad: totalCajas,
+      };
+    });
     return comprasProcesadas;
   } catch (error) {
     console.error("Error en MostrarComprasPorMarca:", error);
@@ -144,7 +153,7 @@ export async function MostrarProximosACaducar() {
       new Date(new Date().setDate(new Date().getDate() + 15)).toISOString()
     )
     .order("fecha_caducidad", { ascending: true })
-    .limit(3);
+    .limit(4);
 
   if (error) {
     console.error("Error al cargar próximos a caducar:", error);
@@ -190,7 +199,7 @@ export async function MostrarMovimientosRecientes() {
       `
       )
       .order("fecha_entrada", { ascending: false })
-      .limit(3);
+      .limit(4);
 
     if (errorEntradas) {
       console.error("Error al cargar entradas:", errorEntradas);
@@ -212,7 +221,7 @@ export async function MostrarMovimientosRecientes() {
       )
       .eq("estado", "completado")
       .order("fecha", { ascending: false })
-      .limit(2);
+      .limit(4);
 
     if (errorVentas) {
       console.error("Error al cargar ventas:", errorVentas);
@@ -221,7 +230,7 @@ export async function MostrarMovimientosRecientes() {
     // Formatear entradas
     const entradasFormateadas = (entradas || []).map((entrada) => ({
       id: `E-${entrada.id}`,
-      pedido: entrada.codigo_barras || `E-${entrada.id}`,
+      pedido: entrada.codigo_barras,
       cantidad: entrada.cantidad || 0,
       almacen: entrada.racks?.nombre || "Sin asignar",
       fecha: entrada.fecha_entrada,
@@ -287,7 +296,7 @@ export async function MostrarPedidosActivos() {
     )
     .not("estado", "eq", "completado")
     .order("fecha", { ascending: false })
-    .limit(2);
+    .limit(4);
   if (error) {
     console.error("Error al cargar pedidos activos:", error);
     return [];

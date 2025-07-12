@@ -8,19 +8,23 @@ import {
   useThemeStore,
   Login,
 } from "./index";
+import SidebarMovile from "./components/organismos/sidebar/SidebarMovile";
 import { Device } from "./styles/breakpoints";
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // Estado para el menú móvil
   const { themeStyle } = useThemeStore();
   const { pathname } = useLocation();
   return (
     <ThemeProvider theme={themeStyle}>
       <AuthContextProvider>
         <GlobalStyles />
-        {pathname != "/login" ? (
+        {pathname === "/login" ? (
+          <Login />
+        ) : (
           <Container>
             <section className="contentSidebar">
               <Sidebar
@@ -28,13 +32,18 @@ function App() {
                 setState={() => setSidebarOpen(!sidebarOpen)}
               />
             </section>
-            <section className="contentMenuambur">menu ambur</section>
+            <section className="contentMenuambur">
+              <section className="contentNavbarMobile">
+                <SidebarMovile
+                  isOpen={mobileMenuOpen}
+                  setIsOpen={setMobileMenuOpen}
+                />
+              </section>
+            </section>
             <section className="contentRouters">
               <MyRoutes />
             </section>
           </Container>
-        ) : (
-          <Login />
         )}
         <ReactQueryDevtools initialIsOpen={true} />
       </AuthContextProvider>
@@ -60,6 +69,7 @@ const Container = styled.main`
     /*background-color: rgba(231,13, 136, 0.5);*/
     grid-template-columns: 1;
     width: 100%;
+    padding-top: 70px;
   }
   @media ${Device.tablet} {
     grid-template-columns: 125px 1fr;
@@ -72,6 +82,7 @@ const Container = styled.main`
     }
     .contentRouters {
       grid-column: 2;
+      padding-top: 0;
     }
   }
 `;

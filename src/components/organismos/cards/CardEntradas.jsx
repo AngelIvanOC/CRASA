@@ -96,7 +96,6 @@ const PieContainer = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
 
     .subtitle {
       color: #9291a5;
@@ -118,7 +117,7 @@ const PieContainer = styled.div`
     /* Efectos hover para las secciones del pie */
     .recharts-pie-sector:hover {
       opacity: 0.8;
-      transform: scale(1.05);
+      transform: scale(1.02);
       transition: all 0.2s ease;
     }
   }

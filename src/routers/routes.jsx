@@ -56,6 +56,7 @@ export function MyRoutes() {
           path="/ventas/:ventaId/productos"
           element={<ProductosVenta />}
         />{" "}
+        <Route path="*" element={<Dashboard />} />
       </Route>
       <Route path="/login" element={<Login />} />
     </Routes>

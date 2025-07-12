@@ -28,6 +28,19 @@ export const AuthContextProvider = ({ children }) => {
     checkSession();
   }, []);
 
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        setUser(session.user);
+      } else {
+        setUser(null);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
   const insertarDatos = async (id_auth, correo) => {
     try {
       const response = await MostrarUsuarios({ id_auth: id_auth });
@@ -57,7 +70,9 @@ export const AuthContextProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user }}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={{ user, loadingSession }}>
+      {children}
+    </AuthContext.Provider>
   );
 };
 
