@@ -69,6 +69,7 @@ const Container = styled.div`
   //justify-content: center;
   padding: 0 10px;
   height: calc(100vh - 70px);
+  box-sizing: border-box;
 
   .titulo {
     top: 0;
@@ -100,5 +101,6 @@ const Container = styled.div`
   @media ${Device.tablet} {
     height: 100vh;
     padding: 0px 30px 0 0;
+    box-sizing: initial;
   }
 `;

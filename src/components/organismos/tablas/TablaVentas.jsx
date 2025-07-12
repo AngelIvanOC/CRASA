@@ -374,7 +374,7 @@ const Container = styled.div`
       right: 0;
       top: 0;
       height: 100%;
-      width: 5px;
+      width: 0px;
       background: rgba(0, 0, 0, 0.5);
       cursor: col-resize;
       user-select: none;
@@ -415,6 +415,10 @@ const Container = styled.div`
 
       tbody {
         max-height: 65vh;
+      }
+
+      .resizer {
+        width: 5px;
       }
     }
   }
