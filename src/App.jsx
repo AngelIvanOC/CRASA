@@ -13,11 +13,20 @@ import { Device } from "./styles/breakpoints";
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { useSupabaseRealtime } from "./store/useSupabaseRealtime";
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // Estado para el menú móvil
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { themeStyle } = useThemeStore();
   const { pathname } = useLocation();
+  useSupabaseRealtime([
+    "productos",
+    "ventas",
+    "cajas",
+    "detalle_ventas",
+    "racks",
+  ]);
+
   return (
     <ThemeProvider theme={themeStyle}>
       <AuthContextProvider>
@@ -76,6 +85,7 @@ const Container = styled.main`
     height: 100vh;
     .contentSidebar {
       display: initial;
+      z-index: 10;
     }
     .contentMenuambur {
       display: none;
@@ -83,6 +93,7 @@ const Container = styled.main`
     .contentRouters {
       grid-column: 2;
       padding-top: 0;
+      z-index: 1;
     }
   }
 `;

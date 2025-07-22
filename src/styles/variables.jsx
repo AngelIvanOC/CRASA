@@ -12,7 +12,7 @@ import { TbBrandSupabase } from "react-icons/tb";
 import { FaReact } from "react-icons/fa";
 import { BsArrowDown, BsArrowUpShort } from "react-icons/bs";
 import { FaBalanceScale } from "react-icons/fa";
-import logo from "../assets/crasa.avif";
+import logo from "../assets/cralaLogo.jpg";
 import compras from "../assets/compras.svg";
 import emojiCompras from "../assets/emojiCompras.svg";
 
@@ -23,6 +23,8 @@ import ventas from "../assets/ventas.svg";
 import emojiVentas from "../assets/emojiVentas.svg";
 
 import emojiAlmacen from "../assets/emojiAlmacen.svg";
+
+import emojiCajas from "../assets/emojiCajas.svg";
 
 import { FcGoogle } from "react-icons/fc";
 
@@ -133,6 +135,8 @@ export const v = {
 
   ventas: ventas,
   emojiVentas: emojiVentas,
+
+  cajas: emojiCajas,
 
   emojiAlmacen: emojiAlmacen,
   iconogoogle: FcGoogle,

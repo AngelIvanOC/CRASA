@@ -1,19 +1,15 @@
 import styled from "styled-components";
-import {
-  Btnsave,
-  Title,
-  Buscador,
-  TablaProductosVenta,
-  RegistrarProductos,
-} from "../../index";
+import { Btnsave, Title, Buscador, TablaProductosVenta } from "../../index";
 import { v } from "../../styles/variables";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { AsignarProductos } from "../organismos/formularios/AsignarProductos";
 
 export function ProductosVentaTemplate({
   detalleVenta,
   showBackButton = false,
   backRoute = "/",
+  ventaId,
 }) {
   const navigate = useNavigate();
   const [openRegistro, SetopenRegistro] = useState(false);
@@ -30,10 +26,15 @@ export function ProductosVentaTemplate({
   return (
     <Container>
       {openRegistro && (
-        <RegistrarProductos
+        <AsignarProductos
           onClose={() => SetopenRegistro(!openRegistro)}
           dataSelect={dataSelect}
           accion={accion}
+          marcaId={
+            detalleVenta?.[0]?.marca_id ||
+            detalleVenta?.[0]?.productos?.marca_id
+          }
+          ventaId={ventaId}
         />
       )}
       <Title className="titulo" $colortexto="#9291A5">
@@ -49,8 +50,8 @@ export function ProductosVentaTemplate({
           <Buscador />
           <Btnsave
             funcion={nuevoRegistro}
-            bgcolor={v.colorPrincipal}
-            titulo="Nuevo Producto"
+            bgcolor={v.colorBotones}
+            titulo="Asignar Producto"
             icono={<v.iconoagregar />}
             color="#fff"
           />

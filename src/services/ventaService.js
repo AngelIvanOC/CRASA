@@ -29,8 +29,6 @@ export const insertVentaWithProducts = async (
   const ventaInsertData = {
     codigo: ventaData.codigo,
     marca_id: ventaData.marca_id || null,
-    cantidad_productos: ventaData.cantidad_productos || 0,
-    cantidad_total: ventaData.cantidad_total || 0,
     fecha: ventaData.fecha || null,
     factura_url: pdfUrl,
   };

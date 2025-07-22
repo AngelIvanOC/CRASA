@@ -80,7 +80,7 @@ export async function EditarVenta(p) {
 }
 
 export async function MostrarDetalleVenta(venta_id) {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from(tablaDetalle)
     .select(
       `
@@ -88,10 +88,16 @@ export async function MostrarDetalleVenta(venta_id) {
       cantidad,
       fecha_caducidad,
       ubicacion,
-      productos(id, codigo, nombre, racks(id, codigo_rack))
+      productos:producto_id(id, codigo, nombre, marca_id, racks(id, codigo_rack))
     `
     )
     .eq("venta_id", venta_id);
+
+  if (error) {
+    console.error("Error fetching venta details:", error);
+    throw error;
+  }
+
   return data;
 }
 

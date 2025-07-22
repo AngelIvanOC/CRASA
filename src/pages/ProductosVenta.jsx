@@ -34,6 +34,7 @@ export function ProductosVenta() {
       detalleVenta={detalleVenta}
       showBackButton={true}
       backRoute="/ventas"
+      ventaId={ventaId}
     />
   );
 }

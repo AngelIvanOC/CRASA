@@ -92,11 +92,7 @@ export function TablaProductos({
       header: "CANTIDAD",
       cell: (info) => <span>{info.getValue() || 0}</span>,
     },
-    {
-      accessorKey: "racks.codigo_rack",
-      header: "RACK",
-      cell: (info) => <span>{info.getValue() || "-"}</span>,
-    },
+
     {
       accessorKey: "acciones",
       header: "",
@@ -288,11 +284,9 @@ const Container = styled.div`
           &:nth-child(5) {
             width: 10%;
           } /* Cantidad */
+
           &:nth-child(6) {
-            width: 7%;
-          } /* Racks */
-          &:nth-child(7) {
-            width: 8%;
+            width: 15%;
             text-align: center; /* Centrar acciones */
           } /* Acciones */
         }
@@ -322,10 +316,7 @@ const Container = styled.div`
           width: 10%;
         }
         &:nth-child(6) {
-          width: 7%;
-        }
-        &:nth-child(7) {
-          width: 8%;
+          width: 15%;
         }
       }
     }

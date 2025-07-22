@@ -7,6 +7,8 @@ export function Ventas() {
   const { isLoading, error } = useQuery({
     queryKey: ["mostrar ventas"],
     queryFn: mostrarVentas,
+    placeholderData: () => useVentasStore.getState().dataVentas,
+    keepPreviousData: true,
     refetchOnWindowFocus: false,
   });
 

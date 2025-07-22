@@ -32,7 +32,7 @@ export async function InsertarRack(p) {
     marca_id: p.marca_id,
     nivel: p.nivel,
     posicion: p.posicion,
-    capacidad: p.capacidad,
+    lado: p.lado,
     codigo_rack: p.codigo_rack,
   });
 
@@ -49,21 +49,25 @@ export async function InsertarRack(p) {
 
 export async function MostrarRacks() {
   const { data, error } = await supabase
-    .from(tabla)
+    .from("racks")
     .select(
       `
       id,
       codigo_rack,
       nivel,
       posicion,
-      capacidad,
+      lado,
       marcas(id, nombre),
-      productos!productos_racks_fkey(
+      cajas(
         id,
-        codigo,
-        nombre,
         cantidad,
-        cajas
+        fecha_caducidad,
+        codigo_barras,
+        producto:producto_id (
+          id,
+          nombre,
+          codigo
+        )
       )
     `
     )
@@ -74,16 +78,21 @@ export async function MostrarRacks() {
     return [];
   }
 
-  // Procesar los datos para agregar información de ocupación
-  const racksConOcupacion =
-    data?.map((rack) => ({
-      ...rack,
-      ocupado: rack.productos && rack.productos.length > 0,
-      total_productos: rack.productos?.length || 0,
-      productos_info: rack.productos || [],
-    })) || [];
+  const racksProcesados = data.map((rack) => {
+    const cajas = rack.cajas || [];
 
-  return racksConOcupacion;
+    const productosUnicos = cajas
+      .map((caja) => caja.producto)
+      .filter((prod) => prod !== null);
+
+    return {
+      ...rack,
+      ocupado: cajas.length > 0,
+      productos_info: productosUnicos,
+    };
+  });
+
+  return racksProcesados;
 }
 
 export async function BuscarRacks(p) {
@@ -95,7 +104,7 @@ export async function BuscarRacks(p) {
       codigo_rack,
       nivel,
       posicion,
-      capacidad,
+      lado,
       marcas(id, nombre),
       productos!productos_rack_id_fkey(
         id,

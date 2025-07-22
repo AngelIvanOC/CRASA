@@ -41,13 +41,18 @@ export const LinksArray = [
     icon: "fa6-solid:boxes-stacked",
     to: "/racks",
   },
+  {
+    label: "Usuarios",
+    icon: "fa6-solid:users",
+    to: "/usuarios",
+  },
 ];
 export const SecondarylinksArray = [
-  {
+  /*{
     label: "Configuración",
     icon: "fa6-solid:gear",
     to: "/configuracion",
-  },
+  },*/
   {
     label: "Salir",
     icon: "mingcute:align-arrow-left-fill",

@@ -16,7 +16,8 @@ export function CardSmall({
   loading = false,
   emptyMessage = "No hay datos disponibles",
   children,
-  headerButton, // 👈 NUEVO PROP para el botón del header
+  headerButton,
+  headerJustify = "space-between", // 👈 NUEVO PROP para el botón del header
 }) {
   return (
     <Container
@@ -26,6 +27,7 @@ export function CardSmall({
       type="submit"
       $bgcolor={bgcolor}
       onClick={funcion}
+      $headerJustify={headerJustify}
     >
       <section className="content">
         {/* Header con título y botón opcional */}
@@ -86,7 +88,8 @@ const Container = styled.div`
   /* 👈 NUEVO: Estilos para el header */
   .header {
     display: flex;
-    justify-content: space-between;
+    justify-content: ${({ $headerJustify }) =>
+      $headerJustify || "space-between"};
     align-items: center;
     margin-bottom: 10px;
 

@@ -7,6 +7,7 @@ import {
   EditarVenta,
   InsertarProductosVenta,
 } from "../index";
+import { supabase } from "../index";
 
 export const useVentasStore = create((set, get) => ({
   dataVentas: [],
@@ -24,6 +25,7 @@ export const useVentasStore = create((set, get) => ({
     if (!venta) return null; // fallo al insertar compra
 
     const { mostrarVentas } = get();
+
     await mostrarVentas();
 
     return venta; // Devuelve el ID de la compra insertada
@@ -67,5 +69,26 @@ export const useVentasStore = create((set, get) => ({
     await EliminarVenta(p);
     const { mostrarVentas } = get();
     await mostrarVentas();
+  },
+
+  eliminarProductoVenta: async (id) => {
+    const { data, error } = await supabase
+      .from("detalle_ventas")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error al eliminar",
+        text: error.message,
+      });
+      return false;
+    }
+
+    // Actualizar los datos después de eliminar
+    const { mostrarDetalleVenta } = get();
+    await mostrarDetalleVenta(data[0].venta_id); // Reconsulta los detalles
+    return true;
   },
 }));

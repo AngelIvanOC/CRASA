@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useForm } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Spinner, supabase } from "../../../index";
 import {
   Btnsave,
@@ -24,6 +24,7 @@ export function RegistrarVenta({
   const { insertarVenta } = useVentasStore();
   const [isPending, setIsPending] = useState(false);
   const [marcas, setMarcas] = useState([]);
+  const queryClient = useQueryClient();
 
   // Hook personalizado para PDF
   const { pdfFile, pdfPreview, extractedData, isProcessing, processPdfFile } =
@@ -51,6 +52,7 @@ export function RegistrarVenta({
       setIsPending(false);
     },
     onSuccess: () => {
+      queryClient.invalidateQueries(["mostrar ventas"]);
       cerrarFormulario();
       setIsPending(false);
     },

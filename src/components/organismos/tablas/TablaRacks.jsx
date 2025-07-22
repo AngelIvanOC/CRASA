@@ -70,15 +70,16 @@ export function TablaRacks({
       cell: (info) => <span>{info.getValue() || "-"}</span>,
     },
     {
+      accessorKey: "lado",
+      header: "LADO",
+      cell: (info) => <span>{info.getValue() || 0}</span>,
+    },
+    {
       accessorKey: "posicion",
       header: "POSICION",
       cell: (info) => <span>{info.getValue() || 0}</span>,
     },
-    {
-      accessorKey: "capacidad",
-      header: "CAPACIDAD",
-      cell: (info) => <span>{info.getValue() || 0}</span>,
-    },
+    
     {
       accessorKey: "ocupado",
       header: "OCUPADO",
@@ -91,13 +92,20 @@ export function TablaRacks({
     },
     {
       accessorKey: "productos_info",
-      header: "PRODUCTO",
+      header: "PRODUCTO(S)",
       cell: (info) => {
         const productos = info.getValue();
         if (!productos || productos.length === 0) {
           return <span style={{ color: "#6c757d" }}>Sin producto</span>;
         }
-        return <span>{productos[0].nombre}</span>;
+
+        return (
+          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+            {productos.map((producto) => (
+              <span key={producto.id}>{producto.nombre}</span>
+            ))}
+          </div>
+        );
       },
     },
     {
@@ -292,7 +300,7 @@ const Container = styled.div`
           } /* POSICION */
           &:nth-child(5) {
             width: 15%;
-          } /* CAPACIDAD */
+          } /* LADO */
           &:nth-child(6) {
             width: 10%;
           } /* OCUPADO */

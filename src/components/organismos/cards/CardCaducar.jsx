@@ -72,7 +72,7 @@ const Container = styled.div`
   /* Header con título y botón opcional */
   .header {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     margin-bottom: 10px;
 

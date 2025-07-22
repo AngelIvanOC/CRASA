@@ -8,6 +8,7 @@ export function CardMovimientos({ data, loading }) {
       loading={loading}
       emptyMessage="No hay movimientos recientes"
       className="span-2"
+      headerJustify="center"
     >
       {data.length > 0 ? (
         <div className="movimientos-table">

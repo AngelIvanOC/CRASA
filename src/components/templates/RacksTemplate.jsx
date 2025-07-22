@@ -8,11 +8,12 @@ import {
   RegistrarRacks,
 } from "../../index";
 import { v } from "../../styles/variables";
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 
 export function RacksTemplate() {
   const [openRegistro, SetopenRegistro] = useState(false);
-  const { dataRacks } = useRacksStore();
+  const { dataRacks, mostrarRacks } = useRacksStore();
   const [accion, setAccion] = useState("");
   const [dataSelect, setdataSelect] = useState([]);
 
@@ -21,6 +22,10 @@ export function RacksTemplate() {
     setAccion("Nuevo");
     setdataSelect([]);
   }
+
+  useEffect(() => {
+    mostrarRacks(); // ✅ Esto carga los racks con sus flags "ocupado" y "productos_info"
+  }, []);
 
   return (
     <Container>

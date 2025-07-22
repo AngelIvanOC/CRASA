@@ -2,13 +2,7 @@ import React from "react";
 import { InputText } from "../../index";
 import { v } from "../../styles/variables";
 
-export const VentaForm = ({
-  register,
-  errors,
-  marcas,
-  dataSelect,
-  accion,
-}) => {
+export const VentaForm = ({ register, errors, marcas, dataSelect, accion }) => {
   if (accion !== "Editar") return null;
 
   return (
@@ -44,6 +38,7 @@ export const VentaForm = ({
         </InputText>
       </article>
 
+      {/*}
       <article>
         <InputText icono={<v.iconoFlechabajo />}>
           <input
@@ -67,7 +62,7 @@ export const VentaForm = ({
           <label className="form__label">Cantidad Total</label>
           {errors.nombre?.type === "required" && <p>Campo requerido</p>}
         </InputText>
-      </article>
+      </article>*/}
 
       <article>
         <InputText icono={<v.iconoFlechabajo />}>

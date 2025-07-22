@@ -1,22 +1,22 @@
 import styled from "styled-components";
-import { Title, TablaCajas, Buscador, Btnsave } from "../../index";
+import {
+  Title,
+  useUsuariosStore,
+  TablaUsuarios,
+  Btnsave,
+  Buscador,
+  RegistrarUsuario,
+} from "../../index";
 import { v } from "../../styles/variables";
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { RegistrarCajas } from "../organismos/formularios/RegistrarCajas";
+import { Device } from "../../styles/breakpoints";
 
-export function CajasProductoTemplate({
-  cajas,
-  showBackButton,
-  backRoute,
-  refreshCajas,
-}) {
+export function UsuariosTemplate() {
   const [openRegistro, SetopenRegistro] = useState(false);
   const [accion, setAccion] = useState("");
   const [dataSelect, setdataSelect] = useState([]);
   const [isExploding, setIsExploding] = useState(false);
-
-  const navigate = useNavigate();
+  const { dataTodosUsuarios } = useUsuariosStore();
 
   function nuevoRegistro() {
     SetopenRegistro(!openRegistro);
@@ -27,42 +27,36 @@ export function CajasProductoTemplate({
   return (
     <Container>
       {openRegistro && (
-        <RegistrarCajas
+        <RegistrarUsuario
           onClose={() => SetopenRegistro(!openRegistro)}
           dataSelect={dataSelect}
           accion={accion}
           setIsExploding={setIsExploding}
-          refreshCajas={refreshCajas}
-          setAccion={setAccion}
-          setdataSelect={setdataSelect}
         />
       )}
 
       <Title className="titulo" $colortexto="#9291A5">
-        {showBackButton && (
-          <span onClick={() => navigate(backRoute)} className="back-button">
-            <v.felchaizquierdalarga />
-          </span>
-        )}
-        <img src={v.emojiAlmacen} alt="" /> CAJAS
+        <img src={v.emojiUsuarios} alt="" /> USUARIOS
       </Title>
+
       <section className="main">
         <section className="header">
           <Buscador />
+
           <Btnsave
             funcion={nuevoRegistro}
             bgcolor={v.colorBotones}
-            titulo="Nueva Caja"
+            titulo="Nuevo Usuario"
             icono={<v.iconoagregar />}
             color="#fff"
           />
         </section>
-        <TablaCajas
-          data={cajas}
-          refreshCajas={refreshCajas}
-          setAccion={setAccion}
-          setdataSelect={setdataSelect}
+
+        <TablaUsuarios
+          data={dataTodosUsuarios}
           SetopenRegistro={SetopenRegistro}
+          setdataSelect={setdataSelect}
+          setAccion={setAccion}
         />
       </section>
     </Container>
@@ -70,19 +64,16 @@ export function CajasProductoTemplate({
 }
 
 const Container = styled.div`
-  height: 100vh;
   display: flex;
   flex-direction: column;
-  //justify-content: center;
-  padding: 0px 30px 0 0;
+  padding: 0 10px;
+  height: calc(100vh - 70px);
+  box-sizing: border-box;
 
   .titulo {
     top: 0;
     left: 0;
     max-height: 5vh;
-    .back-button {
-      cursor: pointer;
-    }
   }
 
   .main {
@@ -104,5 +95,11 @@ const Container = styled.div`
       height: 10vh;
       box-sizing: border-box;
     }
+  }
+
+  @media ${Device.tablet} {
+    height: 100vh;
+    padding: 0px 30px 0 0;
+    box-sizing: initial;
   }
 `;

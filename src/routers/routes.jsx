@@ -13,6 +13,7 @@ import {
   useUsuariosStore,
   ProductosVenta,
   CajasProducto,
+  Usuarios,
 } from "../index";
 import { useQuery } from "@tanstack/react-query";
 export function MyRoutes() {
@@ -45,17 +46,15 @@ export function MyRoutes() {
   return (
     <Routes>
       <Route element={<ProtectedRoute user={user} redirectTo="/login" />}>
-        <Route path="/configuracion" element={<Configuracion />} />
-        {/*<Route path="/configuracion/categorias" element={<Categorias />} />*/}
+        {/*<Route path="/configuracion" element={<Configuracion />} />
+        <Route path="/configuracion/categorias" element={<Categorias />} />*/}
         <Route path="/" element={<Dashboard />} />
+        <Route path="/usuarios" element={<Usuarios />} />
         <Route path="/almacen" element={<Almacen />} />
         <Route path="/almacen/:productoId/cajas" element={<CajasProducto />} />
         <Route path="/racks" element={<Racks />} />
         <Route path="/ventas" element={<Ventas />} />
-        <Route
-          path="/ventas/:ventaId/productos"
-          element={<ProductosVenta />}
-        />
+        <Route path="/ventas/:ventaId/productos" element={<ProductosVenta />} />
         <Route path="*" element={<Dashboard />} />
       </Route>
       <Route path="/login" element={<Login />} />

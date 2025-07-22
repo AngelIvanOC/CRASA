@@ -41,7 +41,6 @@ export function LoginTemplate() {
       <div className="card">
         <ContentLogo>
           <img src={v.logo} alt="" />
-          <span>CRASA</span>
         </ContentLogo>
         <Title $paddingbottom="40px">Ingresar</Title>
 
@@ -115,10 +114,7 @@ const ContentLogo = styled.section`
   align-items: center;
   justify-content: center;
   margin: 20px;
-  span {
-    font-weight: 700;
-  }
   img {
-    width: 10%;
+    width: 75%;
   }
 `;

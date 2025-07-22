@@ -69,18 +69,24 @@ export function DashboardTemplate() {
           <CardSmall
             titulo={
               <span>
-                Cajas <img src={v.compras} />
+                Cajas <img src={v.cajas} />
               </span>
             }
             data={dataCompras}
             loading={loadingCompras}
             emptyMessage="No hay compras registradas"
+            emoji={v.cajas}
           />
           <CardSmall
-            titulo="Productos"
+            titulo={
+              <span>
+                Productos <img src={v.emojiAlmacen} />
+              </span>
+            }
             data={dataProductos}
             loading={loadingProductos}
             emptyMessage="No hay productos registrados"
+            emoji={v.compras}
           />
         </section>
 
@@ -163,6 +169,7 @@ const Container = styled.div`
         "area2" 3.5fr
         "main" 3.5fr;
       gap: 15px;
+      padding: 0;
       box-sizing: border-box;
 
       > * {

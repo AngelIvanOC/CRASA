@@ -30,3 +30,38 @@ export async function ObtenerCajasPorProducto(producto_id) {
 
   return data;
 }
+
+export async function InsertarCaja(caja) {
+  const { data, error } = await supabase.from("cajas").insert([caja]).select();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  Swal.fire({
+    icon: "success",
+    title: "¡Éxito!",
+    text: "Caja registrada correctamente",
+  });
+
+  return data[0];
+}
+
+export async function EditarCaja(caja) {
+  const { id, ...rest } = caja;
+  const { data, error } = await supabase
+    .from("cajas")
+    .update(rest)
+    .eq("id", id)
+    .select();
+
+  if (error) throw new Error(error.message);
+
+  Swal.fire({
+    icon: "success",
+    title: "¡Éxito!",
+    text: "Caja actualizada correctamente",
+  });
+
+  return data[0];
+}

@@ -189,6 +189,7 @@ export async function MostrarMovimientosRecientes() {
         codigo_barras,
         productos (
           nombre,
+          codigo,
           marcas (
             nombre
           )
@@ -230,7 +231,7 @@ export async function MostrarMovimientosRecientes() {
     // Formatear entradas
     const entradasFormateadas = (entradas || []).map((entrada) => ({
       id: `E-${entrada.id}`,
-      pedido: entrada.codigo_barras,
+      pedido: entrada.productos?.codigo,
       cantidad: entrada.cantidad || 0,
       almacen: entrada.racks?.nombre || "Sin asignar",
       fecha: entrada.fecha_entrada,

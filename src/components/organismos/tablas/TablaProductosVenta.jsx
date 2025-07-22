@@ -5,6 +5,7 @@ import {
   Paginacion,
   ImagenContent,
   Icono,
+  useVentasStore,
 } from "../../../index";
 import Swal from "sweetalert2";
 import { v } from "../../../styles/variables";
@@ -30,29 +31,23 @@ export function TablaProductosVenta({
   const [datas, setData] = useState(data);
   const [columnFilters, setColumnFilters] = useState([]);
 
-  const { eliminarCategoria } = useCategoriasStore();
+  const { eliminarProductoVenta } = useVentasStore();
 
   function eliminar(p) {
-    if (p.nombre === "General") {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Este registro no se permite modificar ya que es valor por defecto.",
-        footer: '<a href="">...</a>',
-      });
-      return;
-    }
     Swal.fire({
-      title: "¿Estás seguro(a)(e)?",
-      text: "Una vez eliminado, ¡no podrá recuperar este registro!",
+      title: "¿Estás seguro?",
+      text: "Una vez eliminado, ¡no podrá recuperar este producto!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Si, eliminar",
+      confirmButtonText: "Sí, eliminar",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await eliminarCategoria({ id: p.id });
+        const ok = await eliminarProductoVenta(p.id); // p.id es el ID del registro en detalle_ventas
+        if (ok) {
+          Swal.fire("Eliminado", "Producto eliminado con éxito", "success");
+        }
       }
     });
   }
@@ -106,7 +101,7 @@ export function TablaProductosVenta({
         return filterStatuses.includes(status?.id);
       },
     },
-    {
+    /*{
       accessorKey: "productos.racks.codigo_rack",
       header: "UBICACION",
       cell: (info) => <span>{info.getValue()}</span>,
@@ -144,7 +139,7 @@ export function TablaProductosVenta({
         const status = row.getValue(columnId);
         return filterStatuses.includes(status?.id);
       },
-    },
+    },*/
   ];
 
   const table = useReactTable({
@@ -313,24 +308,25 @@ const Container = styled.div`
 
           /* Distribución específica por columna */
           &:nth-child(1) {
-            width: 5%;
+            width: 25%;
           } /* Código */
           &:nth-child(2) {
-            width: 40%;
+            width: 50%;
           } /* Nombre */
           &:nth-child(3) {
-            width: 15%;
+            width: 25%;
           } /* Cantidad */
-          &:nth-child(4) {
+
+          /*&:nth-child(4) {
             width: 15%;
           } /* Ubicación */
-          &:nth-child(5) {
+          /*&:nth-child(5) {
             width: 17%;
           } /* Fecha Caducidad */
-          &:nth-child(6) {
+          /*&:nth-child(6) {
             width: 8%;
             text-align: center; /* Centrar acciones */
-          } /* Acciones */
+          //} /* Acciones */
         }
       }
     }
@@ -343,15 +339,18 @@ const Container = styled.div`
 
       th {
         &:nth-child(1) {
-          width: 5%;
+          //width: 5%;
+          width: 25%;
         }
         &:nth-child(2) {
-          width: 40%;
+          //width: 40%;
+          width: 50%;
         }
         &:nth-child(3) {
-          width: 15%;
+          //width: 15%;
+          width: 25%;
         }
-        &:nth-child(4) {
+        /*&:nth-child(4) {
           width: 15%;
         }
         &:nth-child(5) {
@@ -359,7 +358,7 @@ const Container = styled.div`
         }
         &:nth-child(6) {
           width: 8%;
-        }
+        }*/
       }
     }
 

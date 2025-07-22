@@ -1,131 +1,174 @@
 import styled from "styled-components";
 import {
-  ContentAccionesTabla,
+  useUsuariosStore,
   Paginacion,
-  ImagenContent,
-  Icono,
+  ContentAccionesTabla,
 } from "../../../index";
 import { v } from "../../../styles/variables";
-import { useState } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { Device } from "../../../index";
+import { FaCaretDown, FaCaretUp } from "react-icons/fa6";
 import {
-  flexRender,
+  useReactTable,
   getCoreRowModel,
+  flexRender,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable,
 } from "@tanstack/react-table";
-import { FaCaretDown, FaCaretUp } from "react-icons/fa6";
 import Swal from "sweetalert2";
-import { supabase } from "../../../index";
 
-export function TablaCajas({
+export function TablaUsuarios({
   data,
-  refreshCajas,
-  setAccion,
-  setdataSelect,
   SetopenRegistro,
+  setdataSelect,
+  setAccion,
 }) {
+  const { dataTodosUsuarios, eliminarUsuario } = useUsuariosStore();
   const [columnFilters, setColumnFilters] = useState([]);
 
-  const columns = [
-    {
-      accessorKey: "codigo_barras",
-      header: "CÓDIGO BARRAS",
-      cell: (info) => <span>{info.getValue() || "-"}</span>,
+  // Memorizar las funciones para evitar re-renders
+  const editar = useCallback(
+    (data) => {
+      SetopenRegistro(true);
+      setdataSelect(data);
+      setAccion("Editar");
     },
-    {
-      accessorKey: "cantidad",
-      header: "CANTIDAD",
-      cell: (info) => <span>{info.getValue()}</span>,
-    },
-    {
-      accessorKey: "fecha_caducidad",
-      header: "CADUCIDAD",
-      cell: (info) => <span>{info.getValue() || "-"}</span>,
-    },
-    {
-      accessorKey: "racks.codigo_rack",
-      header: "UBICACIÓN",
-      cell: (info) => <span>{info.getValue() || "-"}</span>,
-    },
-    {
-      accessorKey: "fecha_entrada",
-      header: "ENTRADA",
-      cell: (info) => <span>{info.getValue()?.split("T")[0] || "-"}</span>,
-    },
-    {
-      accessorKey: "acciones",
-      header: "",
-      enableSorting: false,
-      cell: (info) => (
-        <ContentAccionesTabla
-          funcionEditar={() => editarCaja(info.row.original)}
-          funcionEliminar={() => eliminarCaja(info.row.original)}
-        />
-      ),
-    },
-  ];
+    [SetopenRegistro, setdataSelect, setAccion]
+  );
 
-  function editarCaja(caja) {
-    setAccion("Editar");
-    setdataSelect(caja);
-    SetopenRegistro((prev) => {
-      if (!prev) return true;
-      return prev;
-    });
-  }
-
-  async function eliminarCaja(caja) {
-    const result = await Swal.fire({
-      title: "¿Estás seguro?",
-      text: "¡No podrás revertir esto!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Sí, eliminarlo",
-    });
-
-    if (result.isConfirmed) {
-      try {
-        // Liberar el rack primero
-        if (caja.rack_id) {
-          await supabase
-            .from("racks")
-            .update({ ocupado: false })
-            .eq("id", caja.rack_id);
+  const eliminar = useCallback(
+    (usuario) => {
+      Swal.fire({
+        title: "¿Estás seguro(a)?",
+        text: "Una vez eliminado, ¡no podrá recuperar este usuario!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sí, eliminar",
+        cancelButtonText: "Cancelar",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            await eliminarUsuario({ id: usuario.id });
+            Swal.fire({
+              icon: "success",
+              title: "¡Eliminado!",
+              text: "El usuario ha sido eliminado correctamente.",
+              timer: 2000,
+              showConfirmButton: false,
+            });
+          } catch (error) {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "Hubo un problema al eliminar el usuario.",
+            });
+          }
         }
+      });
+    },
+    [eliminarUsuario]
+  );
 
-        // Luego eliminar la caja
-        await supabase.from("cajas").delete().eq("id", caja.id);
-        if (typeof refreshCajas === "function") {
-          refreshCajas();
-        }
-        Swal.fire("¡Eliminado!", "La caja ha sido eliminada.", "success");
-      } catch (error) {
-        Swal.fire("Error", error.message, "error");
-      }
-    }
-  }
+  // Memorizar las columnas para evitar re-creación
+  const columns = useMemo(
+    () => [
+      {
+        accessorKey: "nombres",
+        header: "NOMBRE",
+        cell: (info) => <span>{info.getValue()}</span>,
+      },
+      {
+        accessorKey: "telefono",
+        header: "TELÉFONO",
+        cell: (info) => <span>{info.getValue() || "-"}</span>,
+      },
+      {
+        accessorKey: "correo",
+        header: "CORREO",
+        cell: (info) => <span>{info.getValue() || "-"}</span>,
+      },
+      {
+        accessorKey: "roles.nombre",
+        header: "ROL",
+        cell: (info) => <span>{info.getValue() || "-"}</span>,
+      },
+      {
+        accessorKey: "estado",
+        header: "ESTADO",
+        cell: (info) => (
+          <span className={`estado ${info.getValue()?.toLowerCase()}`}>
+            {info.getValue() || "ACTIVO"}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "fecharegistro",
+        header: "REGISTRO",
+        cell: (info) => (
+          <span>
+            {info.getValue()
+              ? new Date(info.getValue()).toLocaleDateString()
+              : "-"}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "acciones",
+        header: "",
+        enableSorting: false,
+        cell: (info) => (
+          <ContentAccionesTabla
+            funcionEditar={() => editar(info.row.original)}
+            funcionEliminar={() => eliminar(info.row.original)}
+          />
+        ),
+      },
+    ],
+    [editar, eliminar]
+  );
+
+  // Usar datos del store directamente, no el prop
+  const tableData = useMemo(() => dataTodosUsuarios || [], [dataTodosUsuarios]);
 
   const table = useReactTable({
-    data: data || [],
+    data: tableData,
     columns,
-    state: {
-      columnFilters,
-    },
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     columnResizeMode: "onChange",
+    state: {
+      columnFilters,
+    },
+    onColumnFiltersChange: setColumnFilters,
     initialState: {
       pagination: {
         pageSize: 10,
       },
     },
   });
+
+  // Mostrar spinner solo si no hay datos y están cargando
+  if (!tableData.length) {
+    return (
+      <Container>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "50vh",
+          }}
+        >
+          <span>No hay usuarios registrados</span>
+        </div>
+      </Container>
+    );
+  }
 
   return (
     <Container>
@@ -190,13 +233,13 @@ export function TablaCajas({
 }
 
 const Container = styled.div`
-  height: 80vh;
+  height: 70vh;
 
   .responsive-table {
     width: 100%;
     border-collapse: collapse;
     font-family: Arial, sans-serif;
-    height: 75vh;
+    height: 55vh;
 
     thead {
       background-color: ${({ theme }) => theme.bgtotalFuerte};
@@ -238,7 +281,7 @@ const Container = styled.div`
 
     tbody {
       display: block;
-      max-height: 65vh;
+      max-height: 55vh;
       overflow-y: auto;
       width: 100%;
 
@@ -261,23 +304,45 @@ const Container = styled.div`
           vertical-align: middle;
 
           &:nth-child(1) {
-            width: 20%;
-          }
+            width: 15%;
+          } /* NOMBRE */
           &:nth-child(2) {
-            width: 10%;
-          }
+            width: 12%;
+          } /* TELÉFONO */
           &:nth-child(3) {
-            width: 20%;
-          }
+            width: 18%;
+          } /* CORREO */
           &:nth-child(4) {
-            width: 20%;
-          }
-          &:nth-child(5) {
-            width: 20%;
-          }
-          &:nth-child(6) {
             width: 10%;
-          }
+          } /* ROL */
+          &:nth-child(5) {
+            width: 10%;
+            text-align: center;
+
+            .estado {
+              padding: 4px 8px;
+              border-radius: 12px;
+              font-size: 12px;
+              font-weight: 500;
+
+              &.activo {
+                background-color: #e7f5e7;
+                color: #2e7d32;
+              }
+
+              &.inactivo {
+                background-color: #ffebee;
+                color: #c62828;
+              }
+            }
+          } /* ESTADO */
+          &:nth-child(6) {
+            width: 13%;
+          } /* FECHA */
+          &:nth-child(7) {
+            width: 10%;
+            text-align: center;
+          } /* ACCIONES */
         }
       }
     }
@@ -289,21 +354,27 @@ const Container = styled.div`
 
       th {
         &:nth-child(1) {
-          width: 20%;
+          width: 15%;
         }
         &:nth-child(2) {
-          width: 10%;
+          width: 12%;
         }
         &:nth-child(3) {
-          width: 20%;
+          width: 18%;
         }
         &:nth-child(4) {
-          width: 20%;
+          width: 10%;
         }
         &:nth-child(5) {
-          width: 20%;
+          width: 10%;
+          .header-content {
+            justify-content: center;
+          }
         }
         &:nth-child(6) {
+          width: 13%;
+        }
+        &:nth-child(7) {
           width: 10%;
         }
       }
@@ -314,7 +385,7 @@ const Container = styled.div`
       right: 0;
       top: 0;
       height: 100%;
-      width: 5px;
+      width: 0px;
       background: rgba(0, 0, 0, 0.5);
       cursor: col-resize;
       user-select: none;
@@ -331,6 +402,22 @@ const Container = styled.div`
         &:hover {
           opacity: 1;
         }
+      }
+    }
+  }
+
+  @media ${Device.tablet} {
+    height: 80vh;
+
+    .responsive-table {
+      height: 75vh;
+
+      tbody {
+        max-height: 65vh;
+      }
+
+      .resizer {
+        width: 5px;
       }
     }
   }

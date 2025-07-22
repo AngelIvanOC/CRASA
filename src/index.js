@@ -86,3 +86,12 @@ export * from "./services/ventaService";
 export * from "./pages/CajasProducto";
 export * from "./components/templates/CajasProductoTemplate";
 export * from "./components/organismos/tablas/TablaCajas";
+
+//Usuarios
+export * from "./pages/Usuarios";
+export * from "./supabase/crudUsuarios";
+export * from "./store/UsuariosStore";
+export * from "./components/templates/UsuariosTemplate";
+export * from "./components/organismos/formularios/RegistrarUsuario";
+export * from "./components/moleculas/UsuarioForm";
+export * from "./components/organismos/tablas/TablaUsuarios";

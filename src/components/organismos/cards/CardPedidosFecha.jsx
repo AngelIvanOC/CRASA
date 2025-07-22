@@ -22,7 +22,7 @@ export function CardPedidosFecha({ data, loading }) {
       <section className="content">
         {/* Header con título */}
         <div className="header">
-          <h2>Pedidos/AñoAndy</h2>
+          <h2>Pedidos/Año</h2>
         </div>
 
         {loading ? (
@@ -65,8 +65,13 @@ export function CardPedidosFecha({ data, loading }) {
                   dataKey="pedidos"
                   stroke="#023E8A"
                   strokeWidth={3}
-                  dot={{ fill: "#fff", strokeWidth: 2, r: 6 }}
-                  activeDot={{ r: 8, fill: "#023E8A" }}
+                  dot={{
+                    fill: "#fff",
+                    strokeWidth: 2,
+                    r: 6,
+                    cursor: "pointer",
+                  }}
+                  activeDot={{ r: 8, fill: "#023E8A", cursor: "pointer" }}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -99,7 +104,7 @@ const Container = styled.div`
 
   .header {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     margin-bottom: 10px;
 

@@ -57,7 +57,7 @@ export function RegistrarRacks({
       codigo_rack: data.codigo_rack,
       nivel: data.nivel,
       posicion: data.posicion,
-      capacidad: data.capacidad,
+      lado: data.lado,
     };
 
     if (accion === "Editar") {
@@ -93,7 +93,7 @@ export function RegistrarRacks({
         codigo_rack: dataSelect.codigo_rack,
         nivel: dataSelect.nivel,
         posicion: dataSelect.posicion,
-        capacidad: dataSelect.capacidad,
+        lado: dataSelect.lado,
       });
     } else {
       reset({
@@ -101,7 +101,7 @@ export function RegistrarRacks({
         codigo_rack: "",
         nivel: "",
         posicion: "",
-        capacidad: "",
+        lado: "",
       });
     }
   }, [accion, dataSelect, reset]);
@@ -142,7 +142,6 @@ export function RegistrarRacks({
                   )}
                 </InputText>
               </article>
-
               <article>
                 <InputText icono={<v.iconoFlechabajo />}>
                   <select
@@ -185,10 +184,10 @@ export function RegistrarRacks({
                   <input
                     className="form__field"
                     type="number"
-                    placeholder="Posicion"
-                    {...register("posicion")}
+                    placeholder="Lado"
+                    {...register("lado")}
                   />
-                  <label className="form__label">Posicion</label>
+                  <label className="form__label">Lado</label>
                 </InputText>
               </article>
 
@@ -197,10 +196,10 @@ export function RegistrarRacks({
                   <input
                     className="form__field"
                     type="number"
-                    placeholder="Capacidad"
-                    {...register("capacidad")}
+                    placeholder="Posicion"
+                    {...register("posicion")}
                   />
-                  <label className="form__label">Capacidad</label>
+                  <label className="form__label">Posicion</label>
                 </InputText>
               </article>
 
