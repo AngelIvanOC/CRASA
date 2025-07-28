@@ -79,7 +79,7 @@ export async function MostrarRacks() {
       )
     `
     )
-    .order("id", { ascending: false });
+    .order("id", { ascending: true });
 
   if (error) {
     console.error("Error al obtener racks:", error);
