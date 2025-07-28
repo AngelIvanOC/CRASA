@@ -9,10 +9,19 @@ import {
 } from "../../index";
 import { v } from "../../styles/variables";
 import { useState } from "react";
+import { ModalFiltros } from "../moleculas/ModalFiltros";
 
 export function AlmacenTemplate() {
   const [openRegistro, SetopenRegistro] = useState(false);
-  const { dataProductos } = useProductosStore();
+  const [openFiltros, setOpenFiltros] = useState(false);
+  const {
+    dataProductos,
+    buscarProductosConFiltros,
+    mostrarProductosConFiltros,
+    setBuscador,
+    filtros,
+    setFiltros,
+  } = useProductosStore();
   const [accion, setAccion] = useState("");
   const [dataSelect, setdataSelect] = useState([]);
 
@@ -21,6 +30,31 @@ export function AlmacenTemplate() {
     setAccion("Nuevo");
     setdataSelect([]);
   }
+
+  // Función para manejar la búsqueda con filtros
+  const handleBuscar = async (valor) => {
+    console.log("handleBuscar llamado con valor:", valor);
+    setBuscador(valor);
+    if (valor.trim() === "") {
+      console.log("Valor vacío, mostrando todos los productos con filtros");
+      await mostrarProductosConFiltros();
+    } else {
+      console.log("Buscando productos con:", valor);
+      await buscarProductosConFiltros({ buscador: valor });
+    }
+  };
+
+  // Función para aplicar filtros
+  const handleApplyFilters = async (nuevosFiltros) => {
+    setFiltros(nuevosFiltros);
+    // Volver a ejecutar la búsqueda/mostrar con los nuevos filtros
+    const buscadorActual = useProductosStore.getState().buscador;
+    if (buscadorActual && buscadorActual.trim() !== "") {
+      await buscarProductosConFiltros({ buscador: buscadorActual });
+    } else {
+      await mostrarProductosConFiltros();
+    }
+  };
 
   return (
     <Container>
@@ -32,14 +66,30 @@ export function AlmacenTemplate() {
         />
       )}
 
+      <ModalFiltros
+        isOpen={openFiltros}
+        onClose={() => setOpenFiltros(false)}
+        onApplyFilters={handleApplyFilters}
+        filtrosActivos={filtros}
+      />
+
       <Title className="titulo" $colortexto="#9291A5">
         <img src={v.emojiAlmacen} alt="" /> ALMACEN
       </Title>
 
       <section className="main">
         <section className="header">
-          <Buscador />
-
+          <div className="search-container">
+            {/* Botón de filtros */}
+            <FilterButton
+              onClick={() => setOpenFiltros(true)}
+              $hasFilters={filtros.marca !== ""}
+            >
+              <v.iconoFiltro /> {/* Asume que tienes un icono de filtro */}
+              {filtros.marca !== "" && <FilterDot />}
+            </FilterButton>
+            <Buscador setBuscador={handleBuscar} />
+          </div>
           <Btnsave
             funcion={nuevoRegistro}
             bgcolor={v.colorBotones}
@@ -90,6 +140,50 @@ const Container = styled.div`
       padding: 15px 20px;
       height: 10vh;
       box-sizing: border-box;
+
+      .search-container {
+        display: flex;
+        gap: 10px;
+      }
     }
   }
+`;
+
+const FilterButton = styled.button`
+  background: ${(props) =>
+    props.$hasFilters ? v.colorBotones || "#3b82f6" : "white"};
+  color: ${(props) => (props.$hasFilters ? "white" : "#6b7280")};
+  border: 2px solid #e5e5e5;
+  border-radius: 8px;
+  padding: 10px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.2s;
+  height: 40px;
+  width: 40px;
+
+  &:hover {
+    background: ${(props) =>
+      props.$hasFilters
+        ? v.colorBotones
+          ? `${v.colorBotones}dd`
+          : "#2563eb"
+        : "#f3f4f6"};
+    border-color: ${(props) =>
+      props.$hasFilters ? v.colorBotones || "#3b82f6" : "#9ca3af"};
+  }
+`;
+
+const FilterDot = styled.div`
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  background: #ef4444;
+  border-radius: 50%;
+  border: 2px solid #e5e5e5;
 `;

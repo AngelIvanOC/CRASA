@@ -2,28 +2,32 @@ import styled from "styled-components";
 import { v } from "../../styles/variables";
 
 export function Buscador({ setBuscador }) {
+  console.log("Buscador renderizado con setBuscador:", setBuscador); // Debug
+
   function buscar(e) {
-    setBuscador(e.target.value);
+    const valor = e.target.value;
+    console.log("Valor ingresado en buscador:", valor); // Debug
+    setBuscador(valor);
   }
+
   return (
     <Container>
       <section className="content">
         <v.iconobuscar className="icono" />
-        <input type="text" placeholder="Buscar" onChange={buscar} />
+        <input type="text" placeholder="Buscar ..." onChange={buscar} />
       </section>
     </Container>
   );
 }
 
 const Container = styled.div`
-  width: 25%;
+  min-width: 25%;
   border-radius: 10px;
   align-items: center;
   display: flex;
   color: ${(props) => props.theme.textsecundario};
   border: 2px solid ${({ theme }) => theme.color2};
   background-color: ${(props) => props.theme.bgtotal};
-
   .content {
     gap: 10px;
     display: flex;

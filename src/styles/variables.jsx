@@ -64,6 +64,7 @@ import { FcImageFile } from "react-icons/fc";
 import { IoIosArrowBack } from "react-icons/io";
 import { GrAdd } from "react-icons/gr";
 import { FaSearch } from "react-icons/fa";
+import { FaFilter } from "react-icons/fa";
 
 export const v = {
   colorPrincipal: `#023E8A`,
@@ -73,6 +74,7 @@ export const v = {
   iconoagregar: GrAdd,
   iconobarras: FaBars,
   iconobuscar: FaSearch,
+  iconoFiltro: FaFilter,
 
   iconoimagenvacia: FcImageFile,
   iconoemijivacio: BsEmojiDizzy,

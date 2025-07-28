@@ -43,21 +43,69 @@ export async function MostrarProductos() {
       cajas,
       cantidad,
       racks(id, codigo_rack),
-      marcas(id, nombre)
+      marcas(id, nombre),
+      piso(cantidad)
     `
     )
     .order("id", { ascending: false });
-  return data;
+  const productosConPiso =
+    data?.map((producto) => ({
+      ...producto,
+      cantidad_piso:
+        producto.piso?.reduce(
+          (total, item) => total + (item.cantidad || 0),
+          0
+        ) || 0,
+    })) || [];
+
+  return productosConPiso;
 }
 
 export async function BuscarProductos(p) {
-  const { data } = await supabase
-    .from(tabla)
-    .select()
-    .or(
-      `codigo.ilike.%${p.buscador}%,nombre.ilike.%${p.buscador}%,marca.ilike.%${p.buscador}%`
+  // Si el valor de búsqueda es solo números, buscar por código
+  const esNumero = !isNaN(p.buscador) && p.buscador.trim() !== "";
+
+  let query = supabase.from(tabla).select(
+    `
+      id,
+      codigo,
+      nombre,
+      cajas,
+      cantidad,
+      racks(id, codigo_rack),
+      marcas(id, nombre),
+      piso(cantidad)
+    `
+  );
+
+  if (esNumero) {
+    // Buscar por código (número exacto o que empiece con)
+    query = query.or(
+      `codigo.eq.${p.buscador},codigo::text.like.${p.buscador}%`
     );
-  return data;
+  } else {
+    // Buscar solo por nombre si no es número
+    query = query.ilike("nombre", `%${p.buscador}%`);
+  }
+
+  const { data, error } = await query.order("id", { ascending: false });
+
+  if (error) {
+    console.error("Error en BuscarProductos:", error);
+    return [];
+  }
+
+  const productosConPiso =
+    data?.map((producto) => ({
+      ...producto,
+      cantidad_piso:
+        producto.piso?.reduce(
+          (total, item) => total + (item.cantidad || 0),
+          0
+        ) || 0,
+    })) || [];
+
+  return productosConPiso;
 }
 
 export async function EliminarProductos(p) {

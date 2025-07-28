@@ -45,8 +45,8 @@ export const useRacksStore = create((set, get) => ({
   },
 
   buscarProductos: async (p) => {
-    const response = await BuscarProductos(p);
-    set({ dataProductos: response });
+    const response = await BuscarRacks(p);
+    set({ dataRacks: response });
     return response;
   },
 }));

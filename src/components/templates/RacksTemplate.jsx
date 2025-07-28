@@ -13,7 +13,8 @@ import { useState, useEffect } from "react";
 
 export function RacksTemplate() {
   const [openRegistro, SetopenRegistro] = useState(false);
-  const { dataRacks, mostrarRacks } = useRacksStore();
+  const { dataRacks, mostrarRacks, buscarProductos, setBuscador } =
+    useRacksStore();
   const [accion, setAccion] = useState("");
   const [dataSelect, setdataSelect] = useState([]);
 
@@ -22,6 +23,22 @@ export function RacksTemplate() {
     setAccion("Nuevo");
     setdataSelect({});
   }
+
+  const handleBuscar = async (valor) => {
+    console.log("handleBuscar llamado con valor:", valor); // Debug
+
+    setBuscador(valor);
+
+    if (valor.trim() === "") {
+      console.log("Valor vacío, mostrando todos los productos"); // Debug
+      // Si está vacío, mostrar todos los productos
+      await mostrarRacks();
+    } else {
+      console.log("Buscando productos con:", valor); // Debug
+      // Si hay texto, buscar
+      await buscarProductos({ buscador: valor });
+    }
+  };
 
   useEffect(() => {
     mostrarRacks(); // ✅ Esto carga los racks con sus flags "ocupado" y "productos_info"
@@ -43,7 +60,7 @@ export function RacksTemplate() {
 
       <section className="main">
         <section className="header">
-          <Buscador />
+          <Buscador setBuscador={handleBuscar} />
 
           <Btnsave
             funcion={nuevoRegistro}
