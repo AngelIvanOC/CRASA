@@ -7,6 +7,7 @@ import {
   useProductosStore,
   Icono,
   ConvertirCapitalize,
+  Spinner,
 } from "../../../index";
 import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
@@ -122,7 +123,7 @@ export function RegistrarProductos({
   return (
     <Container>
       {isPending ? (
-        <span>Cargando...</span>
+        <Spinner />
       ) : (
         <div className="sub-contenedor">
           <div className="headers">

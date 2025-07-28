@@ -5,14 +5,19 @@ import { NavLink } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../../store/AuthStore";
+import { forwardRef } from "react";
 
-export function Sidebar({ state, setState }) {
+export const Sidebar = forwardRef(({ state, setState }, ref) => {
   const { cerrarSesion } = useAuthStore();
   const navigate = useNavigate();
 
   return (
     <Main $isopen={state.toString()}>
-      <Container $isopen={state.toString()} className={state ? "active" : ""}>
+      <Container
+        ref={ref}
+        $isopen={state.toString()}
+        className={state ? "active" : ""}
+      >
         <div className="Logocontent" onClick={() => setState(!state)}>
           <section className={state ? "content open" : "content"}>
             <div className="Linkicon">
@@ -71,7 +76,8 @@ export function Sidebar({ state, setState }) {
       </Container>
     </Main>
   );
-}
+});
+
 const Container = styled.div`
   background: ${({ theme }) => theme.bgtotal};
   color: ${(props) => props.theme.text};

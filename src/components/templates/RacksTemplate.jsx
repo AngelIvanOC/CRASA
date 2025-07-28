@@ -20,7 +20,7 @@ export function RacksTemplate() {
   function nuevoRegistro() {
     SetopenRegistro(!openRegistro);
     setAccion("Nuevo");
-    setdataSelect([]);
+    setdataSelect({});
   }
 
   useEffect(() => {

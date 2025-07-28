@@ -35,7 +35,7 @@ export function VentasTemplate() {
       )}
 
       <Title className="titulo" $colortexto="#9291A5">
-        <img src={v.emojiCompras} alt="" /> VENTAS
+        <img src={v.almacen} alt="" /> VENTAS
       </Title>
 
       <section className="main">

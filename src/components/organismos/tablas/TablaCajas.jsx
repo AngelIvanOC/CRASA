@@ -102,7 +102,13 @@ export function TablaCajas({
         if (typeof refreshCajas === "function") {
           refreshCajas();
         }
-        Swal.fire("¡Eliminado!", "La caja ha sido eliminada.", "success");
+        Swal.fire({
+          icon: "success",
+          title: "¡Eliminado!",
+          text: "La caja ha sido eliminada correctamente.",
+          timer: 2000,
+          showConfirmButton: false,
+        });
       } catch (error) {
         Swal.fire("Error", error.message, "error");
       }

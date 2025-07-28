@@ -40,8 +40,10 @@ export async function InsertarCaja(caja) {
 
   Swal.fire({
     icon: "success",
-    title: "¡Éxito!",
-    text: "Caja registrada correctamente",
+    title: "¡Caja creada!",
+    text: "Caja creada correctamente.",
+    timer: 2000,
+    showConfirmButton: false,
   });
 
   return data[0];
@@ -59,8 +61,10 @@ export async function EditarCaja(caja) {
 
   Swal.fire({
     icon: "success",
-    title: "¡Éxito!",
-    text: "Caja actualizada correctamente",
+    title: "¡Actualizado!",
+    text: "Caja actualizada correctamente.",
+    timer: 2000,
+    showConfirmButton: false,
   });
 
   return data[0];

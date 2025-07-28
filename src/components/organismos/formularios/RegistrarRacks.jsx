@@ -7,9 +7,10 @@ import {
   useRacksStore,
   Icono,
   ConvertirCapitalize,
+  Spinner, // ✅ Agregar Spinner
 } from "../../../index";
 import { useForm } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query"; // ✅ Agregar useQueryClient
 import { supabase } from "../../../index";
 
 export function RegistrarRacks({
@@ -20,6 +21,7 @@ export function RegistrarRacks({
 }) {
   const { insertarRack, editarRack } = useRacksStore();
   const [isPending, setIsPending] = useState(false);
+  const queryClient = useQueryClient(); // ✅ Agregar queryClient
 
   const {
     register,
@@ -28,14 +30,31 @@ export function RegistrarRacks({
     reset,
   } = useForm();
 
+  // ✅ Mutation para insertar
   const { mutate: doInsertar } = useMutation({
     mutationFn: insertar,
     mutationKey: "insertar racks",
     onError: (err) => {
-      console.log("El error", err.message);
+      console.error("Error al insertar rack:", err); // ✅ Cambiar a console.error
       setIsPending(false);
     },
     onSuccess: () => {
+      queryClient.invalidateQueries(["mostrar racks"]); // ✅ Invalidar queries
+      cerrarFormulario();
+      setIsPending(false);
+    },
+  });
+
+  // ✅ Mutation para editar
+  const { mutate: doEditar } = useMutation({
+    mutationFn: editar,
+    mutationKey: "editar rack",
+    onError: (err) => {
+      console.error("Error al editar rack:", err);
+      setIsPending(false);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["mostrar racks"]); // ✅ Invalidar queries
       cerrarFormulario();
       setIsPending(false);
     },
@@ -43,16 +62,25 @@ export function RegistrarRacks({
 
   const handlesub = (data) => {
     setIsPending(true);
-    doInsertar(data);
+
+    if (accion === "Editar") {
+      const rackData = {
+        ...data,
+        id: dataSelect.id,
+      };
+      doEditar(rackData); // ✅ Usar doEditar
+    } else {
+      doInsertar(data);
+    }
   };
 
   const cerrarFormulario = () => {
     onClose();
-    setIsExploding(true);
+    if (setIsExploding) setIsExploding(true); // ✅ Agregar verificación
   };
 
   async function insertar(data) {
-    const producto = {
+    const rack = {
       marca_id: data.marca_id || null,
       codigo_rack: data.codigo_rack,
       nivel: data.nivel,
@@ -60,12 +88,21 @@ export function RegistrarRacks({
       lado: data.lado,
     };
 
-    if (accion === "Editar") {
-      producto.id = dataSelect.id;
-      await editarRack(producto);
-    } else {
-      await insertarRack(producto);
-    }
+    await insertarRack(rack);
+  }
+
+  // ✅ Función separada para editar
+  async function editar(data) {
+    const rack = {
+      id: data.id,
+      marca_id: data.marca_id || null,
+      codigo_rack: data.codigo_rack,
+      nivel: data.nivel,
+      posicion: data.posicion,
+      lado: data.lado,
+    };
+
+    await editarRack(rack);
   }
 
   const [marcas, setMarcas] = useState([]);
@@ -77,14 +114,6 @@ export function RegistrarRacks({
     }
     cargarMarcas();
   }, []);
-
-  useEffect(() => {
-    console.log("Marcas cargadas:", marcas); // Verifica en consola
-  }, [marcas]);
-
-  useEffect(() => {
-    console.log("Datos para editar:", dataSelect); // Verifica en consola
-  }, [dataSelect]);
 
   useEffect(() => {
     if (accion === "Editar") {
@@ -109,13 +138,14 @@ export function RegistrarRacks({
   return (
     <Container>
       {isPending ? (
-        <span>Cargando...</span>
+        <Spinner /> // ✅ Usar componente Spinner
       ) : (
         <div className="sub-contenedor">
           <div className="headers">
             <section>
               <h1>
-                {accion == "Editar" ? "Editar rack" : "Registrar nuevo rack"}
+                {accion === "Editar" ? "Editar rack" : "Registrar nuevo rack"}{" "}
+                {/* ✅ Cambiar == por === */}
               </h1>
             </section>
 
@@ -140,27 +170,6 @@ export function RegistrarRacks({
                   {errors.codigo_rack?.type === "required" && (
                     <p>Campo requerido</p>
                   )}
-                </InputText>
-              </article>
-              <article>
-                <InputText icono={<v.iconoFlechabajo />}>
-                  <select
-                    className="form__field"
-                    {...register("marca_id", {
-                      valueAsNumber: true,
-                      required: false,
-                    })}
-                    defaultValue={dataSelect?.marca_id || ""}
-                  >
-                    <option value="">Seleccione una marca</option>
-                    {marcas &&
-                      marcas.map((marca) => (
-                        <option key={marca.id} value={marca.id}>
-                          {marca.nombre}
-                        </option>
-                      ))}
-                  </select>
-                  <label className="form__label">Marca</label>
                 </InputText>
               </article>
 

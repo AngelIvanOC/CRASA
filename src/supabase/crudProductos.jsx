@@ -13,6 +13,14 @@ export async function InsertarProductos(p) {
     racks: p.racks,
   });
 
+  Swal.fire({
+    icon: "success",
+    title: "¡Producto creado!",
+    text: "Producto creado correctamente.",
+    timer: 2000,
+    showConfirmButton: false,
+  });
+
   if (error) {
     Swal.fire({
       icon: "error",
@@ -68,6 +76,14 @@ export async function EliminarProductos(p) {
 
 export async function EditarProductos(p) {
   const { error } = await supabase.from(tabla).update(p).eq("id", p.id);
+
+  Swal.fire({
+    icon: "success",
+    title: "¡Actualizado!",
+    text: "Producto actualizado correctamente.",
+    timer: 2000,
+    showConfirmButton: false,
+  });
 
   if (error) {
     Swal.fire({

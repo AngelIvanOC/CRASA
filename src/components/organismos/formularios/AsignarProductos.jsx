@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { v } from "../../../styles/variables";
-import { InputText, Btnsave } from "../../../index";
+import { InputText, Btnsave, Spinner } from "../../../index";
 import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { supabase } from "../../../index";
@@ -111,7 +111,7 @@ export function AsignarProductos({
   return (
     <Container>
       {isPending ? (
-        <span>Cargando...</span>
+        <Spinner />
       ) : (
         <div className="sub-contenedor">
           <div className="headers">

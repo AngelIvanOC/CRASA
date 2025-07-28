@@ -84,7 +84,7 @@ export function TablaProductos({
     },
     {
       accessorKey: "cajas",
-      header: "CAJAS",
+      header: "TARIMA",
       cell: (info) => <span>{info.getValue() || 0}</span>,
     },
     {

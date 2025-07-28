@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { v } from "../../../styles/variables";
-import { InputText, Btnsave } from "../../../index";
+import { InputText, Btnsave, Spinner } from "../../../index";
 import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { supabase } from "../../../index";
@@ -73,9 +73,24 @@ export function RegistrarCajas({
         .from("racks")
         .select("*")
         .eq("ocupado", false)
-        .eq("marca_id", productoData?.marca_id || null);
+        .order("nivel", { ascending: true }) // A < B < C
+        .order("lado", { ascending: true }) // 1 < 2
+        .order("posicion", { ascending: true }); // 1 < 2 < ... < 40;
 
-      setRacks(racksData || []);
+      // Ordenar por posición numéricamente ya que está guardado como text
+      const racksOrdenados = racksData?.sort((a, b) => {
+        // Primero por nivel
+        if (a.nivel !== b.nivel) {
+          return a.nivel.localeCompare(b.nivel);
+        }
+        // Luego por lado
+        if (a.lado !== b.lado) {
+          return parseInt(a.lado) - parseInt(b.lado);
+        }
+        // Finalmente por posición (convertir a número)
+        return parseInt(a.posicion) - parseInt(b.posicion);
+      });
+      setRacks(racksOrdenados || []);
     }
 
     cargarDatos();
@@ -102,7 +117,7 @@ export function RegistrarCajas({
   return (
     <Container>
       {isPending ? (
-        <span>Cargando...</span>
+        <Spinner />
       ) : (
         <div className="sub-contenedor">
           <div className="headers">

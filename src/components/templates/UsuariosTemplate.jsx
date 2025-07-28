@@ -36,7 +36,7 @@ export function UsuariosTemplate() {
       )}
 
       <Title className="titulo" $colortexto="#9291A5">
-        <img src={v.emojiUsuarios} alt="" /> USUARIOS
+        <img src={v.personal} alt="" /> PERSONAL
       </Title>
 
       <section className="main">

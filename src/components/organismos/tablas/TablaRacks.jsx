@@ -59,11 +59,11 @@ export function TablaRacks({
       header: "# RACK",
       cell: (info) => <span>{info.getValue()}</span>,
     },
-    {
+    /*{
       accessorKey: "marcas.nombre",
       header: "MARCA",
       cell: (info) => <span>{info.getValue()}</span>,
-    },
+    },*/
     {
       accessorKey: "nivel",
       header: "NIVEL",
@@ -79,7 +79,7 @@ export function TablaRacks({
       header: "POSICION",
       cell: (info) => <span>{info.getValue() || 0}</span>,
     },
-    
+
     {
       accessorKey: "ocupado",
       header: "OCUPADO",
@@ -291,23 +291,20 @@ const Container = styled.div`
           } /* # RACK */
           &:nth-child(2) {
             width: 10%;
-          } /* MARCA */
+          } /* NIVEL */
           &:nth-child(3) {
             width: 10%;
-          } /* NIVEL */
+          } /* POSICION */
           &:nth-child(4) {
             width: 10%;
-          } /* POSICION */
-          &:nth-child(5) {
-            width: 15%;
           } /* LADO */
-          &:nth-child(6) {
+          &:nth-child(5) {
             width: 10%;
           } /* OCUPADO */
-          &:nth-child(7) {
-            width: 35%;
+          &:nth-child(6) {
+            width: 40%;
           } /* PRODUCTO */
-          &:nth-child(8) {
+          &:nth-child(7) {
             width: 10%;
             text-align: center; /* Centrar acciones */
           } /* ACCIONES */
@@ -335,15 +332,12 @@ const Container = styled.div`
           width: 10%;
         }
         &:nth-child(5) {
-          width: 15%;
-        }
-        &:nth-child(6) {
           width: 10%;
         }
-        &:nth-child(7) {
-          width: 35%;
+        &:nth-child(6) {
+          width: 40%;
         }
-        &:nth-child(8) {
+        &:nth-child(7) {
           width: 10%;
         }
       }

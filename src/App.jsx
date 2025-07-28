@@ -10,15 +10,38 @@ import {
 } from "./index";
 import SidebarMovile from "./components/organismos/sidebar/SidebarMovile";
 import { Device } from "./styles/breakpoints";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useSupabaseRealtime } from "./store/useSupabaseRealtime";
+
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const sidebarRef = useRef(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { themeStyle } = useThemeStore();
   const { pathname } = useLocation();
+
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+        setSidebarOpen(false);
+      }
+    }
+
+    if (sidebarOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [sidebarOpen]);
+
   useSupabaseRealtime([
     "productos",
     "ventas",
@@ -39,6 +62,7 @@ function App() {
               <Sidebar
                 state={sidebarOpen}
                 setState={() => setSidebarOpen(!sidebarOpen)}
+                ref={sidebarRef}
               />
             </section>
             <section className="contentMenuambur">

@@ -24,7 +24,10 @@ import emojiVentas from "../assets/emojiVentas.svg";
 
 import emojiAlmacen from "../assets/emojiAlmacen.svg";
 
+import almacen from "../assets/almacen.svg";
 import emojiCajas from "../assets/emojiCajas.svg";
+
+import personal from "../assets/personal.svg";
 
 import { FcGoogle } from "react-icons/fc";
 
@@ -137,6 +140,9 @@ export const v = {
   emojiVentas: emojiVentas,
 
   cajas: emojiCajas,
+  almacen: almacen,
+
+  personal: personal,
 
   emojiAlmacen: emojiAlmacen,
   iconogoogle: FcGoogle,
