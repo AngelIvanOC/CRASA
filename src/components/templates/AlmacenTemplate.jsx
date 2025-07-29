@@ -10,10 +10,13 @@ import {
 import { v } from "../../styles/variables";
 import { useState } from "react";
 import { ModalFiltros } from "../moleculas/ModalFiltros";
+import { CargarProductosExcel } from "../moleculas/CargarProductosExcel";
 
 export function AlmacenTemplate() {
   const [openRegistro, SetopenRegistro] = useState(false);
   const [openFiltros, setOpenFiltros] = useState(false);
+  const [openCargarExcel, setOpenCargarExcel] = useState(false); // Nuevo estado
+
   const {
     dataProductos,
     buscarProductosConFiltros,
@@ -66,6 +69,10 @@ export function AlmacenTemplate() {
         />
       )}
 
+      {openCargarExcel && (
+        <CargarProductosExcel onClose={() => setOpenCargarExcel(false)} />
+      )}
+
       <ModalFiltros
         isOpen={openFiltros}
         onClose={() => setOpenFiltros(false)}
@@ -90,6 +97,14 @@ export function AlmacenTemplate() {
             </FilterButton>
             <Buscador setBuscador={handleBuscar} />
           </div>
+          <Btnsave
+            funcion={() => setOpenCargarExcel(true)}
+            bgcolor="#10b981" // Verde para diferenciarlo
+            titulo="Cargar Excel"
+            icono={<v.iconoagregar />} // Puedes usar otro icono si tienes uno para Excel
+            color="#fff"
+          />
+
           <Btnsave
             funcion={nuevoRegistro}
             bgcolor={v.colorBotones}

@@ -5,6 +5,8 @@ import {
   EliminarProductos,
   InsertarProductos,
   MostrarProductos,
+  InsertarProductosMasivo,
+  VerificarCodigosExistentes,
 } from "../index";
 import { supabase } from "../index";
 
@@ -40,6 +42,44 @@ export const useProductosStore = create((set, get) => ({
     await InsertarProductos(p);
     const { mostrarProductos } = get();
     await mostrarProductos();
+  },
+
+  // Nueva función para inserción masiva desde Excel
+  insertarProductosMasivo: async (productos) => {
+    try {
+      // Verificar códigos existentes
+      const codigos = productos.map((p) => p.codigo);
+      const codigosExistentes = await VerificarCodigosExistentes(codigos);
+
+      // Filtrar productos que no existan
+      const productosNuevos = productos.filter(
+        (p) => !codigosExistentes.includes(p.codigo)
+      );
+
+      if (productosNuevos.length === 0) {
+        return {
+          exitosos: 0,
+          fallidos: productos.length,
+          mensaje: "Todos los códigos ya existen",
+        };
+      }
+
+      // Insertar productos nuevos
+      const result = await InsertarProductosMasivo(productosNuevos);
+
+      // Refrescar la lista
+      const { mostrarProductos } = get();
+      await mostrarProductos();
+
+      return {
+        exitosos: result.length,
+        fallidos: productos.length - result.length,
+        mensaje: "Importación completada",
+      };
+    } catch (error) {
+      console.error("Error en inserción masiva:", error);
+      throw error;
+    }
   },
 
   eliminarProducto: async (p) => {

@@ -32,6 +32,33 @@ export async function InsertarProductos(p) {
   return true;
 }
 
+// Nueva función para insertar múltiples productos
+export async function InsertarProductosMasivo(productos) {
+  const { data, error } = await supabase.from(tabla).insert(productos).select();
+
+  if (error) {
+    console.error("Error en inserción masiva:", error);
+    throw error;
+  }
+
+  return data;
+}
+
+// Nueva función para verificar códigos existentes
+export async function VerificarCodigosExistentes(codigos) {
+  const { data, error } = await supabase
+    .from(tabla)
+    .select("codigo")
+    .in("codigo", codigos);
+
+  if (error) {
+    console.error("Error verificando códigos:", error);
+    return [];
+  }
+
+  return data?.map((item) => item.codigo) || [];
+}
+
 export async function MostrarProductos() {
   const { data } = await supabase
     .from(tabla)
