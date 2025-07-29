@@ -17,6 +17,7 @@ export function CargarProductosExcel({ onClose }) {
   const [marcas, setMarcas] = useState([]);
   const fileInputRef = useRef();
   const { insertarProductosMasivo } = useProductosStore();
+  const [dragOver, setDragOver] = useState(false);
 
   // Cargar marcas al montar el componente
   useEffect(() => {
@@ -174,20 +175,6 @@ export function CargarProductosExcel({ onClose }) {
             {previewData.length === 0 ? (
               <div className="upload-section">
                 <div className="marcas-disponibles">
-                  <Btnsave
-                    funcion={() => {
-                      const link = document.createElement("a");
-                      link.href =
-                        "https://tgftzyihxjojnnbmlecn.supabase.co/storage/v1/object/public/imagenes//FORMATO_PRODUCTOS.xlsx";
-                      link.download = "/assets/FORMATO_PRODUCTOS.xlsx";
-                      link.click();
-                    }}
-                    bgcolor="#3b82f6"
-                    titulo="Descargar Formato"
-                    icono={<v.iconoguardar />}
-                    color="#fff"
-                  />
-
                   <div
                     style={{
                       display: "flex",
@@ -195,7 +182,9 @@ export function CargarProductosExcel({ onClose }) {
                       padding: "10px",
                     }}
                   >
-                    <p style={{ margin: 0 }}>Marcas disponibles:</p>
+                    <p style={{ margin: 0, marginRight: "10px" }}>
+                      Marcas disponibles:
+                    </p>
                     <div className="marcas-list">
                       {marcas.map((marca) => (
                         <span key={marca.id} className="marca-tag">
@@ -204,6 +193,79 @@ export function CargarProductosExcel({ onClose }) {
                       ))}
                     </div>
                   </div>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "20px",
+                    }}
+                  >
+                    <Btnsave
+                      funcion={() => {
+                        const link = document.createElement("a");
+                        link.href =
+                          "https://tgftzyihxjojnnbmlecn.supabase.co/storage/v1/object/public/imagenes//FORMATO_PRODUCTOS.xlsx";
+                        link.download = "/assets/FORMATO_PRODUCTOS.xlsx";
+                        link.click();
+                      }}
+                      bgcolor={v.colorBotones}
+                      titulo="Descargar Formato"
+                      icono={<v.iconoguardar />}
+                      color="#fff"
+                    />
+
+                    <Btnsave
+                      funcion={() => fileInputRef.current?.click()}
+                      bgcolor={v.colorBotones}
+                      titulo="Seleccionar Archivo"
+                      icono={<v.iconoagregar />}
+                      color="#fff"
+                    />
+                  </div>
+                </div>
+
+                <div
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setDragOver(true);
+                  }}
+                  onDragLeave={() => setDragOver(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setDragOver(false);
+                    const file = e.dataTransfer.files[0];
+                    if (
+                      file &&
+                      (file.name.endsWith(".xlsx") ||
+                        file.name.endsWith(".xls"))
+                    ) {
+                      handleFileSelect({ target: { files: [file] } });
+                    } else {
+                      Swal.fire(
+                        "Archivo inválido",
+                        "Solo se permiten archivos Excel",
+                        "warning"
+                      );
+                    }
+                  }}
+                  style={{
+                    border: `2px dashed ${dragOver ? "#3b82f6" : "#ccc"}`,
+                    borderRadius: "10px",
+                    padding: "30px",
+                    marginBottom: "20px",
+                    backgroundColor: dragOver ? "#f0f9ff" : "transparent",
+                    transition: "0.3s",
+                    cursor: "pointer",
+                  }}
+                >
+                  <p style={{ margin: 0, color: "#666" }}>
+                    {dragOver
+                      ? "Suelta el archivo aquí"
+                      : "Arrastra tu archivo Excel aquí o selecciónalo manualmente"}
+                  </p>
+                  <p style={{ fontSize: "12px", color: "#999" }}>
+                    Formatos soportados: .xlsx, .xls
+                  </p>
                 </div>
 
                 <input
@@ -212,14 +274,6 @@ export function CargarProductosExcel({ onClose }) {
                   ref={fileInputRef}
                   onChange={handleFileSelect}
                   style={{ display: "none" }}
-                />
-
-                <Btnsave
-                  funcion={() => fileInputRef.current?.click()}
-                  bgcolor={v.colorBotones}
-                  titulo="Seleccionar Archivo"
-                  icono={<v.iconoagregar />}
-                  color="#fff"
                 />
               </div>
             ) : (

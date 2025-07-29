@@ -47,13 +47,10 @@ export const useProductosStore = create((set, get) => ({
   // Nueva función para inserción masiva desde Excel
   insertarProductosMasivo: async (productos) => {
     try {
-      // Verificar códigos existentes
-      const codigos = productos.map((p) => p.codigo);
-      const codigosExistentes = await VerificarCodigosExistentes(codigos);
+      const codigosExistentes = await VerificarCodigosExistentes(productos);
 
-      // Filtrar productos que no existan
       const productosNuevos = productos.filter(
-        (p) => !codigosExistentes.includes(p.codigo)
+        (p) => !codigosExistentes.includes(`${p.codigo}-${p.marca_id}`)
       );
 
       if (productosNuevos.length === 0) {

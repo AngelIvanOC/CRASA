@@ -48,15 +48,18 @@ export async function InsertarProductosMasivo(productos) {
 export async function VerificarCodigosExistentes(codigos) {
   const { data, error } = await supabase
     .from(tabla)
-    .select("codigo")
-    .in("codigo", codigos);
+    .select("codigo, marca_id")
+    .in(
+      "codigo",
+      codigos.map((p) => p.codigo)
+    );
 
   if (error) {
     console.error("Error verificando códigos:", error);
     return [];
   }
 
-  return data?.map((item) => item.codigo) || [];
+  return data?.map((item) => `${item.codigo}-${item.marca_id}`) || [];
 }
 
 export async function MostrarProductos() {
