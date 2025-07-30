@@ -114,6 +114,11 @@ export function TablaVentas({
       ),
     },
     {
+      accessorKey: "usuarios.nombres",
+      header: "RESPONSABLE",
+      cell: (info) => <span>{info.getValue() || "No asignado"}</span>,
+    },
+    {
       accessorKey: "factura_url",
       header: "FACTURA",
       enableSorting: false,
@@ -308,26 +313,32 @@ const Container = styled.div`
 
           /* Distribución específica por columna */
           &:nth-child(1) {
-            width: 15%;
+            width: 12.5%;
           } /* # PEDIDO */
           &:nth-child(2) {
-            width: 20%;
+            width: 12.5%;
           } /* MARCA */
           &:nth-child(3) {
-            width: 12%;
+            width: 12.5%;
+            text-align: center; /* CANTIDAD */
           } /* CANTIDAD */
           &:nth-child(4) {
-            width: 15%;
+            width: 12.5%;
+            text-align: center;
           } /* CANTIDAD TOTAL */
           &:nth-child(5) {
-            width: 15%;
+            width: 12.5%;
           } /* FECHA */
           &:nth-child(6) {
-            width: 13%;
+            width: 12.5%;
             text-align: center;
           } /* FACTURA */
           &:nth-child(7) {
-            width: 10%;
+            width: 12.5%;
+            text-align: center; /* ACCIONES */
+          }
+          &:nth-child(8) {
+            width: 12.5%;
             text-align: center; /* Centrar acciones */
           } /* ACCIONES */
         }
@@ -342,28 +353,37 @@ const Container = styled.div`
 
       th {
         &:nth-child(1) {
-          width: 15%;
+          width: 12.5%;
         }
         &:nth-child(2) {
-          width: 20%;
+          width: 12.5%;
         }
         &:nth-child(3) {
-          width: 12%;
-        }
-        &:nth-child(4) {
-          width: 15%;
-        }
-        &:nth-child(5) {
-          width: 15%;
-        }
-        &:nth-child(6) {
-          width: 13%;
+          width: 12.5%;
           .header-content {
             justify-content: center;
           }
         }
+        &:nth-child(4) {
+          width: 12.5%;
+          .header-content {
+            justify-content: center;
+          }
+        }
+        &:nth-child(5) {
+          width: 12.5%;
+        }
+        &:nth-child(6) {
+          width: 12.5%;
+        }
         &:nth-child(7) {
-          width: 10%;
+          width: 12.5%;
+          .header-content {
+            justify-content: center;
+          }
+        }
+        &:nth-child(8) {
+          width: 12.5%;
         }
       }
     }

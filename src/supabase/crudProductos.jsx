@@ -74,21 +74,51 @@ export async function MostrarProductos() {
       cantidad,
       racks(id, codigo_rack),
       marcas(id, nombre),
-      piso(cantidad)
+      piso(cantidad),
+      cajas(id, cantidad),
+      suelto(id,cantidad)
     `
     )
     .order("id", { ascending: false });
-  const productosConPiso =
-    data?.map((producto) => ({
-      ...producto,
-      cantidad_piso:
+  const productosConCalculos =
+    data?.map((producto) => {
+      // Calcular cantidad de piso (suma de cantidades)
+      const cantidad_piso =
         producto.piso?.reduce(
           (total, item) => total + (item.cantidad || 0),
           0
-        ) || 0,
-    })) || [];
+        ) || 0;
 
-  return productosConPiso;
+      // Calcular cantidad de suelto (suma de cantidades)
+      const cantidad_suelto =
+        producto.suelto?.reduce(
+          (total, item) => total + (item.cantidad || 0),
+          0
+        ) || 0;
+
+      // Calcular tarimas como en la app móvil:
+      // cantidadTarimas = cajas con cantidad > 0
+      const cajasConCantidad = Array.isArray(producto.cajas)
+        ? producto.cajas.filter((caja) => caja.cantidad > 0).length
+        : 0;
+
+      // registrosSuelto = cantidad de registros en suelto
+      const registrosSuelto = Array.isArray(producto.suelto)
+        ? producto.suelto.length
+        : 0;
+
+      // Total tarimas = cajas con cantidad + registros suelto
+      const totalTarimas = cajasConCantidad + registrosSuelto;
+
+      return {
+        ...producto,
+        cantidad_piso,
+        cantidad_suelto,
+        tarimas: totalTarimas, // Nueva propiedad que coincide con la app móvil
+      };
+    }) || [];
+
+  return productosConCalculos;
 }
 
 export async function BuscarProductos(p) {
@@ -104,7 +134,9 @@ export async function BuscarProductos(p) {
       cantidad,
       racks(id, codigo_rack),
       marcas(id, nombre),
-      piso(cantidad)
+      piso(cantidad),
+      cajas(id, cantidad),
+      suelto(id,cantidad)
     `
   );
 
@@ -125,17 +157,37 @@ export async function BuscarProductos(p) {
     return [];
   }
 
-  const productosConPiso =
-    data?.map((producto) => ({
-      ...producto,
-      cantidad_piso:
+  const productosConCalculos =
+    data?.map((producto) => {
+      // Calcular cantidad de piso (suma de cantidades)
+      const cantidad_piso =
         producto.piso?.reduce(
           (total, item) => total + (item.cantidad || 0),
           0
-        ) || 0,
-    })) || [];
+        ) || 0;
 
-  return productosConPiso;
+      // Calcular tarimas como en la app móvil:
+      // cantidadTarimas = cajas con cantidad > 0
+      const cajasConCantidad = Array.isArray(producto.cajas)
+        ? producto.cajas.filter((caja) => caja.cantidad > 0).length
+        : 0;
+
+      // registrosSuelto = cantidad de registros en suelto
+      const registrosSuelto = Array.isArray(producto.suelto)
+        ? producto.suelto.length
+        : 0;
+
+      // Total tarimas = cajas con cantidad + registros suelto
+      const totalTarimas = cajasConCantidad + registrosSuelto;
+
+      return {
+        ...producto,
+        cantidad_piso,
+        tarimas: totalTarimas, // Nueva propiedad que coincide con la app móvil
+      };
+    }) || [];
+
+  return productosConCalculos;
 }
 
 export async function EliminarProductos(p) {

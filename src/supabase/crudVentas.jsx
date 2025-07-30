@@ -15,7 +15,8 @@ export async function MostrarVentas() {
       cantidad_total,
       fecha,
       factura_url,
-      marcas(id, nombre)
+      marcas(id, nombre),
+      usuarios(id, nombres)
     `
     )
     .order("fecha", { ascending: false });

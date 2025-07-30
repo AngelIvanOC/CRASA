@@ -87,16 +87,20 @@ export function TablaProductos({
       cell: (info) => <span>{info.getValue() || "-"}</span>,
     },
     {
-      accessorKey: "cajas",
-      header: "TARIMA",
+      accessorKey: "tarimas",
+      header: "TARIMAS",
       cell: (info) => <span>{info.getValue() || 0}</span>,
     },
     {
       accessorKey: "cantidad",
-      header: "CANTIDAD",
+      header: "EN RACK",
       cell: (info) => <span>{info.getValue() || 0}</span>,
     },
-
+    {
+      accessorKey: "cantidad_suelto",
+      header: "SUELTO",
+      cell: (info) => <span>{info.getValue() || 0}</span>,
+    },
     {
       accessorKey: "cantidad_piso",
       header: "PISO",
@@ -283,13 +287,13 @@ const Container = styled.div`
             width: 5%;
           } /* Código */
           &:nth-child(2) {
-            width: 40%;
+            width: 36%;
           } /* Nombre */
           &:nth-child(3) {
-            width: 10%;
+            width: 12%;
           } /* Marca */
           &:nth-child(4) {
-            width: 10%;
+            width: 8%;
             text-align: center;
           } /* Cajas */
           &:nth-child(5) {
@@ -297,11 +301,15 @@ const Container = styled.div`
             text-align: center;
           } /* Cantidad */
           &:nth-child(6) {
-            width: 10%;
+            width: 8%;
+            text-align: center;
+          } /* Suelto */
+          &:nth-child(7) {
+            width: 8%;
             text-align: center;
           } /* Piso */
-          &:nth-child(7) {
-            width: 10%;
+          &:nth-child(8) {
+            width: 8%;
             text-align: center; /* Centrar acciones */
           } /* Acciones */
         }
@@ -319,13 +327,13 @@ const Container = styled.div`
           width: 5%;
         }
         &:nth-child(2) {
-          width: 40%;
+          width: 36%;
         }
         &:nth-child(3) {
-          width: 10%;
+          width: 12%;
         }
         &:nth-child(4) {
-          width: 10%;
+          width: 8%;
           .header-content {
             justify-content: center;
           }
@@ -338,13 +346,19 @@ const Container = styled.div`
         }
 
         &:nth-child(6) {
-          width: 10%;
+          width: 8%;
           .header-content {
             justify-content: center;
           }
         }
         &:nth-child(7) {
-          width: 10%;
+          width: 8%;
+          .header-content {
+            justify-content: center;
+          }
+        }
+        &:nth-child(8) {
+          width: 8%;
         }
       }
     }

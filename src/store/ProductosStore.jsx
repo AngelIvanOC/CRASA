@@ -97,8 +97,20 @@ export const useProductosStore = create((set, get) => ({
     return response;
   },
 
+  calcularTarimas: (producto) => {
+    const cajasConCantidad = Array.isArray(producto.cajas)
+      ? producto.cajas.filter((caja) => caja.cantidad > 0).length
+      : 0;
+
+    const registrosSuelto = Array.isArray(producto.suelto)
+      ? producto.suelto.length
+      : 0;
+
+    return cajasConCantidad + registrosSuelto;
+  },
+
   mostrarProductosConFiltros: async () => {
-    const { filtros } = get();
+    const { filtros, calcularTarimas } = get();
     console.log("mostrarProductosConFiltros con filtros:", filtros);
 
     let query = supabase.from("productos").select(`
@@ -109,7 +121,9 @@ export const useProductosStore = create((set, get) => ({
         cantidad,
         racks(id, codigo_rack),
         marcas(id, nombre),
-        piso(cantidad)
+        piso(cantidad),
+        cajas(id, cantidad),
+        suelto(id, cantidad)
       `);
 
     // Aplicar filtro de marca si existe
@@ -125,20 +139,45 @@ export const useProductosStore = create((set, get) => ({
       return [];
     }
 
-    const productosConPiso =
-      data?.map((producto) => ({
-        ...producto,
-        cantidad_piso:
+    const productosConCalculos =
+      data?.map((producto) => {
+        // Calcular cantidad de piso
+        const cantidad_piso =
           producto.piso?.reduce(
             (total, item) => total + (item.cantidad || 0),
             0
-          ) || 0,
-      })) || [];
+          ) || 0;
 
-    console.log("Productos filtrados:", productosConPiso);
-    set({ dataProductos: productosConPiso });
-    set({ productoItemSelect: productosConPiso[0] });
-    return productosConPiso;
+        // Calcular cantidad de suelto
+        const cantidad_suelto =
+          producto.suelto?.reduce(
+            (total, item) => total + (item.cantidad || 0),
+            0
+          ) || 0;
+
+        // Calcular tarimas como en la app móvil
+        const cajasConCantidad = Array.isArray(producto.cajas)
+          ? producto.cajas.filter((caja) => caja.cantidad > 0).length
+          : 0;
+
+        const registrosSuelto = Array.isArray(producto.suelto)
+          ? producto.suelto.length
+          : 0;
+
+        const totalTarimas = cajasConCantidad + registrosSuelto;
+
+        return {
+          ...producto,
+          cantidad_piso,
+          cantidad_suelto,
+          tarimas: totalTarimas,
+        };
+      }) || [];
+
+    console.log("Productos filtrados:", productosConCalculos);
+    set({ dataProductos: productosConCalculos });
+    set({ productoItemSelect: productosConCalculos[0] });
+    return productosConCalculos;
   },
 
   buscarProductosConFiltros: async (p) => {

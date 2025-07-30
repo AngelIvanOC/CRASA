@@ -11,11 +11,13 @@ import { v } from "../../styles/variables";
 import { useState } from "react";
 import { ModalFiltros } from "../moleculas/ModalFiltros";
 import { CargarProductosExcel } from "../moleculas/CargarProductosExcel";
+import { ExportarProductosExcel } from "../moleculas/ExportarProductosExcel";
 
 export function AlmacenTemplate() {
   const [openRegistro, SetopenRegistro] = useState(false);
   const [openFiltros, setOpenFiltros] = useState(false);
   const [openCargarExcel, setOpenCargarExcel] = useState(false); // Nuevo estado
+  const [openExportarExcel, setOpenExportarExcel] = useState(false);
 
   const {
     dataProductos,
@@ -73,6 +75,10 @@ export function AlmacenTemplate() {
         <CargarProductosExcel onClose={() => setOpenCargarExcel(false)} />
       )}
 
+      {openExportarExcel && (
+        <ExportarProductosExcel onClose={() => setOpenExportarExcel(false)} />
+      )}
+
       <ModalFiltros
         isOpen={openFiltros}
         onClose={() => setOpenFiltros(false)}
@@ -97,6 +103,15 @@ export function AlmacenTemplate() {
             </FilterButton>
             <Buscador setBuscador={handleBuscar} />
           </div>
+
+          <Btnsave
+            funcion={() => setOpenExportarExcel(true)}
+            bgcolor="#f59e0b" // Amarillo para diferenciarlo
+            titulo="Exportar Excel"
+            icono={<v.iconoagregar />} // Asume que tienes un icono de descarga
+            color="#fff"
+          />
+
           <Btnsave
             funcion={() => setOpenCargarExcel(true)}
             bgcolor="#10b981" // Verde para diferenciarlo
