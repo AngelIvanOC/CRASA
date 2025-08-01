@@ -10,10 +10,15 @@ import {
   PdfUploader,
 } from "../../../index";
 import { v } from "../../../styles/variables";
+import { ExcelUploader } from "../../moleculas/ExcelUploader"; // Nuevo
 
 // Importar nuevos módulos
 import { usePdfReader } from "../../../hooks/usePdfReader";
-import { insertVentaWithProducts } from "../../../services/ventaService";
+import { useExcelReader } from "../../../hooks/useExcelReader"; // Nuevo
+import {
+  insertVentaWithProducts,
+  insertVentaWithExcelProducts, // Nuevo
+} from "../../../services/ventaService";
 
 export function RegistrarVenta({
   onClose,
@@ -24,11 +29,26 @@ export function RegistrarVenta({
   const { insertarVenta } = useVentasStore();
   const [isPending, setIsPending] = useState(false);
   const [marcas, setMarcas] = useState([]);
+  const [uploadType, setUploadType] = useState("pdf"); // "pdf" o "excel"
   const queryClient = useQueryClient();
 
-  // Hook personalizado para PDF
-  const { pdfFile, pdfPreview, extractedData, isProcessing, processPdfFile } =
-    usePdfReader();
+  // Hook para PDF
+  const {
+    pdfFile,
+    pdfPreview,
+    extractedData: pdfData,
+    isProcessing: isPdfProcessing,
+    processPdfFile,
+  } = usePdfReader();
+
+  // Hook para Excel
+  const {
+    excelFile,
+    excelPreview,
+    extractedData: excelData,
+    isProcessing: isExcelProcessing,
+    processExcelFile,
+  } = useExcelReader();
 
   const {
     register,
@@ -38,17 +58,29 @@ export function RegistrarVenta({
     setValue,
   } = useForm();
 
-  // Mutation para insertar
-  const { mutate: doInsertar } = useMutation({
+  // Mutation para insertar con PDF
+  const { mutate: doInsertarPdf } = useMutation({
     mutationFn: (data) =>
-      insertVentaWithProducts(
-        { ...data, pdfFile },
-        extractedData,
-        insertarVenta
-      ),
-    mutationKey: "insertar venta",
+      insertVentaWithProducts({ ...data, pdfFile }, pdfData, insertarVenta),
+    mutationKey: "insertar venta pdf",
     onError: (err) => {
-      console.error("Error al insertar venta:", err);
+      console.error("Error al insertar venta con PDF:", err);
+      setIsPending(false);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["mostrar ventas"]);
+      cerrarFormulario();
+      setIsPending(false);
+    },
+  });
+
+  // Mutation para insertar con Excel
+  const { mutate: doInsertarExcel } = useMutation({
+    mutationFn: (data) =>
+      insertVentaWithExcelProducts(data, excelData, insertarVenta, excelFile),
+    mutationKey: "insertar venta excel",
+    onError: (err) => {
+      console.error("Error al insertar venta con Excel:", err);
       setIsPending(false);
     },
     onSuccess: () => {
@@ -60,7 +92,16 @@ export function RegistrarVenta({
 
   const handlesub = (data) => {
     setIsPending(true);
-    doInsertar(data);
+
+    if (uploadType === "excel" && excelData) {
+      doInsertarExcel(data);
+    } else if (uploadType === "pdf" && pdfData) {
+      doInsertarPdf(data);
+    } else {
+      // Inserción manual normal
+      setIsPending(false);
+      console.error("No hay datos para insertar");
+    }
   };
 
   const cerrarFormulario = () => {
@@ -71,27 +112,38 @@ export function RegistrarVenta({
   const handleFileSelect = async (file) => {
     try {
       const data = await processPdfFile(file);
+      autocompletarFormulario(data);
+    } catch (error) {
+      console.error("Error procesando archivo PDF:", error);
+    }
+  };
 
-      // Autocompletar formulario
-      if (data) {
-        if (data.pedidoNo) setValue("codigo", data.pedidoNo);
-        if (data.cantidadProductos)
-          setValue("cantidad_productos", data.cantidadProductos);
-        if (data.cantidadTotal) setValue("cantidad_total", data.cantidadTotal);
-        if (data.fecha) setValue("fecha", data.fecha);
+  const handleExcelSelect = async (file) => {
+    try {
+      const data = await processExcelFile(file);
+      autocompletarFormulario(data);
+    } catch (error) {
+      console.error("Error procesando archivo Excel:", error);
+    }
+  };
 
-        // Buscar marca
-        if (marcas.length > 0 && data.marca) {
-          const marcaEncontrada = marcas.find((m) =>
-            m.nombre.toLowerCase().includes(data.marca.toLowerCase())
-          );
-          if (marcaEncontrada) {
-            setValue("marca_id", marcaEncontrada.id);
-          }
+  const autocompletarFormulario = (data) => {
+    if (data) {
+      if (data.pedidoNo) setValue("codigo", data.pedidoNo);
+      if (data.cantidadProductos)
+        setValue("cantidad_productos", data.cantidadProductos);
+      if (data.cantidadTotal) setValue("cantidad_total", data.cantidadTotal);
+      if (data.fecha) setValue("fecha", data.fecha);
+
+      // Buscar marca
+      if (marcas.length > 0 && data.marca) {
+        const marcaEncontrada = marcas.find((m) =>
+          m.nombre.toLowerCase().includes(data.marca.toLowerCase())
+        );
+        if (marcaEncontrada) {
+          setValue("marca_id", marcaEncontrada.id);
         }
       }
-    } catch (error) {
-      console.error("Error procesando archivo:", error);
     }
   };
 
@@ -144,35 +196,61 @@ export function RegistrarVenta({
             </section>
           </div>
 
-          {/* Componente para subir PDF */}
+          {/* Selector de tipo de archivo */}
           {accion !== "Editar" && (
-            <PdfUploader
-              onFileSelect={handleFileSelect}
-              pdfPreview={pdfPreview}
-              isProcessing={isProcessing}
-            />
-          )}
+            <div style={{ marginBottom: "20px" }}>
+              <div
+                style={{ display: "flex", gap: "10px", marginBottom: "15px" }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setUploadType("pdf")}
+                  style={{
+                    padding: "8px 16px",
+                    backgroundColor:
+                      uploadType === "pdf" ? v.colorBotones : "#6c757d",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Factura PDF
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setUploadType("excel")}
+                  style={{
+                    padding: "8px 16px",
+                    backgroundColor:
+                      uploadType === "excel" ? "#217346" : "#6c757d",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Archivo Excel
+                </button>
+              </div>
 
-          {/** 
-          {extractedData?.rawText && (
-            <div
-              style={{
-                whiteSpace: "pre-wrap",
-                maxHeight: "200px",
-                overflowY: "auto",
-                backgroundColor: "#f5f5f5",
-                padding: "10px",
-                borderRadius: "8px",
-                marginTop: "15px",
-              }}
-            >
-              <h3 style={{ marginBottom: "8px", color: "#666" }}>
-                Texto extraído del PDF:
-              </h3>
-              <p>{extractedData.rawText}</p>
+              {/* Componentes para subir archivos */}
+              {uploadType === "pdf" ? (
+                <PdfUploader
+                  onFileSelect={handleFileSelect}
+                  pdfPreview={pdfPreview}
+                  isProcessing={isPdfProcessing}
+                />
+              ) : (
+                <ExcelUploader
+                  onFileSelect={handleExcelSelect}
+                  excelPreview={excelPreview}
+                  isProcessing={isExcelProcessing}
+                />
+              )}
             </div>
           )}
-*/}
+
           <form className="formulario" onSubmit={handleSubmit(handlesub)}>
             {/* Componente del formulario */}
             <VentaForm
@@ -182,12 +260,30 @@ export function RegistrarVenta({
               dataSelect={dataSelect}
               accion={accion}
             />
+            <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
+              <Btnsave
+                icono={<v.iconoguardar />}
+                titulo="Guardar"
+                bgcolor={v.colorBotones}
+                color="#fff"
+              />
 
-            <Btnsave
-              icono={<v.iconoguardar />}
-              titulo="Guardar"
-              bgcolor={v.colorBotones}
-            />
+              {uploadType === "excel" && (
+                <Btnsave
+                  funcion={() => {
+                    const link = document.createElement("a");
+                    link.href =
+                      "https://tgftzyihxjojnnbmlecn.supabase.co/storage/v1/object/public/imagenes//FORMATO_VENTA.xlsx";
+                    link.download = "/assets/FORMATO_VENTA.xlsx";
+                    link.click();
+                  }}
+                  bgcolor={v.colorBotones}
+                  titulo="Descargar Formato"
+                  icono={<v.iconoguardar />}
+                  color="#fff"
+                />
+              )}
+            </div>
           </form>
         </div>
       )}
