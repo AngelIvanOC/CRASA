@@ -10,6 +10,7 @@ import {
 import { v } from "../../styles/variables";
 import { useState } from "react";
 import { Device } from "../../index";
+import { RegistrarDevolucion } from "../organismos/formularios/RegistrarDevolucion";
 
 export function VentasTemplate() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -17,11 +18,16 @@ export function VentasTemplate() {
   const [accion, setAccion] = useState("");
   const [dataSelect, setdataSelect] = useState([]);
   const { dataVentas } = useVentasStore();
+  const [openDevolucion, setOpenDevolucion] = useState(false);
 
   function nuevoRegistro() {
     SetopenRegistro(!openRegistro);
     setAccion("Nuevo");
     setdataSelect([]);
+  }
+
+  function nuevaDevolucion() {
+    setOpenDevolucion(!openDevolucion);
   }
 
   return (
@@ -34,6 +40,12 @@ export function VentasTemplate() {
         />
       )}
 
+      {openDevolucion && (
+        <RegistrarDevolucion
+          onClose={() => setOpenDevolucion(!openDevolucion)}
+        />
+      )}
+
       <Title className="titulo" $colortexto="#9291A5">
         <img src={v.almacen} alt="" /> VENTAS
       </Title>
@@ -41,6 +53,14 @@ export function VentasTemplate() {
       <section className="main">
         <section className="header">
           <Buscador />
+
+          <Btnsave
+            funcion={nuevaDevolucion}
+            bgcolor={v.colorBotones}
+            titulo="Registrar Devolución"
+            icono={<v.iconoagregar />}
+            color="#fff"
+          />
 
           <Btnsave
             funcion={nuevoRegistro}

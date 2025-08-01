@@ -162,6 +162,7 @@ const parseCrasa = (text) => {
     "Referencia",
     "Folio",
     "Uso del",
+    "UUID",
   ];
 
   const regexProhibido = new RegExp(`^(${palabrasProhibidas.join("|")})`, "i");
