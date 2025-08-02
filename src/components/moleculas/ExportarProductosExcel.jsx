@@ -94,11 +94,11 @@ export function ExportarProductosExcel({ onClose }) {
           CODIGO: producto.codigo,
           NOMBRE: producto.nombre,
           MARCA: producto.marcas?.nombre || "",
+          TOTAL: total,
           TARIMAS: totalTarimas,
           CANTIDAD_RACK: producto.cantidad || 0,
           CANTIDAD_SUELTO: cantidadSuelto,
           CANTIDAD_PISO: cantidadPiso,
-          TOTAL: total, // NUEVA COLUMNA
         };
       });
 
