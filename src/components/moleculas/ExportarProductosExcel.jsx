@@ -82,6 +82,14 @@ export function ExportarProductosExcel({ onClose }) {
             0
           ) || 0;
 
+        // AGREGAR: Calcular registros de piso
+        const registrosPiso = Array.isArray(producto.piso)
+          ? producto.piso.length
+          : 0;
+
+        // AGREGAR: Calcular total (tarimas + registros de piso)
+        const total = totalTarimas + registrosPiso;
+
         return {
           CODIGO: producto.codigo,
           NOMBRE: producto.nombre,
@@ -90,6 +98,7 @@ export function ExportarProductosExcel({ onClose }) {
           CANTIDAD_RACK: producto.cantidad || 0,
           CANTIDAD_SUELTO: cantidadSuelto,
           CANTIDAD_PISO: cantidadPiso,
+          TOTAL: total, // NUEVA COLUMNA
         };
       });
 
@@ -114,7 +123,7 @@ export function ExportarProductosExcel({ onClose }) {
       };
 
       // Aplicar estilos a los headers (fila 1)
-      const headerCells = ["A1", "B1", "C1", "D1", "E1", "F1", "G1"];
+      const headerCells = ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"];
       headerCells.forEach((cell) => {
         if (!ws[cell]) ws[cell] = {};
         ws[cell].s = headerStyle;

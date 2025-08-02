@@ -87,6 +87,11 @@ export function TablaProductos({
       cell: (info) => <span>{info.getValue() || "-"}</span>,
     },
     {
+      accessorKey: "total",
+      header: "TOTAL",
+      cell: (info) => <span>{info.getValue() || 0}</span>,
+    },
+    {
       accessorKey: "tarimas",
       header: "TARIMAS",
       cell: (info) => <span>{info.getValue() || 0}</span>,
@@ -290,26 +295,30 @@ const Container = styled.div`
             width: 36%;
           } /* Nombre */
           &:nth-child(3) {
-            width: 12%;
+            width: 10%;
           } /* Marca */
           &:nth-child(4) {
             width: 8%;
             text-align: center;
-          } /* Cajas */
+          } /* Total */
           &:nth-child(5) {
-            width: 10%;
+            width: 8%;
             text-align: center;
-          } /* Cantidad */
+          } /* Cajas */
           &:nth-child(6) {
             width: 8%;
             text-align: center;
-          } /* Suelto */
+          } /* Cantidad */
           &:nth-child(7) {
             width: 8%;
             text-align: center;
-          } /* Piso */
+          } /* Suelto */
           &:nth-child(8) {
             width: 8%;
+            text-align: center;
+          } /* Piso */
+          &:nth-child(9) {
+            width: 10%;
             text-align: center; /* Centrar acciones */
           } /* Acciones */
         }
@@ -330,7 +339,7 @@ const Container = styled.div`
           width: 36%;
         }
         &:nth-child(3) {
-          width: 12%;
+          width: 10%;
         }
         &:nth-child(4) {
           width: 8%;
@@ -339,7 +348,7 @@ const Container = styled.div`
           }
         }
         &:nth-child(5) {
-          width: 10%;
+          width: 8%;
           .header-content {
             justify-content: center;
           }
@@ -359,6 +368,12 @@ const Container = styled.div`
         }
         &:nth-child(8) {
           width: 8%;
+          .header-content {
+            justify-content: center;
+          }
+        }
+        &:nth-child(9) {
+          width: 10%;
         }
       }
     }
