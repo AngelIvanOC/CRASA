@@ -120,7 +120,7 @@ export async function MostrarProductos() {
         cantidad_piso,
         cantidad_suelto,
         tarimas: totalTarimas,
-        total: totalTarimas + registrosPiso, // Nueva propiedad que coincide con la app móvil
+        total: cantidad_piso + cantidad_suelto + producto.cantidad, // Nueva propiedad que coincide con la app móvil
       };
     }) || [];
 
@@ -177,6 +177,13 @@ export async function BuscarProductos(p) {
         ? producto.piso.length
         : 0;
 
+      // Calcular cantidad de suelto (suma de cantidades)
+      const cantidad_suelto =
+        producto.suelto?.reduce(
+          (total, item) => total + (item.cantidad || 0),
+          0
+        ) || 0;
+
       // Calcular tarimas como en la app móvil:
       // cantidadTarimas = cajas con cantidad > 0
       const cajasConCantidad = Array.isArray(producto.cajas)
@@ -196,7 +203,7 @@ export async function BuscarProductos(p) {
         cantidad_piso,
         cantidad_suelto,
         tarimas: totalTarimas,
-        total: totalTarimas + registrosPiso, // Nueva propiedad que coincide con la app móvil
+        total: cantidad_piso + cantidad_suelto + producto.cantidad, // Nueva propiedad que coincide con la app móvil
       };
     }) || [];
 

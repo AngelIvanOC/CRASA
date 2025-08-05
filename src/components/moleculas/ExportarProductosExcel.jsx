@@ -88,7 +88,7 @@ export function ExportarProductosExcel({ onClose }) {
           : 0;
 
         // AGREGAR: Calcular total (tarimas + registros de piso)
-        const total = totalTarimas + registrosPiso;
+        const total = cantidadPiso + cantidadSuelto + producto.cantidad;
 
         return {
           CODIGO: producto.codigo,

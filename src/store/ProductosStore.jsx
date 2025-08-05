@@ -171,6 +171,7 @@ export const useProductosStore = create((set, get) => ({
           cantidad_piso,
           cantidad_suelto,
           tarimas: totalTarimas,
+          total: cantidad_piso + cantidad_suelto + producto.cantidad, // Nueva propiedad que coincide con la app móvil
         };
       }) || [];
 
@@ -192,7 +193,9 @@ export const useProductosStore = create((set, get) => ({
     cantidad,
     racks(id, codigo_rack),
     marcas(id, nombre),
-    piso(cantidad)
+    piso(cantidad),
+      cajas(id, cantidad),
+      suelto(id,cantidad)
   `);
 
     // Aplicar búsqueda
@@ -217,14 +220,40 @@ export const useProductosStore = create((set, get) => ({
     }
 
     const productosConPiso =
-      data?.map((producto) => ({
-        ...producto,
-        cantidad_piso:
+      data?.map((producto) => {
+        const cantidad_piso =
           producto.piso?.reduce(
             (total, item) => total + (item.cantidad || 0),
             0
-          ) || 0,
-      })) || [];
+          ) || 0;
+
+        const cantidad_suelto =
+          producto.suelto?.reduce(
+            (total, item) => total + (item.cantidad || 0),
+            0
+          ) || 0;
+
+        // cantidadTarimas = cajas con cantidad > 0
+        const cajasConCantidad = Array.isArray(producto.cajas)
+          ? producto.cajas.filter((caja) => caja.cantidad > 0).length
+          : 0;
+
+        // registrosSuelto = cantidad de registros en suelto
+        const registrosSuelto = Array.isArray(producto.suelto)
+          ? producto.suelto.length
+          : 0;
+
+        // Total tarimas = cajas con cantidad + registros suelto
+        const totalTarimas = cajasConCantidad + registrosSuelto;
+
+        return {
+          ...producto,
+          cantidad_piso,
+          cantidad_suelto,
+          tarimas: totalTarimas,
+          total: cantidad_piso + cantidad_suelto + producto.cantidad, // Nueva propiedad que coincide con la app móvil
+        };
+      }) || [];
 
     set({ dataProductos: productosConPiso });
     return productosConPiso;

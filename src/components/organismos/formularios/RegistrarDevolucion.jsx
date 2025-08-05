@@ -28,6 +28,14 @@ export function RegistrarDevolucion({ onClose, setIsExploding }) {
       setIsPending(false);
     },
     onSuccess: () => {
+      Swal.fire({
+        icon: "success",
+        title: "¡Devolución registrada!",
+        text: "La devolución se ha procesado correctamente.",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+
       queryClient.invalidateQueries(["mostrar piso"]); // Actualizar datos de piso
       cerrarFormulario();
       setIsPending(false);
