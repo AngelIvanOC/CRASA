@@ -19,6 +19,7 @@ import { useQuery } from "@tanstack/react-query";
 export function MyRoutes() {
   const { user, loadingSession } = UserAuth();
   const { dataUsuarios, mostrarusuarios } = useUsuariosStore();
+  const esEncargado = dataUsuarios?.id_rol === 3;
 
   //const { mostrarempresa, dataempresa } = useEmpresaStore();
   const { isLoading, error } = useQuery({
@@ -48,8 +49,9 @@ export function MyRoutes() {
       <Route element={<ProtectedRoute user={user} redirectTo="/login" />}>
         {/*<Route path="/configuracion" element={<Configuracion />} />
         <Route path="/configuracion/categorias" element={<Categorias />} />*/}
+
         <Route path="/" element={<Dashboard />} />
-        <Route path="/usuarios" element={<Usuarios />} />
+        {!esEncargado && <Route path="/usuarios" element={<Usuarios />} />}
         <Route path="/almacen" element={<Almacen />} />
         <Route path="/almacen/:productoId/cajas" element={<CajasProducto />} />
         <Route path="/racks" element={<Racks />} />

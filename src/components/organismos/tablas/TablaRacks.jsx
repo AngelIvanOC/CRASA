@@ -4,6 +4,7 @@ import {
   useRacksStore,
   Paginacion,
   Icono,
+  useUsuariosStore,
 } from "../../../index";
 import Swal from "sweetalert2";
 import { v } from "../../../styles/variables";
@@ -30,6 +31,10 @@ export function TablaRacks({
   const [datas, setData] = useState(data);
   const [columnFilters, setColumnFilters] = useState([]);
   const { eliminarRack } = useRacksStore();
+
+  const { dataUsuarios } = useUsuariosStore();
+
+  const esEncargado = dataUsuarios?.id_rol === 3;
 
   function eliminar(p) {
     Swal.fire({
@@ -114,8 +119,10 @@ export function TablaRacks({
       enableSorting: false,
       cell: (info) => (
         <ContentAccionesTabla
-          funcionEditar={() => editar(info.row.original)}
-          funcionEliminar={() => eliminar(info.row.original)}
+          funcionEditar={!esEncargado ? () => editar(info.row.original) : null}
+          funcionEliminar={
+            !esEncargado ? () => eliminar(info.row.original) : null
+          }
         />
       ),
     },

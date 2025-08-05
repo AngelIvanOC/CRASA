@@ -6,6 +6,7 @@ import {
   Btnsave,
   Buscador,
   RegistrarVenta,
+  useUsuariosStore,
 } from "../../index";
 import { v } from "../../styles/variables";
 import { useState } from "react";
@@ -19,6 +20,9 @@ export function VentasTemplate() {
   const [dataSelect, setdataSelect] = useState([]);
   const { dataVentas } = useVentasStore();
   const [openDevolucion, setOpenDevolucion] = useState(false);
+
+  const { dataUsuarios } = useUsuariosStore();
+  const esEncargado = dataUsuarios?.id_rol === 3;
 
   function nuevoRegistro() {
     SetopenRegistro(!openRegistro);
@@ -54,13 +58,15 @@ export function VentasTemplate() {
         <section className="header">
           <Buscador />
 
-          <Btnsave
-            funcion={nuevaDevolucion}
-            bgcolor={v.colorBotones}
-            titulo="Registrar Devolución"
-            icono={<v.iconoagregar />}
-            color="#fff"
-          />
+          {!esEncargado && (
+            <Btnsave
+              funcion={nuevaDevolucion}
+              bgcolor={v.colorBotones}
+              titulo="Registrar Devolución"
+              icono={<v.iconoagregar />}
+              color="#fff"
+            />
+          )}
 
           <Btnsave
             funcion={nuevoRegistro}

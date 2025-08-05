@@ -6,6 +6,7 @@ import {
   useProductosStore,
   TablaProductos,
   RegistrarProductos,
+  useUsuariosStore,
 } from "../../index";
 import { v } from "../../styles/variables";
 import { useState } from "react";
@@ -18,6 +19,9 @@ export function AlmacenTemplate() {
   const [openFiltros, setOpenFiltros] = useState(false);
   const [openCargarExcel, setOpenCargarExcel] = useState(false); // Nuevo estado
   const [openExportarExcel, setOpenExportarExcel] = useState(false);
+
+  const { dataUsuarios } = useUsuariosStore();
+  const esEncargado = dataUsuarios?.id_rol === 3;
 
   const {
     dataProductos,
@@ -104,29 +108,33 @@ export function AlmacenTemplate() {
             <Buscador setBuscador={handleBuscar} />
           </div>
 
-          <Btnsave
-            funcion={() => setOpenExportarExcel(true)}
-            bgcolor="#f59e0b" // Amarillo para diferenciarlo
-            titulo="Exportar Excel"
-            icono={<v.iconoagregar />} // Asume que tienes un icono de descarga
-            color="#fff"
-          />
+          {!esEncargado && (
+            <>
+              <Btnsave
+                funcion={() => setOpenExportarExcel(true)}
+                bgcolor="#f59e0b" // Amarillo para diferenciarlo
+                titulo="Exportar Excel"
+                icono={<v.iconoagregar />} // Asume que tienes un icono de descarga
+                color="#fff"
+              />
 
-          <Btnsave
-            funcion={() => setOpenCargarExcel(true)}
-            bgcolor="#10b981" // Verde para diferenciarlo
-            titulo="Cargar Excel"
-            icono={<v.iconoagregar />} // Puedes usar otro icono si tienes uno para Excel
-            color="#fff"
-          />
+              <Btnsave
+                funcion={() => setOpenCargarExcel(true)}
+                bgcolor="#10b981" // Verde para diferenciarlo
+                titulo="Cargar Excel"
+                icono={<v.iconoagregar />} // Puedes usar otro icono si tienes uno para Excel
+                color="#fff"
+              />
 
-          <Btnsave
-            funcion={nuevoRegistro}
-            bgcolor={v.colorBotones}
-            titulo="Nuevo Producto"
-            icono={<v.iconoagregar />}
-            color="#fff"
-          />
+              <Btnsave
+                funcion={nuevoRegistro}
+                bgcolor={v.colorBotones}
+                titulo="Nuevo Producto"
+                icono={<v.iconoagregar />}
+                color="#fff"
+              />
+            </>
+          )}
         </section>
         <TablaProductos
           data={dataProductos}

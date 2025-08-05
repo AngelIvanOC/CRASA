@@ -4,6 +4,7 @@ import {
   useProductosStore,
   Paginacion,
   Icono,
+  useUsuariosStore,
 } from "../../../index";
 import Swal from "sweetalert2";
 import { v } from "../../../styles/variables";
@@ -33,8 +34,11 @@ export function TablaProductos({
   const [datas, setData] = useState(data);
   const [columnFilters, setColumnFilters] = useState([]);
   const { eliminarProducto } = useProductosStore();
+  const { dataUsuarios } = useUsuariosStore();
 
   const navigate = useNavigate();
+
+  const esEncargado = dataUsuarios?.id_rol === 3;
 
   function eliminar(p) {
     Swal.fire({
@@ -118,8 +122,10 @@ export function TablaProductos({
       enableSorting: false,
       cell: (info) => (
         <ContentAccionesTabla
-          funcionEditar={() => editar(info.row.original)}
-          funcionEliminar={() => eliminar(info.row.original)}
+          funcionEditar={!esEncargado ? () => editar(info.row.original) : null}
+          funcionEliminar={
+            !esEncargado ? () => eliminar(info.row.original) : null
+          }
           funcionVer={() => handleVerCajas(info.row.original)}
         />
       ),

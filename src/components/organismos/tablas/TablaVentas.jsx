@@ -3,6 +3,7 @@ import {
   useVentasStore,
   Paginacion,
   ContentAccionesTabla,
+  useUsuariosStore,
 } from "../../../index";
 import { v } from "../../../styles/variables";
 import { useState, useEffect } from "react";
@@ -33,6 +34,9 @@ export function TablaVentas({
   const [selectedVenta, setSelectedVenta] = useState(null);
   const [datas, setData] = useState(data);
   const [columnFilters, setColumnFilters] = useState([]);
+
+  const { dataUsuarios } = useUsuariosStore();
+  const esEncargado = dataUsuarios?.id_rol === 3;
 
   const navigate = useNavigate();
 
@@ -142,8 +146,10 @@ export function TablaVentas({
       enableSorting: false,
       cell: (info) => (
         <ContentAccionesTabla
-          funcionEditar={() => editar(info.row.original)}
-          funcionEliminar={() => eliminar(info.row.original)}
+          funcionEditar={!esEncargado ? () => editar(info.row.original) : null}
+          funcionEliminar={
+            !esEncargado ? () => eliminar(info.row.original) : null
+          }
           funcionVer={() => handleVerDetalle(info.row.original)}
         />
       ),

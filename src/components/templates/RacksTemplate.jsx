@@ -6,6 +6,7 @@ import {
   useRacksStore,
   TablaRacks,
   RegistrarRacks,
+  useUsuariosStore,
 } from "../../index";
 import { v } from "../../styles/variables";
 
@@ -17,6 +18,9 @@ export function RacksTemplate() {
     useRacksStore();
   const [accion, setAccion] = useState("");
   const [dataSelect, setdataSelect] = useState([]);
+
+  const { dataUsuarios } = useUsuariosStore();
+  const esEncargado = dataUsuarios?.id_rol === 3;
 
   function nuevoRegistro() {
     SetopenRegistro(!openRegistro);
@@ -62,13 +66,15 @@ export function RacksTemplate() {
         <section className="header">
           <Buscador setBuscador={handleBuscar} />
 
-          <Btnsave
-            funcion={nuevoRegistro}
-            bgcolor={v.colorBotones}
-            titulo="Nuevo Rack"
-            icono={<v.iconoagregar />}
-            color="#fff"
-          />
+          {!esEncargado && (
+            <Btnsave
+              funcion={nuevoRegistro}
+              bgcolor={v.colorBotones}
+              titulo="Nuevo Rack"
+              icono={<v.iconoagregar />}
+              color="#fff"
+            />
+          )}
         </section>
         <TablaRacks
           data={dataRacks}
