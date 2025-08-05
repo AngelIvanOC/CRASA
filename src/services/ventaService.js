@@ -59,24 +59,37 @@ const insertProductsFromExtractedData = async (productos, ventaId) => {
 
   for (const producto of productos) {
     try {
-      // Buscar producto existente
-      const { data: productoExistente } = await supabase
-        .from("productos")
-        .select("id")
-        .eq("codigo", producto.codigo)
-        .maybeSingle();
+      const codigoNumerico = parseInt(producto.codigo);
 
-      let productoId = productoExistente?.id;
-      const marcaId = mapaMarcas[producto.marca?.toUpperCase()] ?? null;
-
-      if (marcaId === null) {
-        console.error("Marca desconocida:", producto.marca);
+      if (!codigoNumerico || isNaN(codigoNumerico)) {
+        console.error("❌ Código inválido:", producto.codigo);
         continue;
       }
 
+      const marcaId = mapaMarcas[producto.marca?.toUpperCase()] ?? null;
+
+      if (marcaId === null) {
+        console.error("❌ Marca desconocida:", producto.marca);
+        continue;
+      }
+
+      // Buscar producto existente
+      const { data: productoExistente, error: errorBusqueda } = await supabase
+        .from("productos")
+        .select("id, codigo, nombre, marca_id")
+        .eq("codigo", codigoNumerico)
+        .eq("marca_id", marcaId)
+        .maybeSingle();
+
+      let productoId = productoExistente?.id;
+
       // Crear producto si no existe
-      /*if (!productoId) {
-        const { data: nuevoProducto, error: errorProducto } = await supabase
+      if (!productoId) {
+        console.warn(
+          `Producto con código ${producto.codigo} no existe - omitiendo`
+        );
+        continue;
+        /*const { data: nuevoProducto, error: errorProducto } = await supabase
           .from("productos")
           .insert({
             codigo: producto.codigo,
@@ -91,8 +104,8 @@ const insertProductsFromExtractedData = async (productos, ventaId) => {
           continue;
         }
 
-        productoId = nuevoProducto.id;
-      }*/
+        productoId = productoId;*/
+      }
 
       // Insertar detalle de venta
       const { error: errorDetalle } = await supabase
@@ -103,7 +116,9 @@ const insertProductsFromExtractedData = async (productos, ventaId) => {
           cantidad: producto.cantidad || 0,
           fecha_caducidad: null,
           ubicacion: null,
-        });
+        })
+        .select("*")
+        .single();
 
       if (errorDetalle) {
         console.error("Error insertando detalle:", errorDetalle);
