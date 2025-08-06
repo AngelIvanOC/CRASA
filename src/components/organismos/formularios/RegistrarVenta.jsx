@@ -8,6 +8,7 @@ import {
   useVentasStore,
   VentaForm,
   PdfUploader,
+  InputText,
 } from "../../../index";
 import { v } from "../../../styles/variables";
 import { ExcelUploader } from "../../moleculas/ExcelUploader"; // Nuevo
@@ -31,6 +32,7 @@ export function RegistrarVenta({
   const [marcas, setMarcas] = useState([]);
   const [uploadType, setUploadType] = useState("pdf"); // "pdf" o "excel"
   const queryClient = useQueryClient();
+  const [usuarios, setUsuarios] = useState([]);
 
   // Hook para PDF
   const {
@@ -179,6 +181,21 @@ export function RegistrarVenta({
     }
   }, [accion, dataSelect, reset]);
 
+  // Cargar usuarios
+  useEffect(() => {
+    async function cargarDatos() {
+      const [usuariosData] = await Promise.all([
+        supabase.from("usuarios").select("*").eq("id_rol", 2).order("nombres"),
+      ]);
+
+      setUsuarios(usuariosData.data || []);
+
+      console.log("Usuarios cargados:", usuariosData.data);
+    }
+
+    cargarDatos();
+  }, []);
+
   return (
     <Container>
       {isPending ? (
@@ -200,7 +217,7 @@ export function RegistrarVenta({
           {accion !== "Editar" && (
             <div style={{ marginBottom: "20px" }}>
               <div
-                style={{ display: "flex", gap: "10px", marginBottom: "15px" }}
+                style={{ display: "flex", gap: "10px", marginBottom: "10px" }}
               >
                 <button
                   type="button"
@@ -248,6 +265,31 @@ export function RegistrarVenta({
                   isProcessing={isExcelProcessing}
                 />
               )}
+
+              <section>
+                <article>
+                  <InputText>
+                    <select
+                      className="form__field"
+                      {...register("usuario", {
+                        required: true,
+                      })}
+                      defaultValue={dataSelect?.usuario || ""}
+                    >
+                      <option value="">Seleccione encargado</option>
+                      {usuarios?.map((usuario) => (
+                        <option key={usuario.id} value={usuario.id_auth}>
+                          {usuario.nombres}
+                        </option>
+                      ))}
+                    </select>
+                    <label className="form__label">Usuario</label>
+                    {errors.usuario?.type === "required" && (
+                      <p>Campo requerido</p>
+                    )}
+                  </InputText>
+                </article>
+              </section>
             </div>
           )}
 
@@ -259,6 +301,7 @@ export function RegistrarVenta({
               marcas={marcas}
               dataSelect={dataSelect}
               accion={accion}
+              usuarios={usuarios}
             />
             <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
               <Btnsave
@@ -321,7 +364,6 @@ const Container = styled.div`
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
 
       h1 {
         font-size: 20px;
@@ -334,7 +376,7 @@ const Container = styled.div`
     }
 
     .pdf-upload-section {
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       .pdf-preview {
         margin-top: 10px;
         border: 1px solid #ddd;

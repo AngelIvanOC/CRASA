@@ -1,5 +1,11 @@
 import styled from "styled-components";
-import { Title, TablaCajas, Buscador, Btnsave } from "../../index";
+import {
+  Title,
+  TablaCajas,
+  Buscador,
+  Btnsave,
+  useUsuariosStore,
+} from "../../index";
 import { v } from "../../styles/variables";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -15,6 +21,10 @@ export function CajasProductoTemplate({
   const [accion, setAccion] = useState("");
   const [dataSelect, setdataSelect] = useState([]);
   const [isExploding, setIsExploding] = useState(false);
+
+  const { dataUsuarios } = useUsuariosStore();
+
+  const esEncargado = dataUsuarios?.id_rol === 3;
 
   const navigate = useNavigate();
 
@@ -49,13 +59,15 @@ export function CajasProductoTemplate({
       <section className="main">
         <section className="header">
           <Buscador />
-          <Btnsave
-            funcion={nuevoRegistro}
-            bgcolor={v.colorBotones}
-            titulo="Nueva Caja"
-            icono={<v.iconoagregar />}
-            color="#fff"
-          />
+          {!esEncargado && (
+            <Btnsave
+              funcion={nuevoRegistro}
+              bgcolor={v.colorBotones}
+              titulo="Nueva Caja"
+              icono={<v.iconoagregar />}
+              color="#fff"
+            />
+          )}
         </section>
         <TablaCajas
           data={cajas}

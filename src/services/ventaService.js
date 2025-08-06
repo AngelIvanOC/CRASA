@@ -31,6 +31,7 @@ export const insertVentaWithProducts = async (
     marca_id: ventaData.marca_id || null,
     fecha: ventaData.fecha || null,
     factura_url: pdfUrl,
+    usuario: ventaData.usuario,
   };
 
   const idVentaNueva = await insertarVenta(ventaInsertData);
@@ -145,6 +146,7 @@ export const insertVentaWithExcelProducts = async (
     marca_id: ventaData.marca_id || null,
     fecha: ventaData.fecha || extractedData.fecha,
     factura_url: excelUrl,
+    usuario: ventaData.usuario,
   };
 
   const idVentaNueva = await insertarVenta(ventaInsertData);
