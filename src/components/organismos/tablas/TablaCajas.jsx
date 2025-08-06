@@ -1,3 +1,5 @@
+// TablaCajas.js - Tabla actualizada
+
 import styled from "styled-components";
 import {
   ContentAccionesTabla,
@@ -45,41 +47,63 @@ export function TablaCajas({
       cell: (info) => <span>{info.getValue() || "-"}</span>,
     },
     {
-      accessorKey: "racks.codigo_rack",
+      accessorKey: "ubicacion",
       header: "UBICACIÓN",
-      cell: (info) => <span>{info.getValue() || "-"}</span>,
+      cell: (info) => (
+        <span
+          style={{
+            fontWeight: info.row.original.tipo !== "caja" ? "bold" : "normal",
+            color:
+              info.row.original.tipo === "suelto"
+                ? "#e67e22"
+                : info.row.original.tipo === "piso"
+                ? "#e74c3c"
+                : "inherit",
+          }}
+        >
+          {info.getValue() || "-"}
+        </span>
+      ),
     },
     {
       accessorKey: "fecha_entrada",
       header: "ENTRADA",
       cell: (info) => <span>{info.getValue()?.split("T")[0] || "-"}</span>,
     },
+
     {
       accessorKey: "acciones",
       header: "",
       enableSorting: false,
       cell: (info) => (
         <ContentAccionesTabla
-          funcionEditar={() => editarCaja(info.row.original)}
-          funcionEliminar={() => eliminarCaja(info.row.original)}
+          funcionEditar={() => editarRegistro(info.row.original)}
+          funcionEliminar={() => eliminarRegistro(info.row.original)}
         />
       ),
     },
   ];
 
-  function editarCaja(caja) {
+  function editarRegistro(registro) {
     setAccion("Editar");
-    setdataSelect(caja);
+    setdataSelect(registro);
     SetopenRegistro((prev) => {
       if (!prev) return true;
       return prev;
     });
   }
 
-  async function eliminarCaja(caja) {
+  async function eliminarRegistro(registro) {
+    const tipoTexto =
+      registro.tipo === "caja"
+        ? "caja"
+        : registro.tipo === "suelto"
+        ? "registro suelto"
+        : "registro de piso";
+
     const result = await Swal.fire({
       title: "¿Estás seguro?",
-      text: "¡No podrás revertir esto!",
+      text: `¡No podrás revertir la eliminación de este ${tipoTexto}!`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -89,23 +113,40 @@ export function TablaCajas({
 
     if (result.isConfirmed) {
       try {
-        // Liberar el rack primero
-        if (caja.rack_id) {
+        // Liberar el rack si es una caja
+        if (registro.tipo === "caja" && registro.rack_id) {
           await supabase
             .from("racks")
             .update({ ocupado: false })
-            .eq("id", caja.rack_id);
+            .eq("id", registro.rack_id);
         }
 
-        // Luego eliminar la caja
-        await supabase.from("cajas").delete().eq("id", caja.id);
+        // Eliminar según el tipo
+        let tabla;
+        switch (registro.tipo) {
+          case "caja":
+            tabla = "cajas";
+            break;
+          case "suelto":
+            tabla = "suelto";
+            break;
+          case "piso":
+            tabla = "piso";
+            break;
+          default:
+            throw new Error("Tipo de registro no válido");
+        }
+
+        await supabase.from(tabla).delete().eq("id", registro.id);
+
         if (typeof refreshCajas === "function") {
           refreshCajas();
         }
+
         Swal.fire({
           icon: "success",
           title: "¡Eliminado!",
-          text: "La caja ha sido eliminada correctamente.",
+          text: `El ${tipoTexto} ha sido eliminado correctamente.`,
           timer: 2000,
           showConfirmButton: false,
         });
@@ -270,19 +311,19 @@ const Container = styled.div`
             width: 20%;
           }
           &:nth-child(2) {
-            width: 10%;
+            width: 12%;
           }
           &:nth-child(3) {
             width: 20%;
           }
           &:nth-child(4) {
-            width: 20%;
+            width: 23%;
           }
           &:nth-child(5) {
             width: 20%;
           }
           &:nth-child(6) {
-            width: 10%;
+            width: 5%;
           }
         }
       }
@@ -298,19 +339,19 @@ const Container = styled.div`
           width: 20%;
         }
         &:nth-child(2) {
-          width: 10%;
+          width: 12%;
         }
         &:nth-child(3) {
           width: 20%;
         }
         &:nth-child(4) {
-          width: 20%;
+          width: 23%;
         }
         &:nth-child(5) {
           width: 20%;
         }
         &:nth-child(6) {
-          width: 10%;
+          width: 5%;
         }
       }
     }

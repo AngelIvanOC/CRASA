@@ -3,69 +3,129 @@ import Swal from "sweetalert2";
 
 const tabla = "cajas";
 
+// crudCajas.js - Funciones actualizadas
+
 export async function ObtenerCajasPorProducto(producto_id) {
-  const { data, error } = await supabase
-    .from(tabla)
-    .select(
+  try {
+    // Obtener cajas
+    const { data: cajas } = await supabase
+      .from("cajas")
+      .select(
+        `
+        *,
+        racks (codigo_rack)
       `
-      id,
-      cantidad,
-      fecha_caducidad,
-      codigo_barras,
-      fecha_entrada,
-      racks(id, codigo_rack)
-    `
-    )
-    .eq("producto_id", producto_id)
-    .order("fecha_entrada", { ascending: false });
+      )
+      .eq("producto_id", producto_id);
 
-  if (error) {
-    Swal.fire({
-      icon: "error",
-      title: "Error al obtener cajas",
-      text: error.message,
+    // Obtener registros sueltos
+    const { data: sueltos } = await supabase
+      .from("suelto")
+      .select("*")
+      .eq("producto_id", producto_id);
+
+    // Obtener registros de piso
+    const { data: pisos } = await supabase
+      .from("piso")
+      .select("*")
+      .eq("producto_id", producto_id);
+
+    // Formatear datos unificados
+    const cajasFormateadas = (cajas || []).map((caja) => ({
+      ...caja,
+      tipo: "caja",
+      ubicacion: caja.racks?.codigo_rack || "-",
+    }));
+
+    const sueltosFormateados = (sueltos || []).map((suelto) => ({
+      ...suelto,
+      tipo: "suelto",
+      ubicacion: "SUELTO",
+      racks: null,
+      rack_id: null,
+    }));
+
+    const pisosFormateados = (pisos || []).map((piso) => ({
+      ...piso,
+      tipo: "piso",
+      ubicacion: "EN PISO",
+      racks: null,
+      rack_id: null,
+      fecha_entrada: null,
+    }));
+
+    // Combinar todos los registros
+    const todosLosRegistros = [
+      ...cajasFormateadas,
+      ...sueltosFormateados,
+      ...pisosFormateados,
+    ].sort((a, b) => {
+      // Ordenar por fecha de entrada (más reciente primero)
+      const fechaA = a.fecha_entrada ? new Date(a.fecha_entrada) : new Date(0);
+      const fechaB = b.fecha_entrada ? new Date(b.fecha_entrada) : new Date(0);
+      return fechaB - fechaA;
     });
-    return [];
-  }
 
-  return data;
+    return todosLosRegistros;
+  } catch (error) {
+    console.error("Error al obtener registros:", error);
+    throw error;
+  }
 }
 
 export async function InsertarCaja(caja) {
   const { data, error } = await supabase.from("cajas").insert([caja]).select();
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  if (error) throw error;
+  return data;
+}
 
-  Swal.fire({
-    icon: "success",
-    title: "¡Caja creada!",
-    text: "Caja creada correctamente.",
-    timer: 2000,
-    showConfirmButton: false,
-  });
+export async function InsertarSuelto(suelto) {
+  const { data, error } = await supabase
+    .from("suelto")
+    .insert([suelto])
+    .select();
 
-  return data[0];
+  if (error) throw error;
+  return data;
+}
+
+export async function InsertarPiso(piso) {
+  const { data, error } = await supabase.from("piso").insert([piso]).select();
+
+  if (error) throw error;
+  return data;
 }
 
 export async function EditarCaja(caja) {
-  const { id, ...rest } = caja;
   const { data, error } = await supabase
     .from("cajas")
-    .update(rest)
-    .eq("id", id)
+    .update(caja)
+    .eq("id", caja.id)
     .select();
 
-  if (error) throw new Error(error.message);
+  if (error) throw error;
+  return data;
+}
 
-  Swal.fire({
-    icon: "success",
-    title: "¡Actualizado!",
-    text: "Caja actualizada correctamente.",
-    timer: 2000,
-    showConfirmButton: false,
-  });
+export async function EditarSuelto(suelto) {
+  const { data, error } = await supabase
+    .from("suelto")
+    .update(suelto)
+    .eq("id", suelto.id)
+    .select();
 
-  return data[0];
+  if (error) throw error;
+  return data;
+}
+
+export async function EditarPiso(piso) {
+  const { data, error } = await supabase
+    .from("piso")
+    .update(piso)
+    .eq("id", piso.id)
+    .select();
+
+  if (error) throw error;
+  return data;
 }

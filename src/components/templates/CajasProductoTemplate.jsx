@@ -1,3 +1,5 @@
+// CajasProductoTemplate.js - Template actualizado
+
 import styled from "styled-components";
 import {
   Title,
@@ -54,7 +56,7 @@ export function CajasProductoTemplate({
             <v.felchaizquierdalarga />
           </span>
         )}
-        <img src={v.emojiAlmacen} alt="" /> CAJAS
+        <img src={v.emojiAlmacen} alt="" /> INVENTARIO
       </Title>
       <section className="main">
         <section className="header">
@@ -63,7 +65,7 @@ export function CajasProductoTemplate({
             <Btnsave
               funcion={nuevoRegistro}
               bgcolor={v.colorBotones}
-              titulo="Nueva Caja"
+              titulo="Nuevo Registro"
               icono={<v.iconoagregar />}
               color="#fff"
             />
@@ -85,7 +87,6 @@ const Container = styled.div`
   height: 100vh;
   display: flex;
   flex-direction: column;
-  //justify-content: center;
   padding: 0px 30px 0 0;
 
   .titulo {

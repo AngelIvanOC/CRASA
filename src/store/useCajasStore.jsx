@@ -1,8 +1,14 @@
+// useCajasStore.js - Store actualizado
+
 import { create } from "zustand";
 import {
   ObtenerCajasPorProducto,
   InsertarCaja,
+  InsertarSuelto,
+  InsertarPiso,
   EditarCaja,
+  EditarSuelto,
+  EditarPiso,
 } from "../supabase/crudCajas";
 import { supabase } from "../supabase/supabase.config";
 
@@ -13,9 +19,9 @@ export const useCajasStore = create((set) => ({
   setDataCajas: (data) => set({ dataCajas: data }),
 
   obtenerCajasPorProducto: async (producto_id) => {
-    const cajas = await ObtenerCajasPorProducto(producto_id);
-    set({ dataCajas: cajas });
-    return cajas;
+    const registros = await ObtenerCajasPorProducto(producto_id);
+    set({ dataCajas: registros });
+    return registros;
   },
 
   insertarCaja: async (caja) => {
@@ -23,41 +29,92 @@ export const useCajasStore = create((set) => ({
     return nuevaCaja;
   },
 
+  insertarSuelto: async (suelto) => {
+    const nuevoSuelto = await InsertarSuelto(suelto);
+    return nuevoSuelto;
+  },
+
+  insertarPiso: async (piso) => {
+    const nuevoPiso = await InsertarPiso(piso);
+    return nuevoPiso;
+  },
+
   editarCaja: async (caja) => {
     const cajaActualizada = await EditarCaja(caja);
     return cajaActualizada;
   },
 
-  guardarCaja: async ({ dataForm, accion, productoId, dataSelect }) => {
-    const caja = {
+  editarSuelto: async (suelto) => {
+    const sueltoActualizado = await EditarSuelto(suelto);
+    return sueltoActualizado;
+  },
+
+  editarPiso: async (piso) => {
+    const pisoActualizado = await EditarPiso(piso);
+    return pisoActualizado;
+  },
+
+  guardarRegistro: async ({
+    dataForm,
+    accion,
+    productoId,
+    dataSelect,
+    tipoRegistro,
+  }) => {
+    const registro = {
       producto_id: dataSelect?.producto_id || parseInt(productoId),
       cantidad: dataForm.cantidad ? parseInt(dataForm.cantidad) : null,
       fecha_caducidad: dataForm.fecha_caducidad || null,
-      rack_id: dataForm.rack_id ? parseInt(dataForm.rack_id) : null,
       codigo_barras: dataForm.codigo_barras || null,
     };
 
-    // Marcar rack como ocupado si se seleccionó uno
-    if (dataForm.rack_id) {
-      await supabase
-        .from("racks")
-        .update({ ocupado: true })
-        .eq("id", dataForm.rack_id);
+    // Solo para cajas agregamos rack_id
+    if (tipoRegistro === "caja") {
+      registro.rack_id = dataForm.rack_id ? parseInt(dataForm.rack_id) : null;
 
-      // También actualizar el producto si es nuevo
-      if (accion !== "Editar") {
+      // Marcar rack como ocupado si se seleccionó uno
+      if (dataForm.rack_id) {
         await supabase
-          .from("productos")
-          .update({ rack_id: parseInt(dataForm.rack_id) })
-          .eq("id", caja.producto_id);
+          .from("racks")
+          .update({ ocupado: true })
+          .eq("id", dataForm.rack_id);
+
+        // También actualizar el producto si es nuevo
+        if (accion !== "Editar") {
+          await supabase
+            .from("productos")
+            .update({ rack_id: parseInt(dataForm.rack_id) })
+            .eq("id", registro.producto_id);
+        }
       }
     }
 
     if (accion === "Editar") {
-      caja.id = dataSelect.id;
-      return await useCajasStore.getState().editarCaja(caja);
+      registro.id = dataSelect.id;
+
+      // Determinar qué función usar según el tipo de registro
+      switch (dataSelect.tipo || tipoRegistro) {
+        case "caja":
+          return await useCajasStore.getState().editarCaja(registro);
+        case "suelto":
+          return await useCajasStore.getState().editarSuelto(registro);
+        case "piso":
+          return await useCajasStore.getState().editarPiso(registro);
+        default:
+          throw new Error("Tipo de registro no válido");
+      }
     } else {
-      return await useCajasStore.getState().insertarCaja(caja);
+      // Insertar nuevo registro según el tipo
+      switch (tipoRegistro) {
+        case "caja":
+          return await useCajasStore.getState().insertarCaja(registro);
+        case "suelto":
+          return await useCajasStore.getState().insertarSuelto(registro);
+        case "piso":
+          return await useCajasStore.getState().insertarPiso(registro);
+        default:
+          throw new Error("Tipo de registro no válido");
+      }
     }
   },
 }));

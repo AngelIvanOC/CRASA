@@ -1,3 +1,5 @@
+// RegistrarCajas.js - Formulario actualizado
+
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { v } from "../../../styles/variables";
@@ -17,8 +19,9 @@ export function RegistrarCajas({
   setAccion,
   setdataSelect,
 }) {
-  const { guardarCaja } = useCajasStore();
+  const { guardarRegistro } = useCajasStore();
   const [isPending, setIsPending] = useState(false);
+  const [tipoRegistro, setTipoRegistro] = useState("caja");
   const { productoId } = useParams();
 
   const {
@@ -30,8 +33,14 @@ export function RegistrarCajas({
 
   const { mutate: doGuardar } = useMutation({
     mutationFn: (dataForm) =>
-      guardarCaja({ dataForm, accion, productoId, dataSelect }),
-    mutationKey: ["guardar caja", accion, dataSelect?.id],
+      guardarRegistro({
+        dataForm,
+        accion,
+        productoId,
+        dataSelect,
+        tipoRegistro,
+      }),
+    mutationKey: ["guardar registro", accion, dataSelect?.id, tipoRegistro],
     onError: (err) => {
       console.log("Error:", err.message);
       setIsPending(false);
@@ -52,8 +61,9 @@ export function RegistrarCajas({
   const cerrarFormulario = () => {
     onClose();
     setIsExploding(true);
-    setAccion(""); // limpia modo edición
-    setdataSelect([]); // limpia datos seleccionados
+    setAccion("");
+    setdataSelect([]);
+    setTipoRegistro("caja");
   };
 
   const [producto, setProducto] = useState(null);
@@ -69,39 +79,45 @@ export function RegistrarCajas({
 
       setProducto(productoData);
 
-      const { data: racksData } = await supabase
-        .from("racks")
-        .select("*")
-        .eq("ocupado", false)
-        .order("nivel", { ascending: true }) // A < B < C
-        .order("lado", { ascending: true }) // 1 < 2
-        .order("posicion", { ascending: true }); // 1 < 2 < ... < 40;
+      // Construir la consulta de racks
+      let query = supabase.from("racks").select("*");
 
-      // Ordenar por posición numéricamente ya que está guardado como text
+      // Si está editando y tiene rack_id, incluir ese rack aunque esté ocupado
+      if (accion === "Editar" && dataSelect?.rack_id) {
+        query = query.or(`ocupado.eq.false,id.eq.${dataSelect.rack_id}`);
+      } else {
+        query = query.eq("ocupado", false);
+      }
+
+      const { data: racksData } = await query
+        .order("nivel", { ascending: true })
+        .order("lado", { ascending: true })
+        .order("posicion", { ascending: true });
+
       const racksOrdenados = racksData?.sort((a, b) => {
-        // Primero por nivel
         if (a.nivel !== b.nivel) {
           return a.nivel.localeCompare(b.nivel);
         }
-        // Luego por lado
         if (a.lado !== b.lado) {
           return parseInt(a.lado) - parseInt(b.lado);
         }
-        // Finalmente por posición (convertir a número)
         return parseInt(a.posicion) - parseInt(b.posicion);
       });
       setRacks(racksOrdenados || []);
     }
 
     cargarDatos();
-  }, [productoId]);
+  }, [productoId, accion, dataSelect]);
 
   useEffect(() => {
-    if (accion === "Editar") {
+    if (accion === "Editar" && dataSelect) {
+      // Establecer el tipo de registro basado en los datos seleccionados
+      setTipoRegistro(dataSelect.tipo || "caja");
+
       reset({
         cantidad: dataSelect?.cantidad || "",
         fecha_caducidad: dataSelect?.fecha_caducidad || "",
-        rack_id: dataSelect?.rack_id || "",
+        rack_id: dataSelect?.rack_id ? String(dataSelect.rack_id) : "", // Convertir a string para el select
         codigo_barras: dataSelect?.codigo_barras || "",
       });
     } else {
@@ -112,7 +128,20 @@ export function RegistrarCajas({
         codigo_barras: "",
       });
     }
-  }, [accion, dataSelect, reset]);
+  }, [accion, dataSelect, reset, racks]); // Agregar racks como dependencia
+
+  const getTitulo = () => {
+    const tipoTexto =
+      tipoRegistro === "caja"
+        ? "Caja"
+        : tipoRegistro === "suelto"
+        ? "Registro Suelto"
+        : "Registro de Piso";
+
+    return accion === "Editar"
+      ? `Editar ${tipoTexto}`
+      : `Registrar nuevo ${tipoTexto}`;
+  };
 
   return (
     <Container>
@@ -122,14 +151,42 @@ export function RegistrarCajas({
         <div className="sub-contenedor">
           <div className="headers">
             <section>
-              <h1>
-                {accion === "Editar" ? "Editar Caja" : "Registrar nueva Caja"}
-              </h1>
+              <h1>{getTitulo()}</h1>
             </section>
             <section>
               <span onClick={onClose}>x</span>
             </section>
           </div>
+
+          {/* Selector de tipo de registro - solo mostrar si no está editando */}
+          {accion !== "Editar" && (
+            <div className="tipo-selector">
+              <h3>Tipo de registro:</h3>
+              <div className="tipo-buttons">
+                <button
+                  type="button"
+                  className={tipoRegistro === "caja" ? "active" : ""}
+                  onClick={() => setTipoRegistro("caja")}
+                >
+                  CAJA
+                </button>
+                <button
+                  type="button"
+                  className={tipoRegistro === "suelto" ? "active" : ""}
+                  onClick={() => setTipoRegistro("suelto")}
+                >
+                  SUELTO
+                </button>
+                <button
+                  type="button"
+                  className={tipoRegistro === "piso" ? "active" : ""}
+                  onClick={() => setTipoRegistro("piso")}
+                >
+                  EN PISO
+                </button>
+              </div>
+            </div>
+          )}
 
           <form className="formulario" onSubmit={handleSubmit(handlesub)}>
             <section className="form-subcontainer">
@@ -157,26 +214,29 @@ export function RegistrarCajas({
                 </InputText>
               </article>
 
-              <article>
-                <InputText icono={<v.iconoFlechabajo />}>
-                  <select
-                    className="form__field"
-                    {...register("rack_id", {
-                      valueAsNumber: true,
-                      required: false,
-                    })}
-                  >
-                    <option value="">Seleccione un rack</option>
-                    {racks.map((rack) => (
-                      <option key={rack.id} value={rack.id}>
-                        {rack.codigo_rack}
-                      </option>
-                    ))}
-                  </select>
-                  <label className="form__label">Rack</label>
-                  {errors.rack_id && <p>Campo requerido</p>}
-                </InputText>
-              </article>
+              {/* Solo mostrar selector de rack si es tipo "caja" */}
+              {(tipoRegistro === "caja" ||
+                (accion === "Editar" && dataSelect?.tipo === "caja")) && (
+                <article>
+                  <InputText icono={<v.iconoFlechabajo />}>
+                    <select
+                      className="form__field"
+                      {...register("rack_id", {
+                        required: false,
+                      })}
+                    >
+                      <option value="">Seleccione un rack</option>
+                      {racks.map((rack) => (
+                        <option key={rack.id} value={rack.id}>
+                          {rack.codigo_rack}
+                        </option>
+                      ))}
+                    </select>
+                    <label className="form__label">Rack</label>
+                    {errors.rack_id && <p>Campo requerido</p>}
+                  </InputText>
+                </article>
+              )}
 
               <article>
                 <InputText icono={<v.iconoFlechabajo />}>
@@ -239,6 +299,44 @@ const Container = styled.div`
       span {
         font-size: 20px;
         cursor: pointer;
+      }
+    }
+
+    .tipo-selector {
+      margin-bottom: 20px;
+
+      h3 {
+        font-size: 16px;
+        margin-bottom: 10px;
+        color: ${({ theme }) => theme.textsecundario};
+      }
+
+      .tipo-buttons {
+        display: flex;
+        gap: 10px;
+
+        button {
+          flex: 1;
+          padding: 10px 15px;
+          border: 2px solid ${({ theme }) => theme.bgtotalFuerte};
+          background: ${({ theme }) => theme.bgtotal};
+          color: ${({ theme }) => theme.textsecundario};
+          border-radius: 8px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          font-weight: 500;
+
+          &:hover {
+            border-color: ${v.colorBotones};
+            color: ${v.colorBotones};
+          }
+
+          &.active {
+            background: ${v.colorBotones};
+            border-color: ${v.colorBotones};
+            color: white;
+          }
+        }
       }
     }
 
