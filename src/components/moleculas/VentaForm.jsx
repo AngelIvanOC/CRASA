@@ -2,14 +2,7 @@ import React from "react";
 import { InputText } from "../../index";
 import { v } from "../../styles/variables";
 
-export const VentaForm = ({
-  register,
-  errors,
-  marcas,
-  dataSelect,
-  accion,
-  usuarios,
-}) => {
+export const VentaForm = ({ register, errors, marcas, dataSelect, accion }) => {
   if (accion !== "Editar") return null;
 
   return (

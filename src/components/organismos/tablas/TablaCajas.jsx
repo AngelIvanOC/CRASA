@@ -19,7 +19,7 @@ import {
 } from "@tanstack/react-table";
 import { FaCaretDown, FaCaretUp } from "react-icons/fa6";
 import Swal from "sweetalert2";
-import { supabase } from "../../../index";
+import { supabase, useUsuariosStore } from "../../../index";
 
 export function TablaCajas({
   data,
@@ -29,6 +29,9 @@ export function TablaCajas({
   SetopenRegistro,
 }) {
   const [columnFilters, setColumnFilters] = useState([]);
+  const { dataUsuarios } = useUsuariosStore();
+
+  const esEncargado = dataUsuarios?.id_rol === 3;
 
   const columns = [
     {
@@ -77,8 +80,14 @@ export function TablaCajas({
       enableSorting: false,
       cell: (info) => (
         <ContentAccionesTabla
-          funcionEditar={() => editarRegistro(info.row.original)}
-          funcionEliminar={() => eliminarRegistro(info.row.original)}
+          funcionEditar={
+            !esEncargado ? () => editarRegistro(info.row.original) : null
+          }
+          funcionEliminar={
+            !esEncargado
+              ? () => () => eliminarRegistro(info.row.original)
+              : null
+          }
         />
       ),
     },

@@ -3,7 +3,7 @@ import { Btnsave, Title, Buscador, TablaProductosVenta } from "../../index";
 import { v } from "../../styles/variables";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AsignarProductos } from "../organismos/formularios/AsignarProductos";
+import { AsignarResponsable } from "../organismos/formularios/AsignarResponsable";
 
 export function ProductosVentaTemplate({
   detalleVenta,
@@ -26,7 +26,7 @@ export function ProductosVentaTemplate({
   return (
     <Container>
       {openRegistro && (
-        <AsignarProductos
+        <AsignarResponsable
           onClose={() => SetopenRegistro(!openRegistro)}
           dataSelect={dataSelect}
           accion={accion}
