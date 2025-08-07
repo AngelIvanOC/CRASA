@@ -40,10 +40,6 @@ export function TablaVentas({
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    mostrarVentas();
-  }, []);
-
   const handleVerDetalle = (venta) => {
     navigate(`/ventas/${venta.id}/productos`);
   };

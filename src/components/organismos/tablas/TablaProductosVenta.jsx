@@ -236,13 +236,13 @@ export function TablaProductosVenta({
 }
 
 const Container = styled.div`
-  height: 80vh;
+  height: 74vh;
 
   .responsive-table {
     width: 100%;
     border-collapse: collapse;
     font-family: Arial, sans-serif;
-    height: 75vh;
+    height: 69vh;
 
     thead {
       background-color: ${({ theme }) => theme.bgtotalFuerte};

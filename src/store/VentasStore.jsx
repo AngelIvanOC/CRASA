@@ -6,6 +6,9 @@ import {
   EliminarVenta,
   EditarVenta,
   InsertarProductosVenta,
+  MostrarAyudantesVenta,
+  InsertarAyudantesVenta,
+  EliminarAyudantesVenta,
 } from "../index";
 import { supabase } from "../index";
 
@@ -66,6 +69,9 @@ export const useVentasStore = create((set, get) => ({
   },
 
   eliminarVenta: async (p) => {
+    // Eliminar ayudantes primero
+    await EliminarAyudantesVenta(p.id);
+
     await EliminarVenta(p);
     const { mostrarVentas } = get();
     await mostrarVentas();
@@ -90,5 +96,43 @@ export const useVentasStore = create((set, get) => ({
     const { mostrarDetalleVenta } = get();
     await mostrarDetalleVenta(data[0].venta_id); // Reconsulta los detalles
     return true;
+  },
+  mostrarAyudantesVenta: async (venta_id) => {
+    const response = await MostrarAyudantesVenta(venta_id);
+    set({ ayudantesVenta: response });
+    return response;
+  },
+
+  asignarEquipoVenta: async (venta_id, responsable_id, ayudantes_ids = []) => {
+    try {
+      // 1. Actualizar responsable
+      await EditarVenta({
+        id: venta_id,
+        usuario: responsable_id,
+      });
+
+      // 2. Eliminar ayudantes existentes
+      await EliminarAyudantesVenta(venta_id);
+
+      // 3. Insertar nuevos ayudantes
+      if (ayudantes_ids.length > 0) {
+        await InsertarAyudantesVenta(venta_id, ayudantes_ids);
+      }
+
+      // 4. Actualizar datos en el store
+      const { mostrarVentas, mostrarAyudantesVenta } = get();
+      await mostrarVentas();
+      await mostrarAyudantesVenta(venta_id);
+
+      return true;
+    } catch (error) {
+      console.error("Error asignando equipo:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error al asignar equipo",
+        text: error.message,
+      });
+      return false;
+    }
   },
 }));

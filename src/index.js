@@ -95,3 +95,5 @@ export * from "./components/templates/UsuariosTemplate";
 export * from "./components/organismos/formularios/RegistrarUsuario";
 export * from "./components/moleculas/UsuarioForm";
 export * from "./components/organismos/tablas/TablaUsuarios";
+
+export * from "./supabase/crudAyudantes";

@@ -7,10 +7,19 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../../index";
 import { useVentasStore } from "../../../index";
 
-export function AsignarResponsable({ onClose, ventaId, responsableActual }) {
+export function AsignarResponsable({
+  onClose,
+  ventaId,
+  responsableActual,
+  ayudantesActuales = [],
+  onEquipoAsignado, // Nuevo callback
+}) {
   const { editarVenta } = useVentasStore();
   const [isPending, setIsPending] = useState(false);
-  const [usuarios, setUsuarios] = useState([]);
+  const [responsables, setResponsables] = useState([]);
+  const [ayudantes, setAyudantes] = useState([]);
+  const [ayudantesSeleccionados, setAyudantesSeleccionados] =
+    useState(ayudantesActuales);
   const queryClient = useQueryClient();
 
   const {
@@ -18,16 +27,31 @@ export function AsignarResponsable({ onClose, ventaId, responsableActual }) {
     handleSubmit,
     formState: { errors },
     setValue,
+    watch,
   } = useForm();
+
+  const responsableSeleccionado = watch("usuario_id");
 
   useEffect(() => {
     async function cargarUsuarios() {
-      const { data } = await supabase
+      // Cargar responsables (rol 2)
+      const { data: responsablesData } = await supabase
         .from("usuarios")
         .select("id, nombres, id_auth")
+        .eq("id_rol", 2)
+        .eq("estado", "ACTIVO")
         .order("nombres", { ascending: true });
 
-      setUsuarios(data || []);
+      // Cargar ayudantes (rol 5)
+      const { data: ayudantesData } = await supabase
+        .from("usuarios")
+        .select("id, nombres, id_auth")
+        .eq("id_rol", 5)
+        .eq("estado", "ACTIVO")
+        .order("nombres", { ascending: true });
+
+      setResponsables(responsablesData || []);
+      setAyudantes(ayudantesData || []);
 
       // Establecer valor inicial si hay responsable actual
       if (responsableActual) {
@@ -38,28 +62,118 @@ export function AsignarResponsable({ onClose, ventaId, responsableActual }) {
     cargarUsuarios();
   }, [responsableActual, setValue]);
 
-  const { mutate: doAsignarResponsable } = useMutation({
+  // Cargar ayudantes existentes
+  useEffect(() => {
+    async function cargarAyudantesExistentes() {
+      if (ventaId) {
+        const { data } = await supabase
+          .from("ayudantes_venta")
+          .select(
+            `
+            usuario_id,
+            usuarios(id, nombres, id_auth)
+          `
+          )
+          .eq("venta_id", ventaId);
+
+        if (data) {
+          setAyudantesSeleccionados(
+            data.map((item) => ({
+              id_auth: item.usuario_id,
+              nombres: item.usuarios.nombres,
+            }))
+          );
+        }
+      }
+    }
+
+    cargarAyudantesExistentes();
+  }, [ventaId]);
+
+  const agregarAyudante = (ayudanteId) => {
+    const ayudante = ayudantes.find((a) => a.id_auth === ayudanteId);
+    if (
+      ayudante &&
+      !ayudantesSeleccionados.find((a) => a.id_auth === ayudanteId)
+    ) {
+      setAyudantesSeleccionados([...ayudantesSeleccionados, ayudante]);
+    }
+  };
+
+  const removerAyudante = (ayudanteId) => {
+    setAyudantesSeleccionados(
+      ayudantesSeleccionados.filter((a) => a.id_auth !== ayudanteId)
+    );
+  };
+
+  // Filtrar ayudantes disponibles (excluir el responsable seleccionado y los ya agregados)
+  const ayudantesDisponibles = ayudantes.filter(
+    (ayudante) =>
+      ayudante.id_auth !== responsableSeleccionado &&
+      !ayudantesSeleccionados.find((a) => a.id_auth === ayudante.id_auth)
+  );
+
+  const { mutate: doAsignarEquipo } = useMutation({
     mutationFn: async (data) => {
-      return await editarVenta({
+      // 1. Actualizar responsable en la venta
+      const ventaResult = await editarVenta({
         id: ventaId,
         usuario: data.usuario_id,
       });
+
+      // 2. Eliminar ayudantes existentes
+      await supabase.from("ayudantes_venta").delete().eq("venta_id", ventaId);
+
+      // 3. Insertar nuevos ayudantes
+      if (ayudantesSeleccionados.length > 0) {
+        const ayudantesData = ayudantesSeleccionados.map((ayudante) => ({
+          venta_id: ventaId,
+          usuario_id: ayudante.id_auth,
+        }));
+
+        await supabase.from("ayudantes_venta").insert(ayudantesData);
+      }
+
+      // 4. Obtener datos actualizados del responsable
+      const responsableSeleccionadoData = responsables.find(
+        (r) => r.id_auth === data.usuario_id
+      );
+
+      return {
+        ventaResult,
+        nuevoResponsable: responsableSeleccionadoData,
+        nuevosAyudantes: ayudantesSeleccionados,
+      };
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // Invalidar queries
       queryClient.invalidateQueries(["mostrar ventas"]);
       queryClient.invalidateQueries(["detalle venta", ventaId]);
+
+      const ayudantesFormateados = ayudantesSeleccionados.map((ayudante) => ({
+        usuario_id: ayudante.id_auth,
+        usuarios: {
+          nombres: ayudante.nombres,
+        },
+      }));
+
+      // Llamar callback para actualizar el estado en el componente padre
+      if (onEquipoAsignado) {
+        onEquipoAsignado(data.nuevoResponsable, ayudantesFormateados);
+      }
+
       onClose();
       setIsPending(false);
     },
     onError: (error) => {
-      console.error("Error asignando responsable:", error);
+      console.error("Error asignando equipo:", error);
       setIsPending(false);
     },
   });
 
   const onSubmit = (data) => {
     setIsPending(true);
-    doAsignarResponsable(data);
+    doAsignarEquipo(data);
   };
 
   return (
@@ -70,11 +184,7 @@ export function AsignarResponsable({ onClose, ventaId, responsableActual }) {
         <div className="sub-contenedor">
           <div className="headers">
             <section>
-              <h1>
-                {responsableActual
-                  ? "Cambiar Responsable"
-                  : "Asignar Responsable"}
-              </h1>
+              <h1>Asignar Equipo de Trabajo</h1>
             </section>
             <section>
               <span onClick={onClose}>×</span>
@@ -83,30 +193,77 @@ export function AsignarResponsable({ onClose, ventaId, responsableActual }) {
 
           <form onSubmit={handleSubmit(onSubmit)}>
             <section className="form-subcontainer">
-              <article>
-                <InputText>
+              {/* Sección Responsable */}
+              <div className="seccion">
+                <h3>Responsable Principal</h3>
+                <article>
+                  <InputText>
+                    <select
+                      {...register("usuario_id", { required: true })}
+                      className="form__field"
+                    >
+                      <option value="">Seleccione un responsable</option>
+                      {responsables.map((responsable) => (
+                        <option
+                          key={responsable.id}
+                          value={responsable.id_auth}
+                        >
+                          {responsable.nombres}
+                        </option>
+                      ))}
+                    </select>
+                    <label className="form__label">Responsable</label>
+                    {errors.usuario_id && <p>Campo requerido</p>}
+                  </InputText>
+                </article>
+              </div>
+
+              {/* Sección Ayudantes */}
+              <div className="seccion">
+                <h3>Ayudantes</h3>
+
+                {/* Agregar ayudante */}
+                <div className="agregar-ayudante">
                   <select
-                    {...register("usuario_id", { required: true })}
-                    className="form__field"
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        agregarAyudante(e.target.value);
+                        e.target.value = "";
+                      }
+                    }}
+                    className="select-ayudante"
                   >
-                    <option value="">Seleccione un responsable</option>
-                    {usuarios.map((usuario) => (
-                      <option key={usuario.id} value={usuario.id_auth}>
-                        {usuario.nombres}
+                    <option value="">Seleccionar ayudante</option>
+                    {ayudantesDisponibles.map((ayudante) => (
+                      <option key={ayudante.id} value={ayudante.id_auth}>
+                        {ayudante.nombres}
                       </option>
                     ))}
                   </select>
-                  <label className="form__label">Responsable</label>
-                  {errors.usuario_id && <p>Campo requerido</p>}
-                </InputText>
-              </article>
+                </div>
+
+                {/* Lista de ayudantes seleccionados */}
+                <div className="ayudantes-lista">
+                  {ayudantesSeleccionados.map((ayudante) => (
+                    <div key={ayudante.id_auth} className="ayudante-item">
+                      <span>{ayudante.nombres}</span>
+                      <button
+                        type="button"
+                        onClick={() => removerAyudante(ayudante.id_auth)}
+                        className="btn-remover"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                  {ayudantesSeleccionados.length === 0 && (
+                    <p className="sin-ayudantes">No hay ayudantes asignados</p>
+                  )}
+                </div>
+              </div>
 
               <Btnsave
-                titulo={
-                  responsableActual
-                    ? "Actualizar Responsable"
-                    : "Asignar Responsable"
-                }
+                titulo="Asignar Equipo"
                 bgcolor={v.colorBotones}
                 type="submit"
               />
@@ -133,8 +290,8 @@ const Container = styled.div`
 
   .sub-contenedor {
     position: relative;
-    width: 500px;
-    max-width: 85%;
+    width: 600px;
+    max-width: 90%;
     border-radius: 20px;
     background: ${({ theme }) => theme.bgtotal};
     box-shadow: -10px 15px 30px rgba(10, 9, 9, 0.4);
@@ -157,11 +314,78 @@ const Container = styled.div`
       }
     }
 
-    .formulario {
-      .form-subcontainer {
-        gap: 20px;
-        display: flex;
-        flex-direction: column;
+    .form-subcontainer {
+      gap: 25px;
+      display: flex;
+      flex-direction: column;
+
+      .seccion {
+        border: 1px solid ${({ theme }) => theme.borde || "#ddd"};
+        border-radius: 8px;
+        padding: 20px;
+
+        h3 {
+          margin: 0 0 15px 0;
+          font-size: 16px;
+          font-weight: 600;
+          color: ${({ theme }) => theme.text};
+        }
+      }
+
+      .agregar-ayudante {
+        margin-bottom: 15px;
+
+        .select-ayudante {
+          width: 100%;
+          padding: 10px;
+          border: 1px solid ${({ theme }) => theme.borde || "#ddd"};
+          border-radius: 5px;
+          font-size: 14px;
+        }
+      }
+
+      .ayudantes-lista {
+        max-height: 200px;
+        overflow-y: auto;
+
+        .ayudante-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 8px 12px;
+          margin-bottom: 5px;
+          background: ${({ theme }) => theme.bgSecundario || "#f5f5f5"};
+          border-radius: 5px;
+
+          span {
+            font-size: 14px;
+          }
+
+          .btn-remover {
+            background: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            &:hover {
+              background: #ff3742;
+            }
+          }
+        }
+
+        .sin-ayudantes {
+          color: ${({ theme }) => theme.textSecundario || "#666"};
+          font-style: italic;
+          text-align: center;
+          padding: 20px;
+        }
       }
     }
   }
