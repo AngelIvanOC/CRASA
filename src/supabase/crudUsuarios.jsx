@@ -3,7 +3,6 @@ import { supabase } from "../index";
 
 const tabla = "usuarios";
 
-// Función para mostrar TODOS los usuarios (para la tabla)
 export async function MostrarTodosUsuarios() {
   const { data } = await supabase
     .from(tabla)
@@ -33,7 +32,6 @@ export async function MostrarUsuarios(p) {
 }
 
 export async function InsertarUsuario(p) {
-  // Verificar si ya existe un usuario con ese correo
   const { data: usuarioExistente, error: errorVerificacion } = await supabase
     .from(tabla)
     .select("id")
@@ -84,7 +82,6 @@ export async function InsertarUsuario(p) {
   return data?.id;
 }
 
-// Nueva función para obtener usuario con información del rol
 export async function MostrarUsuarioConRol(p) {
   const { data } = await supabase
     .from(tabla)
@@ -163,19 +160,16 @@ export async function EliminarUsuario(p) {
   return true;
 }
 
-// Función para obtener roles
 export async function MostrarRoles() {
   const { data } = await supabase.from("roles").select("*").order("nombre");
   return data;
 }
 
-// Función para crear usuario completo (auth + perfil)
 export async function CrearUsuarioCompleto(p) {
   try {
-    // 1. Crear usuario en auth
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email: p.correo,
-      password: p.password, // Nueva propiedad requerida
+      password: p.password,
       options: {
         data: {
           created_by_admin: true,
@@ -186,7 +180,6 @@ export async function CrearUsuarioCompleto(p) {
 
     if (authError) throw authError;
 
-    // 2. Crear perfil en tabla usuarios
     if (authData.user) {
       const usuarioData = {
         ...p,
@@ -194,7 +187,7 @@ export async function CrearUsuarioCompleto(p) {
         fecharegistro: new Date().toISOString().split("T")[0],
         estado: p.estado || "ACTIVO",
       };
-      delete usuarioData.password; // Remover password del perfil
+      delete usuarioData.password;
 
       const { data, error } = await supabase
         .from(tabla)

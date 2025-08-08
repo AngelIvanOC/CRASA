@@ -20,12 +20,10 @@ export const usePdfReader = () => {
     setExtractedData(null);
 
     try {
-      // Crear vista previa
       const reader = new FileReader();
       reader.onload = (e) => setPdfPreview(e.target.result);
       reader.readAsDataURL(file);
 
-      // Extraer datos
       const extractedData = await extractDataFromPDF(file);
       setExtractedData(extractedData);
 

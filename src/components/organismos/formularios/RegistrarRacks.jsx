@@ -7,10 +7,10 @@ import {
   useRacksStore,
   Icono,
   ConvertirCapitalize,
-  Spinner, // ✅ Agregar Spinner
+  Spinner,
 } from "../../../index";
 import { useForm } from "react-hook-form";
-import { useMutation, useQueryClient } from "@tanstack/react-query"; // ✅ Agregar useQueryClient
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../../index";
 
 export function RegistrarRacks({
@@ -21,7 +21,7 @@ export function RegistrarRacks({
 }) {
   const { insertarRack, editarRack } = useRacksStore();
   const [isPending, setIsPending] = useState(false);
-  const queryClient = useQueryClient(); // ✅ Agregar queryClient
+  const queryClient = useQueryClient();
 
   const {
     register,
@@ -30,22 +30,20 @@ export function RegistrarRacks({
     reset,
   } = useForm();
 
-  // ✅ Mutation para insertar
   const { mutate: doInsertar } = useMutation({
     mutationFn: insertar,
     mutationKey: "insertar racks",
     onError: (err) => {
-      console.error("Error al insertar rack:", err); // ✅ Cambiar a console.error
+      console.error("Error al insertar rack:", err);
       setIsPending(false);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(["mostrar racks"]); // ✅ Invalidar queries
+      queryClient.invalidateQueries(["mostrar racks"]);
       cerrarFormulario();
       setIsPending(false);
     },
   });
 
-  // ✅ Mutation para editar
   const { mutate: doEditar } = useMutation({
     mutationFn: editar,
     mutationKey: "editar rack",
@@ -54,7 +52,7 @@ export function RegistrarRacks({
       setIsPending(false);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(["mostrar racks"]); // ✅ Invalidar queries
+      queryClient.invalidateQueries(["mostrar racks"]);
       cerrarFormulario();
       setIsPending(false);
     },
@@ -68,7 +66,7 @@ export function RegistrarRacks({
         ...data,
         id: dataSelect.id,
       };
-      doEditar(rackData); // ✅ Usar doEditar
+      doEditar(rackData);
     } else {
       doInsertar(data);
     }
@@ -76,7 +74,7 @@ export function RegistrarRacks({
 
   const cerrarFormulario = () => {
     onClose();
-    if (setIsExploding) setIsExploding(true); // ✅ Agregar verificación
+    if (setIsExploding) setIsExploding(true);
   };
 
   async function insertar(data) {
@@ -91,7 +89,6 @@ export function RegistrarRacks({
     await insertarRack(rack);
   }
 
-  // ✅ Función separada para editar
   async function editar(data) {
     const rack = {
       id: data.id,
@@ -138,14 +135,13 @@ export function RegistrarRacks({
   return (
     <Container>
       {isPending ? (
-        <Spinner /> // ✅ Usar componente Spinner
+        <Spinner />
       ) : (
         <div className="sub-contenedor">
           <div className="headers">
             <section>
               <h1>
                 {accion === "Editar" ? "Editar rack" : "Registrar nuevo rack"}{" "}
-                {/* ✅ Cambiar == por === */}
               </h1>
             </section>
 

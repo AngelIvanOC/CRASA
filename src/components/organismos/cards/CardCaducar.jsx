@@ -10,7 +10,7 @@ export function CardCaducar({
   return (
     <Container>
       <section className="content">
-        {/* Header con título y botón opcional */}
+        
         <div className="header">
           <h2>{titulo}</h2>
           {headerButton && <div className="header-button">{headerButton}</div>}
@@ -23,9 +23,9 @@ export function CardCaducar({
         ) : data.length > 0 ? (
           <div className="productos-list">
             {data.map((item, index) => {
-              let color = "#d1f7c4"; // verde
-              if (item.dias <= 3) color = "#fddcdc"; // rojo
-              else if (item.dias <= 6) color = "#fff2cc"; // amarillo
+              let color = "#d1f7c4"; 
+              if (item.dias <= 3) color = "#fddcdc";
+              else if (item.dias <= 6) color = "#fff2cc";
 
               return (
                 <div key={index} className="producto-item">
@@ -69,7 +69,6 @@ const Container = styled.div`
     padding: 10px 0;
   }
 
-  /* Header con título y botón opcional */
   .header {
     display: flex;
     justify-content: center;
@@ -99,16 +98,15 @@ const Container = styled.div`
     }
   }
 
-  /* Lista de productos */
   .productos-list {
     display: flex;
     flex-direction: column;
     gap: 5px;
     overflow-y: scroll;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE 10+ */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     ::-webkit-scrollbar {
-      display: none; /* Chrome, Safari */
+      display: none;
     }
     flex-grow: 1;
   }

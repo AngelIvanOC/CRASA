@@ -57,7 +57,6 @@ const Container = styled.div`
     border-image-slice: 1;
     border: 2px solid #1cb0f6;
   }
-  /* reset input */
   .form__field:required,
   .form__field:invalid {
     box-shadow: none;

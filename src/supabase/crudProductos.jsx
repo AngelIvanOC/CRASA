@@ -32,7 +32,6 @@ export async function InsertarProductos(p) {
   return true;
 }
 
-// Nueva función para insertar múltiples productos
 export async function InsertarProductosMasivo(productos) {
   const { data, error } = await supabase.from(tabla).insert(productos).select();
 
@@ -44,7 +43,6 @@ export async function InsertarProductosMasivo(productos) {
   return data;
 }
 
-// Nueva función para verificar códigos existentes
 export async function VerificarCodigosExistentes(codigos) {
   const { data, error } = await supabase
     .from(tabla)
@@ -82,37 +80,30 @@ export async function MostrarProductos() {
     .order("id", { ascending: false });
   const productosConCalculos =
     data?.map((producto) => {
-      // Calcular cantidad de piso (suma de cantidades)
       const cantidad_piso =
         producto.piso?.reduce(
           (total, item) => total + (item.cantidad || 0),
           0
         ) || 0;
 
-      // AGREGAR: Calcular cantidad de REGISTROS en piso
       const registrosPiso = Array.isArray(producto.piso)
         ? producto.piso.length
         : 0;
 
-      // Calcular cantidad de suelto (suma de cantidades)
       const cantidad_suelto =
         producto.suelto?.reduce(
           (total, item) => total + (item.cantidad || 0),
           0
         ) || 0;
 
-      // Calcular tarimas como en la app móvil:
-      // cantidadTarimas = cajas con cantidad > 0
       const cajasConCantidad = Array.isArray(producto.cajas)
         ? producto.cajas.filter((caja) => caja.cantidad > 0).length
         : 0;
 
-      // registrosSuelto = cantidad de registros en suelto
       const registrosSuelto = Array.isArray(producto.suelto)
         ? producto.suelto.length
         : 0;
 
-      // Total tarimas = cajas con cantidad + registros suelto
       const totalTarimas = cajasConCantidad + registrosSuelto;
 
       return {
@@ -120,7 +111,7 @@ export async function MostrarProductos() {
         cantidad_piso,
         cantidad_suelto,
         tarimas: totalTarimas,
-        total: cantidad_piso + cantidad_suelto + producto.cantidad, // Nueva propiedad que coincide con la app móvil
+        total: cantidad_piso + cantidad_suelto + producto.cantidad,
       };
     }) || [];
 
@@ -128,7 +119,6 @@ export async function MostrarProductos() {
 }
 
 export async function BuscarProductos(p) {
-  // Si el valor de búsqueda es solo números, buscar por código
   const esNumero = !isNaN(p.buscador) && p.buscador.trim() !== "";
 
   let query = supabase.from(tabla).select(
@@ -147,12 +137,10 @@ export async function BuscarProductos(p) {
   );
 
   if (esNumero) {
-    // Buscar por código (número exacto o que empiece con)
     query = query.or(
       `codigo.eq.${p.buscador},codigo::text.like.${p.buscador}%`
     );
   } else {
-    // Buscar solo por nombre si no es número
     query = query.ilike("nombre", `%${p.buscador}%`);
   }
 
@@ -165,37 +153,30 @@ export async function BuscarProductos(p) {
 
   const productosConCalculos =
     data?.map((producto) => {
-      // Calcular cantidad de piso (suma de cantidades)
       const cantidad_piso =
         producto.piso?.reduce(
           (total, item) => total + (item.cantidad || 0),
           0
         ) || 0;
 
-      //Calcular cantidad de REGISTROS en piso
       const registrosPiso = Array.isArray(producto.piso)
         ? producto.piso.length
         : 0;
 
-      // Calcular cantidad de suelto (suma de cantidades)
       const cantidad_suelto =
         producto.suelto?.reduce(
           (total, item) => total + (item.cantidad || 0),
           0
         ) || 0;
 
-      // Calcular tarimas como en la app móvil:
-      // cantidadTarimas = cajas con cantidad > 0
       const cajasConCantidad = Array.isArray(producto.cajas)
         ? producto.cajas.filter((caja) => caja.cantidad > 0).length
         : 0;
 
-      // registrosSuelto = cantidad de registros en suelto
       const registrosSuelto = Array.isArray(producto.suelto)
         ? producto.suelto.length
         : 0;
 
-      // Total tarimas = cajas con cantidad + registros suelto
       const totalTarimas = cajasConCantidad + registrosSuelto;
 
       return {
@@ -203,7 +184,7 @@ export async function BuscarProductos(p) {
         cantidad_piso,
         cantidad_suelto,
         tarimas: totalTarimas,
-        total: cantidad_piso + cantidad_suelto + producto.cantidad, // Nueva propiedad que coincide con la app móvil
+        total: cantidad_piso + cantidad_suelto + producto.cantidad,
       };
     }) || [];
 

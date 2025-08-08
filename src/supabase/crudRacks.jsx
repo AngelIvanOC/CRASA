@@ -124,7 +124,6 @@ export async function BuscarRacks(p) {
     )
     .or(`codigo_rack.ilike.%${p.buscador}%,posicion.ilike.%${p.buscador}%`);
 
-  // Procesar los datos igual que en MostrarRacks
   const racksConOcupacion =
     data?.map((rack) => ({
       ...rack,
@@ -137,7 +136,6 @@ export async function BuscarRacks(p) {
 }
 
 export async function EliminarRack(p) {
-  // Verificar si el rack tiene productos antes de eliminar
   const { data: productosEnRack } = await supabase
     .from("productos")
     .select("id")
@@ -189,7 +187,6 @@ export async function EditarRack(p) {
   return true;
 }
 
-// Función adicional para obtener detalles específicos de un rack
 export async function ObtenerDetalleRack(rackId) {
   const { data, error } = await supabase
     .from(tabla)

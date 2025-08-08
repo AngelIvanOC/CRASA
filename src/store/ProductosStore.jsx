@@ -13,7 +13,7 @@ import { supabase } from "../index";
 export const useProductosStore = create((set, get) => ({
   buscador: "",
   setBuscador: (p) => {
-    console.log("setBuscador llamado con:", p); // Debug
+    console.log("setBuscador llamado con:", p);
     set({ buscador: p });
   },
 
@@ -44,7 +44,6 @@ export const useProductosStore = create((set, get) => ({
     await mostrarProductos();
   },
 
-  // Nueva función para inserción masiva desde Excel
   insertarProductosMasivo: async (productos) => {
     try {
       const codigosExistentes = await VerificarCodigosExistentes(productos);
@@ -61,10 +60,8 @@ export const useProductosStore = create((set, get) => ({
         };
       }
 
-      // Insertar productos nuevos
       const result = await InsertarProductosMasivo(productosNuevos);
 
-      // Refrescar la lista
       const { mostrarProductos } = get();
       await mostrarProductos();
 
@@ -126,7 +123,6 @@ export const useProductosStore = create((set, get) => ({
         suelto(id, cantidad)
       `);
 
-    // Aplicar filtro de marca si existe
     if (filtros.marca && filtros.marca !== "") {
       console.log("Aplicando filtro de marca:", filtros.marca);
       query = query.eq("marca_id", filtros.marca);
@@ -141,21 +137,18 @@ export const useProductosStore = create((set, get) => ({
 
     const productosConCalculos =
       data?.map((producto) => {
-        // Calcular cantidad de piso
         const cantidad_piso =
           producto.piso?.reduce(
             (total, item) => total + (item.cantidad || 0),
             0
           ) || 0;
 
-        // Calcular cantidad de suelto
         const cantidad_suelto =
           producto.suelto?.reduce(
             (total, item) => total + (item.cantidad || 0),
             0
           ) || 0;
 
-        // Calcular tarimas como en la app móvil
         const cajasConCantidad = Array.isArray(producto.cajas)
           ? producto.cajas.filter((caja) => caja.cantidad > 0).length
           : 0;
@@ -171,7 +164,7 @@ export const useProductosStore = create((set, get) => ({
           cantidad_piso,
           cantidad_suelto,
           tarimas: totalTarimas,
-          total: cantidad_piso + cantidad_suelto + producto.cantidad, // Nueva propiedad que coincide con la app móvil
+          total: cantidad_piso + cantidad_suelto + producto.cantidad,
         };
       }) || [];
 
@@ -198,7 +191,6 @@ export const useProductosStore = create((set, get) => ({
       suelto(id,cantidad)
   `);
 
-    // Aplicar búsqueda
     if (esNumero) {
       query = query.or(
         `codigo.eq.${p.buscador},codigo::text.like.${p.buscador}%`
@@ -207,7 +199,6 @@ export const useProductosStore = create((set, get) => ({
       query = query.ilike("nombre", `%${p.buscador}%`);
     }
 
-    // Aplicar filtro de marca si existe
     if (filtros.marca && filtros.marca !== "") {
       query = query.eq("marca_id", filtros.marca);
     }
@@ -233,17 +224,14 @@ export const useProductosStore = create((set, get) => ({
             0
           ) || 0;
 
-        // cantidadTarimas = cajas con cantidad > 0
         const cajasConCantidad = Array.isArray(producto.cajas)
           ? producto.cajas.filter((caja) => caja.cantidad > 0).length
           : 0;
 
-        // registrosSuelto = cantidad de registros en suelto
         const registrosSuelto = Array.isArray(producto.suelto)
           ? producto.suelto.length
           : 0;
 
-        // Total tarimas = cajas con cantidad + registros suelto
         const totalTarimas = cajasConCantidad + registrosSuelto;
 
         return {
@@ -251,7 +239,7 @@ export const useProductosStore = create((set, get) => ({
           cantidad_piso,
           cantidad_suelto,
           tarimas: totalTarimas,
-          total: cantidad_piso + cantidad_suelto + producto.cantidad, // Nueva propiedad que coincide con la app móvil
+          total: cantidad_piso + cantidad_suelto + producto.cantidad,
         };
       }) || [];
 

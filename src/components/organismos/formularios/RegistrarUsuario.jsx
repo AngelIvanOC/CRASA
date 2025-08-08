@@ -25,7 +25,6 @@ export function RegistrarUsuario({
     reset,
   } = useForm();
 
-  // Mutation para insertar
   const { mutate: doInsertar } = useMutation({
     mutationFn: insertarUsuario,
     mutationKey: "insertar usuario",
@@ -40,7 +39,6 @@ export function RegistrarUsuario({
     },
   });
 
-  // Mutation para editar
   const { mutate: doEditar } = useMutation({
     mutationFn: editarUsuario,
     mutationKey: "editar usuario",
@@ -66,13 +64,12 @@ export function RegistrarUsuario({
       };
       doEditar(usuarioData);
     } else {
-      // Para nuevo usuario, usar la función completa
       doCrearCompleto(data);
     }
   };
 
   const { mutate: doCrearCompleto } = useMutation({
-    mutationFn: crearUsuarioCompleto, // del store
+    mutationFn: crearUsuarioCompleto,
     mutationKey: "crear usuario completo",
     onError: (err) => {
       console.error("Error al crear usuario:", err);
@@ -90,7 +87,6 @@ export function RegistrarUsuario({
     if (setIsExploding) setIsExploding(true);
   };
 
-  // Cargar tipos de roles
   useEffect(() => {
     async function cargarDatos() {
       const [rolesData] = await Promise.all([
@@ -102,7 +98,6 @@ export function RegistrarUsuario({
     cargarDatos();
   }, []);
 
-  // Reset form when editing
   useEffect(() => {
     if (accion === "Editar") {
       reset({

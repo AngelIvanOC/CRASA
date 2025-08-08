@@ -19,7 +19,6 @@ export const DesplegableUser = [
   },
 ];
 
-//data SIDEBAR
 export const LinksArray = [
   {
     label: "Dashboard",
@@ -48,18 +47,13 @@ export const LinksArray = [
   },
 ];
 export const SecondarylinksArray = [
-  /*{
-    label: "Configuración",
-    icon: "fa6-solid:gear",
-    to: "/configuracion",
-  },*/
   {
     label: "Salir",
     icon: "mingcute:align-arrow-left-fill",
     to: "/salir",
   },
 ];
-//temas
+
 export const TemasData = [
   {
     icono: "🌞",
@@ -71,7 +65,6 @@ export const TemasData = [
   },
 ];
 
-//data configuracion
 export const DataModulosConfiguracion = [
   {
     title: "Productos",
@@ -105,7 +98,7 @@ export const DataModulosConfiguracion = [
     link: "/configuracion/categorias",
   },
 ];
-//tipo usuario
+
 export const TipouserData = [
   {
     descripcion: "empleado",
@@ -116,7 +109,6 @@ export const TipouserData = [
     icono: "👑",
   },
 ];
-//tipodoc
 export const TipoDocData = [
   {
     descripcion: "Dni",

@@ -12,7 +12,7 @@ export function AsignarResponsable({
   ventaId,
   responsableActual,
   ayudantesActuales = [],
-  onEquipoAsignado, // Nuevo callback
+  onEquipoAsignado,
 }) {
   const { editarVenta } = useVentasStore();
   const [isPending, setIsPending] = useState(false);
@@ -34,7 +34,6 @@ export function AsignarResponsable({
 
   useEffect(() => {
     async function cargarUsuarios() {
-      // Cargar responsables (rol 2)
       const { data: responsablesData } = await supabase
         .from("usuarios")
         .select("id, nombres, id_auth")
@@ -42,7 +41,6 @@ export function AsignarResponsable({
         .eq("estado", "ACTIVO")
         .order("nombres", { ascending: true });
 
-      // Cargar ayudantes (rol 5)
       const { data: ayudantesData } = await supabase
         .from("usuarios")
         .select("id, nombres, id_auth")
@@ -53,7 +51,6 @@ export function AsignarResponsable({
       setResponsables(responsablesData || []);
       setAyudantes(ayudantesData || []);
 
-      // Establecer valor inicial si hay responsable actual
       if (responsableActual) {
         setValue("usuario_id", responsableActual.id_auth);
       }
@@ -62,7 +59,6 @@ export function AsignarResponsable({
     cargarUsuarios();
   }, [responsableActual, setValue]);
 
-  // Cargar ayudantes existentes
   useEffect(() => {
     async function cargarAyudantesExistentes() {
       if (ventaId) {
@@ -106,7 +102,6 @@ export function AsignarResponsable({
     );
   };
 
-  // Filtrar ayudantes disponibles (excluir el responsable seleccionado y los ya agregados)
   const ayudantesDisponibles = ayudantes.filter(
     (ayudante) =>
       ayudante.id_auth !== responsableSeleccionado &&
@@ -115,16 +110,13 @@ export function AsignarResponsable({
 
   const { mutate: doAsignarEquipo } = useMutation({
     mutationFn: async (data) => {
-      // 1. Actualizar responsable en la venta
       const ventaResult = await editarVenta({
         id: ventaId,
         usuario: data.usuario_id,
       });
 
-      // 2. Eliminar ayudantes existentes
       await supabase.from("ayudantes_venta").delete().eq("venta_id", ventaId);
 
-      // 3. Insertar nuevos ayudantes
       if (ayudantesSeleccionados.length > 0) {
         const ayudantesData = ayudantesSeleccionados.map((ayudante) => ({
           venta_id: ventaId,
@@ -134,7 +126,6 @@ export function AsignarResponsable({
         await supabase.from("ayudantes_venta").insert(ayudantesData);
       }
 
-      // 4. Obtener datos actualizados del responsable
       const responsableSeleccionadoData = responsables.find(
         (r) => r.id_auth === data.usuario_id
       );
@@ -146,7 +137,6 @@ export function AsignarResponsable({
       };
     },
     onSuccess: (data) => {
-      // Invalidar queries
       queryClient.invalidateQueries(["mostrar ventas"]);
       queryClient.invalidateQueries(["detalle venta", ventaId]);
 
@@ -157,7 +147,6 @@ export function AsignarResponsable({
         },
       }));
 
-      // Llamar callback para actualizar el estado en el componente padre
       if (onEquipoAsignado) {
         onEquipoAsignado(data.nuevoResponsable, ayudantesFormateados);
       }
@@ -193,7 +182,6 @@ export function AsignarResponsable({
 
           <form onSubmit={handleSubmit(onSubmit)}>
             <section className="form-subcontainer">
-              {/* Sección Responsable */}
               <div className="seccion">
                 <h3>Responsable Principal</h3>
                 <article>
@@ -218,11 +206,9 @@ export function AsignarResponsable({
                 </article>
               </div>
 
-              {/* Sección Ayudantes */}
               <div className="seccion">
                 <h3>Ayudantes</h3>
 
-                {/* Agregar ayudante */}
                 <div className="agregar-ayudante">
                   <select
                     onChange={(e) => {
@@ -242,7 +228,6 @@ export function AsignarResponsable({
                   </select>
                 </div>
 
-                {/* Lista de ayudantes seleccionados */}
                 <div className="ayudantes-lista">
                   {ayudantesSeleccionados.map((ayudante) => (
                     <div key={ayudante.id_auth} className="ayudante-item">

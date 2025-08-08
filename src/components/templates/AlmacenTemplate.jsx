@@ -17,7 +17,7 @@ import { ExportarProductosExcel } from "../moleculas/ExportarProductosExcel";
 export function AlmacenTemplate() {
   const [openRegistro, SetopenRegistro] = useState(false);
   const [openFiltros, setOpenFiltros] = useState(false);
-  const [openCargarExcel, setOpenCargarExcel] = useState(false); // Nuevo estado
+  const [openCargarExcel, setOpenCargarExcel] = useState(false); 
   const [openExportarExcel, setOpenExportarExcel] = useState(false);
 
   const { dataUsuarios } = useUsuariosStore();
@@ -40,7 +40,6 @@ export function AlmacenTemplate() {
     setdataSelect([]);
   }
 
-  // Función para manejar la búsqueda con filtros
   const handleBuscar = async (valor) => {
     console.log("handleBuscar llamado con valor:", valor);
     setBuscador(valor);
@@ -53,10 +52,9 @@ export function AlmacenTemplate() {
     }
   };
 
-  // Función para aplicar filtros
   const handleApplyFilters = async (nuevosFiltros) => {
     setFiltros(nuevosFiltros);
-    // Volver a ejecutar la búsqueda/mostrar con los nuevos filtros
+    
     const buscadorActual = useProductosStore.getState().buscador;
     if (buscadorActual && buscadorActual.trim() !== "") {
       await buscarProductosConFiltros({ buscador: buscadorActual });
@@ -97,12 +95,11 @@ export function AlmacenTemplate() {
       <section className="main">
         <section className="header">
           <div className="search-container">
-            {/* Botón de filtros */}
             <FilterButton
               onClick={() => setOpenFiltros(true)}
               $hasFilters={filtros.marca !== ""}
             >
-              <v.iconoFiltro /> {/* Asume que tienes un icono de filtro */}
+              <v.iconoFiltro />
               {filtros.marca !== "" && <FilterDot />}
             </FilterButton>
             <Buscador setBuscador={handleBuscar} />
@@ -112,17 +109,17 @@ export function AlmacenTemplate() {
             <>
               <Btnsave
                 funcion={() => setOpenExportarExcel(true)}
-                bgcolor="#f59e0b" // Amarillo para diferenciarlo
+                bgcolor="#f59e0b" 
                 titulo="Exportar Excel"
-                icono={<v.iconoagregar />} // Asume que tienes un icono de descarga
+                icono={<v.iconoagregar />} 
                 color="#fff"
               />
 
               <Btnsave
                 funcion={() => setOpenCargarExcel(true)}
-                bgcolor="#10b981" // Verde para diferenciarlo
+                bgcolor="#10b981" 
                 titulo="Cargar Excel"
-                icono={<v.iconoagregar />} // Puedes usar otro icono si tienes uno para Excel
+                icono={<v.iconoagregar />} 
                 color="#fff"
               />
 
@@ -151,7 +148,6 @@ const Container = styled.div`
   height: 100vh;
   display: flex;
   flex-direction: column;
-  //justify-content: center;
   padding: 0px 30px 0 0;
 
   .titulo {

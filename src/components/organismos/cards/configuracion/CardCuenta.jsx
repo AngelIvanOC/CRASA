@@ -9,19 +9,17 @@ import Swal from "sweetalert2";
 
 export function CardCuenta() {
   const [showModal, setShowModal] = useState(false);
-  const [cuentaEditar, setCuentaEditar] = useState(null); // ← Descomenta esta línea
+  const [cuentaEditar, setCuentaEditar] = useState(null);
   const { dataCuenta, obtenerDatosCuenta } = useAuthStore();
 
   useEffect(() => {
     obtenerDatosCuenta();
   }, [obtenerDatosCuenta]);
 
-  // Agregar console.log para debug
   useEffect(() => {
     console.log("dataCuenta:", dataCuenta);
   }, [dataCuenta]);
 
-  // Función para cambiar contraseña
   const cambiarContrasena = async () => {
     const { value: nuevaContrasena } = await Swal.fire({
       title: "Cambiar Contraseña",
@@ -83,8 +81,6 @@ export function CardCuenta() {
       key: "id_rol",
       label: "Rol",
       formatter: (value) => {
-        // Si usas MostrarUsuarioConRol, puedes acceder a roles?.nombre
-        // return dataCuenta?.roles?.nombre || "Sin rol asignado";
         return value || "Sin rol asignado";
       },
     },

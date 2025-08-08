@@ -95,11 +95,9 @@ const Container = styled.main`
 
   .contentMenuambur {
     position: absolute;
-    /*background-color: rgba(53,219, 11, 0.5);*/
   }
 
   .contentRouters {
-    /*background-color: rgba(231,13, 136, 0.5);*/
     grid-template-columns: 1;
     width: 100%;
     padding-top: 70px;

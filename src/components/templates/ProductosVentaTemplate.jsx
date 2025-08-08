@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AsignarResponsable } from "../organismos/formularios/AsignarResponsable";
 import { useVentasStore } from "../../index";
-import { supabase } from "../../index"; // Agregar import
+import { supabase } from "../../index"; 
 
 export function ProductosVentaTemplate({
   detalleVenta,
@@ -18,18 +18,15 @@ export function ProductosVentaTemplate({
   const [accion, setAccion] = useState("");
   const [dataSelect, setdataSelect] = useState([]);
 
-  // Estados para responsable y ayudantes
   const [responsableActual, setResponsableActual] = useState(null);
   const [ayudantesActuales, setAyudantesActuales] = useState([]);
 
   const { mostrarAyudantesVenta } = useVentasStore();
 
-  // Cargar datos del equipo asignado
   useEffect(() => {
     async function cargarEquipoAsignado() {
       if (ventaId) {
         try {
-          // 1. Cargar información de la venta (incluyendo responsable)
           const { data: ventaData } = await supabase
             .from("ventas")
             .select(
@@ -50,7 +47,6 @@ export function ProductosVentaTemplate({
             });
           }
 
-          // 2. Cargar ayudantes
           const ayudantes = await mostrarAyudantesVenta(ventaId);
           setAyudantesActuales(ayudantes);
         } catch (error) {
@@ -82,7 +78,6 @@ export function ProductosVentaTemplate({
           ventaId={ventaId}
           responsableActual={responsableActual}
           ayudantesActuales={ayudantesActuales}
-          // Callback para actualizar el responsable después de asignar
           onEquipoAsignado={(nuevoResponsable, nuevosAyudantes) => {
             setResponsableActual(nuevoResponsable);
             setAyudantesActuales(nuevosAyudantes);
@@ -113,7 +108,6 @@ export function ProductosVentaTemplate({
           </div>
         </section>
 
-        {/* Mostrar equipo asignado */}
         <section className="equipo-info">
           <div className="equipo-card">
             <div className="equipo-content">

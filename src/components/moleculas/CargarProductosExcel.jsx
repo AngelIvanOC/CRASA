@@ -19,7 +19,6 @@ export function CargarProductosExcel({ onClose }) {
   const { insertarProductosMasivo } = useProductosStore();
   const [dragOver, setDragOver] = useState(false);
 
-  // Cargar marcas al montar el componente
   useEffect(() => {
     async function cargarMarcas() {
       const { data } = await supabase.from("marcas").select("*");
@@ -39,22 +38,19 @@ export function CargarProductosExcel({ onClose }) {
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
 
-      // Convertir a JSON
       const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
-      // Procesar y validar datos
       const productosProcessados = jsonData.map((row, index) => {
         const codigo = row.CODIGO || row.codigo;
         const nombre = row.NOMBRE || row.nombre;
         const marcaNombre = row.MARCA || row.marca;
 
-        // Buscar marca por nombre
         const marcaEncontrada = marcas.find(
           (m) => m.nombre.toLowerCase() === marcaNombre?.toLowerCase()
         );
 
         return {
-          fila: index + 2, // +2 porque Excel inicia en 1 y tiene header
+          fila: index + 2,
           codigo: codigo ? parseInt(codigo) : null,
           nombre: nombre ? ConvertirCapitalize(nombre.toString()) : null,
           marca_nombre: marcaNombre,
@@ -109,7 +105,6 @@ export function CargarProductosExcel({ onClose }) {
     setIsLoading(true);
 
     try {
-      // Preparar datos para inserción masiva
       const productosParaInsertar = productosValidos.map((producto) => ({
         codigo: producto.codigo,
         nombre: producto.nombre,
@@ -119,7 +114,6 @@ export function CargarProductosExcel({ onClose }) {
         racks: null,
       }));
 
-      // Usar la nueva función del store
       const resultado = await insertarProductosMasivo(productosParaInsertar);
 
       setIsLoading(false);

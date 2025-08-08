@@ -63,7 +63,6 @@ export function TablaVentas({
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          // Usar el store de ventas para eliminar
           const { eliminarVenta } = useVentasStore.getState();
           await eliminarVenta({ id: venta.id });
 
@@ -280,7 +279,6 @@ const Container = styled.div`
             align-items: center;
             line-height: 1;
             color: gray;
-            /* Estilos para los iconos activos */
             .active {
               color: black;
             }
@@ -295,59 +293,57 @@ const Container = styled.div`
       overflow-y: auto;
       width: 100%;
 
-      scrollbar-width: none; /* Firefox */
+      scrollbar-width: none; 
       &::-webkit-scrollbar {
-        display: none; /* Chrome, Safari y Edge */
+        display: none; 
       }
 
       tr {
-        display: table; /* CLAVE: Mantener comportamiento de tabla */
-        width: 100%; /* CLAVE: Forzar ancho completo */
-        table-layout: fixed; /* CLAVE: Layout fijo para distribución equitativa */
+        display: table;
+        width: 100%; 
+        table-layout: fixed; 
         border-bottom: 1px solid #eaecf0;
 
         td {
           padding: 9px 15px;
           text-align: left;
           color: ${(props) => props.theme.textsecundario};
-          display: table-cell; /* CLAVE: Mantener comportamiento de celda */
+          display: table-cell; 
           vertical-align: middle;
 
-          /* Distribución específica por columna */
           &:nth-child(1) {
             width: 12.5%;
-          } /* # PEDIDO */
+          } 
           &:nth-child(2) {
             width: 12.5%;
-          } /* MARCA */
+          } 
           &:nth-child(3) {
             width: 12.5%;
-            text-align: center; /* CANTIDAD */
-          } /* CANTIDAD */
+            text-align: center; 
+          } 
           &:nth-child(4) {
             width: 12.5%;
             text-align: center;
-          } /* CANTIDAD TOTAL */
+          } 
           &:nth-child(5) {
             width: 12.5%;
-          } /* FECHA */
+          } 
           &:nth-child(6) {
             width: 12.5%;
             text-align: center;
-          } /* FACTURA */
+          } 
           &:nth-child(7) {
             width: 12.5%;
-            text-align: center; /* ACCIONES */
+            text-align: center; 
           }
           &:nth-child(8) {
             width: 12.5%;
-            text-align: center; /* Centrar acciones */
-          } /* ACCIONES */
+            text-align: center; 
+          } 
         }
       }
     }
 
-    /* Asegurar que thead tenga la misma distribución */
     thead tr {
       display: table;
       width: 100%;
@@ -390,7 +386,6 @@ const Container = styled.div`
       }
     }
 
-    /* Estilos para el resizer */
     .resizer {
       position: absolute;
       right: 0;
@@ -416,7 +411,6 @@ const Container = styled.div`
       }
     }
 
-    /* Estilos específicos para el botón de factura */
     .btn-ver-factura {
       color: #023e8f;
       cursor: pointer;

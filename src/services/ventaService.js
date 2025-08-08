@@ -22,10 +22,8 @@ export const insertVentaWithProducts = async (
   extractedData,
   insertarVenta
 ) => {
-  // 1. Subir PDF si existe
   const pdfUrl = await uploadPdfToSupabase(ventaData.pdfFile);
 
-  // 2. Insertar venta principal
   const ventaInsertData = {
     codigo: ventaData.codigo,
     marca_id: ventaData.marca_id || null,
@@ -38,7 +36,6 @@ export const insertVentaWithProducts = async (
     throw new Error("No se pudo insertar la venta principal");
   }
 
-  // 3. Insertar productos si existen
   if (extractedData?.productos?.length > 0) {
     await insertProductsFromExtractedData(
       extractedData.productos,
@@ -73,7 +70,6 @@ const insertProductsFromExtractedData = async (productos, ventaId) => {
         continue;
       }
 
-      // Buscar producto existente
       const { data: productoExistente, error: errorBusqueda } = await supabase
         .from("productos")
         .select("id, codigo, nombre, marca_id")
@@ -83,31 +79,13 @@ const insertProductsFromExtractedData = async (productos, ventaId) => {
 
       let productoId = productoExistente?.id;
 
-      // Crear producto si no existe
       if (!productoId) {
         console.warn(
           `Producto con código ${producto.codigo} no existe - omitiendo`
         );
         continue;
-        /*const { data: nuevoProducto, error: errorProducto } = await supabase
-          .from("productos")
-          .insert({
-            codigo: producto.codigo,
-            nombre: producto.descripcion || `Producto ${producto.codigo}`,
-            marca_id: marcaId,
-          })
-          .select("id")
-          .single();
-
-        if (errorProducto) {
-          console.error("Error creando producto:", errorProducto);
-          continue;
-        }
-
-        productoId = productoId;*/
       }
 
-      // Insertar detalle de venta
       const { error: errorDetalle } = await supabase
         .from("detalle_ventas")
         .insert({
@@ -129,8 +107,6 @@ const insertProductsFromExtractedData = async (productos, ventaId) => {
   }
 };
 
-// Agregar estas funciones a tu ventaService.js existente
-
 export const insertVentaWithExcelProducts = async (
   ventaData,
   extractedData,
@@ -139,7 +115,6 @@ export const insertVentaWithExcelProducts = async (
 ) => {
   const excelUrl = await uploadExcelToSupabase(excelFile);
 
-  // 1. Insertar venta principal con datos del Excel
   const ventaInsertData = {
     codigo: ventaData.codigo || extractedData.pedidoNo,
     marca_id: ventaData.marca_id || null,
@@ -153,7 +128,6 @@ export const insertVentaWithExcelProducts = async (
     throw new Error("No se pudo insertar la venta principal");
   }
 
-  // 2. Insertar productos desde Excel
   if (extractedData?.productos?.length > 0) {
     await insertProductsFromExcelData(extractedData.productos, idVentaNueva);
   }
@@ -174,7 +148,6 @@ const insertProductsFromExcelData = async (productos, ventaId) => {
 
   for (const producto of productos) {
     try {
-      // Asegurar que el código sea un número entero
       const codigoNumerico = parseInt(producto.codigo);
 
       console.log("🔍 Procesando producto:");
@@ -191,7 +164,6 @@ const insertProductsFromExcelData = async (productos, ventaId) => {
       console.log("  - Cantidad:", producto.cantidad);
       console.log("  - Marca:", producto.marca);
 
-      // Validar que el código sea válido
       if (!codigoNumerico || isNaN(codigoNumerico)) {
         console.error("❌ Código inválido:", producto.codigo);
         continue;
@@ -204,12 +176,11 @@ const insertProductsFromExcelData = async (productos, ventaId) => {
         continue;
       }
 
-      // ✅ BUSCAR PRODUCTO EXISTENTE CON MISMO CÓDIGO Y MARCA
       const { data: productoExistente, error: errorBusqueda } = await supabase
         .from("productos")
         .select("id, codigo, nombre, marca_id")
         .eq("codigo", codigoNumerico)
-        .eq("marca_id", marcaId) // 🔥 FILTRAR TAMBIÉN POR MARCA
+        .eq("marca_id", marcaId)
         .maybeSingle();
 
       if (errorBusqueda) {
@@ -221,46 +192,6 @@ const insertProductsFromExcelData = async (productos, ventaId) => {
 
       let productoId = productoExistente?.id;
 
-      /* Crear producto si no existe
-      if (!productoId) {
-        console.log(
-          "➕ Creando nuevo producto con código:",
-          codigoNumerico,
-          "y marca:",
-          marcaId
-        );
-
-        const { data: nuevoProducto, error: errorProducto } = await supabase
-          .from("productos")
-          .insert({
-            codigo: codigoNumerico,
-            nombre: `Producto ${codigoNumerico}`,
-            marca_id: marcaId,
-          })
-          .select("id")
-          .single();
-
-        if (errorProducto) {
-          console.error("❌ Error creando producto:", errorProducto);
-          continue;
-        }
-
-        productoId = nuevoProducto.id;
-        console.log("✅ Producto creado con ID:", productoId);
-      } else {
-        console.log("✅ Producto existente encontrado con ID:", productoId);
-      }
-
-      // ✅ VERIFICAR QUE TENEMOS UN PRODUCTO_ID VÁLIDO
-      if (!productoId) {
-        console.error(
-          "❌ No se pudo obtener producto_id para código:",
-          codigoNumerico
-        );
-        continue;
-      }*/
-
-      // Insertar detalle de venta con producto_id válido
       console.log("📝 Insertando detalle de venta:");
       console.log("  - venta_id:", ventaId);
       console.log("  - producto_id:", productoId);
@@ -270,7 +201,7 @@ const insertProductsFromExcelData = async (productos, ventaId) => {
         .from("detalle_ventas")
         .insert({
           venta_id: ventaId,
-          producto_id: productoId, // ✅ Este debería ser un número válido
+          producto_id: productoId,
           cantidad: producto.cantidad || 0,
           fecha_caducidad: null,
           ubicacion: null,
@@ -296,11 +227,9 @@ const insertProductsFromExcelData = async (productos, ventaId) => {
     }
   }
 
-  // Al final, mostrar un resumen
   console.log("📋 Proceso completado");
 };
 
-// Nueva función para subir Excel
 export const uploadExcelToSupabase = async (excelFile) => {
   if (!excelFile) return null;
 

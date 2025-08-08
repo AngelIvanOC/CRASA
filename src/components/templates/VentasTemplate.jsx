@@ -92,7 +92,6 @@ export function VentasTemplate() {
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  //justify-content: center;
   padding: 0 10px;
   height: calc(100vh - 70px);
   box-sizing: border-box;

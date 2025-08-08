@@ -1,4 +1,3 @@
-// hooks/useSupabaseRealtime.js
 import { useEffect } from "react";
 import { supabase } from "../supabase/supabase.config";
 import { useQueryClient } from "@tanstack/react-query";

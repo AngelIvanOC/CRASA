@@ -11,7 +11,6 @@ import styled from "styled-components";
 import { Device } from "../../../styles/breakpoints";
 
 export function CardPedidosFecha({ data, loading }) {
-  // Formatear datos para el gráfico
   const chartData = data.map((item) => ({
     mes: item.mes,
     pedidos: item.cantidad,
@@ -20,7 +19,6 @@ export function CardPedidosFecha({ data, loading }) {
   return (
     <Container>
       <section className="content">
-        {/* Header con título */}
         <div className="header">
           <h2>Pedidos/Año</h2>
         </div>

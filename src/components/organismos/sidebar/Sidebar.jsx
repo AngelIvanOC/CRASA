@@ -54,8 +54,8 @@ export const Sidebar = forwardRef(({ state, setState }, ref) => {
             key={label}
             onClick={() => {
               if (label === "Salir") {
-                cerrarSesion(); // Ejecuta tu función
-                navigate("/login"); // Opcional: Redirige al login
+                cerrarSesion();
+                navigate("/login");
               }
             }}
           >
@@ -104,7 +104,7 @@ const Container = styled.div`
     justify-content: center;
 
     svg {
-      font-size: 25px; /* IGUAL que .Linkicon */
+      font-size: 25px;
       color: ${({ theme }) => theme.text};
       font-weight: bold;
     }

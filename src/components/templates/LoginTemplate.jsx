@@ -32,7 +32,7 @@ export function LoginTemplate() {
     e.preventDefault();
     const success = await loginDirecto(formData.email, formData.password);
     if (success) {
-      navigate("/"); // o la ruta que corresponda
+      navigate("/"); 
     }
   };
 

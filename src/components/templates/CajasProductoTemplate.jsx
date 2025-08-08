@@ -1,5 +1,3 @@
-// CajasProductoTemplate.js - Template actualizado
-
 import styled from "styled-components";
 import {
   Title,

@@ -63,7 +63,7 @@ export async function InsertarVenta(p) {
     return null;
   }
 
-  return data?.id; // ✅ regresa el id insertado
+  return data?.id;
 }
 
 export async function EditarVenta(p) {
@@ -103,8 +103,6 @@ export async function MostrarDetalleVenta(venta_id) {
 }
 
 export async function InsertarProductosVenta(p) {
-  // Verificar si ya existe una compra con ese código
-
   const { error } = await supabase.from(tablaDetalle).insert({
     venta_id: p.venta_id,
     producto_id: p.producto_id,
@@ -126,7 +124,6 @@ export async function InsertarProductosVenta(p) {
 }
 
 export async function EliminarVenta(p) {
-  // Primero eliminar el detalle
   const { error: errorDetalle } = await supabase
     .from(tablaDetalle)
     .delete()
@@ -136,7 +133,6 @@ export async function EliminarVenta(p) {
     throw errorDetalle;
   }
 
-  // Luego eliminar la compra
   const { error } = await supabase.from(tabla).delete().eq("id", p.id);
 
   if (error) {

@@ -21,7 +21,6 @@ export async function MostrarVentasPorMarca() {
       });
       return [];
     }
-    // Procesar datos para obtener el conteo
     const ventasProcesadas = data.map((marca) => ({
       nombre: marca.nombre,
       cantidad: marca.ventas.length,
@@ -53,7 +52,6 @@ export async function MostrarRacksPorMarca() {
       });
       return [];
     }
-    // Procesar datos para obtener el conteo
     const racksProcesados = data.map((marca) => ({
       nombre: marca.nombre,
       cantidad: marca.racks.length,
@@ -81,7 +79,6 @@ export async function MostrarComprasPorMarca() {
       )
       .order("nombre");
     if (error) {
-      // Si no existe tabla compras, devolver array vacío sin error
       console.warn("Tabla compras no encontrada o sin datos");
       return [];
     }
@@ -160,7 +157,6 @@ export async function MostrarProximosACaducar() {
     return [];
   }
 
-  // Procesar los datos para devolver lo necesario
   const hoy = new Date();
   const procesados = data.map((caja) => {
     const dias = Math.ceil(
@@ -178,7 +174,6 @@ export async function MostrarProximosACaducar() {
 
 export async function MostrarMovimientosRecientes() {
   try {
-    // Obtener las últimas 3 entradas (cajas)
     const { data: entradas, error: errorEntradas } = await supabase
       .from("cajas")
       .select(
@@ -206,7 +201,6 @@ export async function MostrarMovimientosRecientes() {
       console.error("Error al cargar entradas:", errorEntradas);
     }
 
-    // Obtener las últimas 2 ventas completadas
     const { data: ventas, error: errorVentas } = await supabase
       .from("ventas")
       .select(
@@ -228,7 +222,6 @@ export async function MostrarMovimientosRecientes() {
       console.error("Error al cargar ventas:", errorVentas);
     }
 
-    // Formatear entradas
     const entradasFormateadas = (entradas || []).map((entrada) => ({
       id: `E-${entrada.id}`,
       pedido: entrada.productos?.codigo,
@@ -239,7 +232,6 @@ export async function MostrarMovimientosRecientes() {
       marca: entrada.productos?.marcas?.nombre || "Sin marca",
     }));
 
-    // Formatear ventas
     const ventasFormateadas = (ventas || []).map((venta) => ({
       id: `V-${venta.id}`,
       pedido: venta.codigo || `V-${venta.id}`,
@@ -250,12 +242,10 @@ export async function MostrarMovimientosRecientes() {
       marca: venta.marcas?.nombre || "Sin marca",
     }));
 
-    // Combinar y ordenar por fecha
     const movimientos = [...entradasFormateadas, ...ventasFormateadas]
       .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
-      .slice(0, 5); // Limitar a 5 movimientos más recientes
+      .slice(0, 5);
 
-    // Formatear fecha para mostrar
     const opcionesFecha = { day: "2-digit", month: "short" };
     const hoy = new Date();
 
@@ -303,7 +293,6 @@ export async function MostrarPedidosActivos() {
     return [];
   }
 
-  // Formatear fecha al estilo "25 abr"
   const opcionesFecha = { day: "2-digit", month: "short" };
   const pedidos = data.map((venta) => {
     const fecha = venta.fecha
@@ -334,7 +323,6 @@ export async function MostrarPedidosPorFecha() {
       return [];
     }
 
-    // Agrupar por mes y contar
     const pedidosPorMes = {};
     const meses = [
       "Ene",
@@ -351,19 +339,16 @@ export async function MostrarPedidosPorFecha() {
       "Dic",
     ];
 
-    // Inicializar todos los meses con 0
     meses.forEach((mes) => {
       pedidosPorMes[mes] = 0;
     });
 
-    // Contar pedidos por mes
     data.forEach((venta) => {
       const fecha = new Date(venta.fecha);
       const mes = meses[fecha.getMonth()];
       pedidosPorMes[mes]++;
     });
 
-    // Convertir a formato requerido para el gráfico
     const resultado = meses.map((mes) => ({
       mes,
       cantidad: pedidosPorMes[mes],
@@ -403,7 +388,6 @@ export async function MostrarEntradasPorSemana() {
       return [];
     }
 
-    // Contar entradas por marca
     const entradasPorMarca = {};
     let totalEntradas = 0;
 
@@ -413,7 +397,6 @@ export async function MostrarEntradasPorSemana() {
       totalEntradas++;
     });
 
-    // Convertir a formato para el gráfico de pastel
     const resultado = Object.entries(entradasPorMarca)
       .map(([nombre, cantidad]) => ({
         nombre,

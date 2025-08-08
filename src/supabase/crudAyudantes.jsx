@@ -1,6 +1,5 @@
 import { supabase } from "../index";
 
-// Función para obtener ayudantes de una venta
 export async function MostrarAyudantesVenta(venta_id) {
   const { data, error } = await supabase
     .from("ayudantes_venta")
@@ -21,7 +20,6 @@ export async function MostrarAyudantesVenta(venta_id) {
   return data;
 }
 
-// Función para insertar ayudantes de una venta
 export async function InsertarAyudantesVenta(venta_id, ayudantes) {
   if (!ayudantes || ayudantes.length === 0) return true;
 
@@ -42,7 +40,6 @@ export async function InsertarAyudantesVenta(venta_id, ayudantes) {
   return true;
 }
 
-// Función para eliminar ayudantes de una venta
 export async function EliminarAyudantesVenta(venta_id) {
   const { error } = await supabase
     .from("ayudantes_venta")
@@ -56,28 +53,3 @@ export async function EliminarAyudantesVenta(venta_id) {
 
   return true;
 }
-
-/* Actualizar la función MostrarVentas para incluir ayudantes
-export async function MostrarVentas() {
-  const { data } = await supabase
-    .from("ventas")
-    .select(
-      `
-      id,
-      codigo,
-      cantidad_productos,
-      cantidad_total,
-      fecha,
-      factura_url,
-      marcas(id, nombre),
-      usuarios(id, nombres),
-      ayudantes_venta(
-        usuario_id,
-        usuarios!inner(nombres)
-      )
-    `
-    )
-    .order("fecha", { ascending: false });
-
-  return data;
-}*/

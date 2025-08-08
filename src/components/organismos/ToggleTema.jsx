@@ -164,6 +164,6 @@ const Container = styled.div`
   }
 
   .w-8 {
-    width: 2rem /* 32px */;
+    width: 2rem;
   }
 `;

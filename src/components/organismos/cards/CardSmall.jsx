@@ -17,7 +17,7 @@ export function CardSmall({
   emptyMessage = "No hay datos disponibles",
   children,
   headerButton,
-  headerJustify = "space-between", // 👈 NUEVO PROP para el botón del header
+  headerJustify = "space-between",
 }) {
   return (
     <Container
@@ -30,14 +30,13 @@ export function CardSmall({
       $headerJustify={headerJustify}
     >
       <section className="content">
-        {/* Header con título y botón opcional */}
         <div className="header">
           <h2>{titulo}</h2>
           {headerButton && <div className="header-button">{headerButton}</div>}
         </div>
 
         {children ? (
-          children // 👈 MOSTRAR EL CHILD CUSTOMIZADO
+          children
         ) : loading ? (
           <div className="loading">
             <p>Cargando...</p>
@@ -85,7 +84,6 @@ const Container = styled.div`
     padding: 10px 0;
   }
 
-  /* 👈 NUEVO: Estilos para el header */
   .header {
     display: flex;
     justify-content: ${({ $headerJustify }) =>
@@ -115,7 +113,6 @@ const Container = styled.div`
     }
   }
 
-  /* 👈 MANTENER h2 para compatibilidad cuando no hay headerButton */
   h2 {
     margin: 0 0 10px 0;
     padding: 0;

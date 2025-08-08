@@ -56,7 +56,7 @@ export function RegistrarProductos({
     const producto = {
       codigo: data.codigo,
       nombre: ConvertirCapitalize(data.nombre),
-      marca_id: data.marca_id || null, // Usa marca_id en lugar de marca
+      marca_id: data.marca_id || null,
       cajas: data.cajas ? parseInt(data.cajas) : null,
       cantidad: data.cantidad ? parseInt(data.cantidad) : null,
       racks: data.racks || null,
@@ -90,12 +90,12 @@ export function RegistrarProductos({
   }, []);
 
   useEffect(() => {
-    console.log("Marcas cargadas:", marcas); // Verifica en consola
-    console.log("Racis cargados:", racks); // Verifica en consola
+    console.log("Marcas cargadas:", marcas);
+    console.log("Racis cargados:", racks);
   }, [marcas, racks]);
 
   useEffect(() => {
-    console.log("Datos para editar:", dataSelect); // Verifica en consola
+    console.log("Datos para editar:", dataSelect);
   }, [dataSelect]);
 
   useEffect(() => {
@@ -103,7 +103,7 @@ export function RegistrarProductos({
       reset({
         codigo: dataSelect.codigo,
         nombre: dataSelect.nombre,
-        marca_id: dataSelect.marca_id || "", // Usa marca_id
+        marca_id: dataSelect.marca_id || "",
         cajas: dataSelect.cajas,
         cantidad: dataSelect.cantidad,
         racks: dataSelect.racks,
@@ -193,54 +193,7 @@ export function RegistrarProductos({
                   <label className="form__label">Marca</label>
                 </InputText>
               </article>
-              {/** 
 
-              <article>
-                <InputText icono={<v.iconoFlechabajo />}>
-                  <input
-                    className="form__field"
-                    type="number"
-                    placeholder="Cajas (opcional)"
-                    {...register("cajas")}
-                  />
-                  <label className="form__label">Cajas</label>
-                </InputText>
-              </article>
-
-              <article>
-                <InputText icono={<v.iconoFlechabajo />}>
-                  <input
-                    className="form__field"
-                    type="number"
-                    placeholder="Cantidad (opcional)"
-                    {...register("cantidad")}
-                  />
-                  <label className="form__label">Cantidad</label>
-                </InputText>
-              </article>
-
-              <article>
-                <InputText icono={<v.iconoFlechabajo />}>
-                  <select
-                    className="form__field"
-                    {...register("racks", {
-                      valueAsNumber: true,
-                      required: false,
-                    })}
-                    defaultValue={dataSelect?.racks || ""}
-                  >
-                    <option value="">Seleccione una ubicacion</option>
-                    {racks &&
-                      racks.map((rack) => (
-                        <option key={rack.id} value={rack.id}>
-                          {rack.codigo_rack}
-                        </option>
-                      ))}
-                  </select>
-                  <label className="form__label">Rack</label>
-                </InputText>
-              </article>
-*/}
               <Btnsave
                 icono={<v.iconoguardar />}
                 titulo="Guardar"

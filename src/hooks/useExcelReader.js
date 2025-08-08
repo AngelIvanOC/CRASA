@@ -20,7 +20,6 @@ export const useExcelReader = () => {
       const extractedData = await extractDataFromExcel(file);
       setExtractedData(extractedData);
 
-      // Crear vista previa con los datos extraídos
       setExcelPreview({
         marca: extractedData.marca,
         totalProductos: extractedData.productos?.length || 0,
@@ -45,22 +44,18 @@ export const useExcelReader = () => {
           const data = new Uint8Array(e.target.result);
           const workbook = XLSX.read(data, { type: "array" });
 
-          // Obtener la primera hoja
           const firstSheetName = workbook.SheetNames[0];
           const worksheet = workbook.Sheets[firstSheetName];
 
-          // Convertir a JSON manteniendo las celdas vacías
           const jsonData = XLSX.utils.sheet_to_json(worksheet, {
             header: 1,
             defval: "",
           });
 
-          // Validar formato
           if (!jsonData || jsonData.length < 3) {
             throw new Error("El archivo Excel debe tener al menos 3 filas");
           }
 
-          // Extraer marca (A1 debe ser "MARCA:" y B1 la marca)
           if (!jsonData[0] || jsonData[0][0] !== "MARCA:") {
             throw new Error("En la celda A1 debe estar el texto 'MARCA:'");
           }
@@ -70,7 +65,6 @@ export const useExcelReader = () => {
             throw new Error("En la celda B1 debe estar especificada la marca");
           }
 
-          // Validar encabezados (A2="CODIGO", B2="CANTIDAD")
           if (
             !jsonData[1] ||
             jsonData[1][0] !== "CODIGO" ||
@@ -81,12 +75,10 @@ export const useExcelReader = () => {
             );
           }
 
-          // Extraer productos (desde la fila 3 en adelante)
           const productos = [];
           for (let i = 2; i < jsonData.length; i++) {
             const row = jsonData[i];
 
-            // Si no hay código, saltar fila
             if (!row || !row[0]) continue;
 
             const codigoRaw = String(row[0]).trim();
@@ -96,7 +88,7 @@ export const useExcelReader = () => {
 
             if (!isNaN(codigo) && codigo > 0) {
               productos.push({
-                codigo: codigo, // Guardar como número entero
+                codigo: codigo, 
                 cantidad,
                 marca: marca.toUpperCase(),
               });
@@ -116,7 +108,7 @@ export const useExcelReader = () => {
             cantidadProductos: productos.length,
             cantidadTotal: productos.reduce((sum, p) => sum + p.cantidad, 0),
             fecha: new Date().toISOString().split("T")[0],
-            pedidoNo: `${Date.now()}`, // Código automático para Excel
+            pedidoNo: `${Date.now()}`, 
           };
 
           resolve(result);

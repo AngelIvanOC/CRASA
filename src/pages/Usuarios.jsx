@@ -7,12 +7,11 @@ export function Usuarios() {
   const { isLoading, error } = useQuery({
     queryKey: ["mostrar todos usuarios"],
     queryFn: mostrarTodosUsuarios,
-    // Usar datos iniciales si ya existen
     initialData: dataTodosUsuarios?.length > 0 ? dataTodosUsuarios : undefined,
-    staleTime: 5 * 60 * 1000, // 5 minutos
-    cacheTime: 10 * 60 * 1000, // 10 minutos
+    staleTime: 5 * 60 * 1000, 
+    cacheTime: 10 * 60 * 1000, 
     refetchOnWindowFocus: false,
-    refetchOnMount: false, // No refetch si ya hay datos
+    refetchOnMount: false, 
   });
 
   if (isLoading && !dataTodosUsuarios?.length) return <Spinner />;

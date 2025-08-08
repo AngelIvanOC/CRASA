@@ -36,7 +36,7 @@ export function RegistrarDevolucion({ onClose, setIsExploding }) {
         showConfirmButton: false,
       });
 
-      queryClient.invalidateQueries(["mostrar piso"]); // Actualizar datos de piso
+      queryClient.invalidateQueries(["mostrar piso"]);
       cerrarFormulario();
       setIsPending(false);
     },
@@ -75,7 +75,6 @@ export function RegistrarDevolucion({ onClose, setIsExploding }) {
         return;
       }
 
-      // Eliminar los productos no encontrados
       pdfData.productos = productos.filter(
         (p) => !codigosNoEncontrados.includes(p.codigo)
       );

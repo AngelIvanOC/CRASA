@@ -12,7 +12,6 @@ import {
 } from "../supabase/crudDashboard";
 
 export const useDashboardStore = create((set, get) => ({
-  // Estados para cada tipo de dato
   dataVentas: [],
   dataRacks: [],
   dataCompras: [],
@@ -23,7 +22,6 @@ export const useDashboardStore = create((set, get) => ({
   dataPedidosFecha: [],
   dataEntradas: [],
 
-  // Estados de carga
   loadingVentas: false,
   loadingRacks: false,
   loadingCompras: false,
@@ -33,11 +31,8 @@ export const useDashboardStore = create((set, get) => ({
   loadingMovimientos: false,
   loadingPedidosFecha: false,
   loadingEntradas: false,
-
-  // Estado general de carga
   loading: false,
 
-  // Función para mostrar ventas por marca
   mostrarVentasPorMarca: async () => {
     set({ loadingVentas: true });
     try {
@@ -53,7 +48,6 @@ export const useDashboardStore = create((set, get) => ({
     }
   },
 
-  // Función para mostrar racks por marca
   mostrarRacksPorMarca: async () => {
     set({ loadingRacks: true });
     try {
@@ -69,7 +63,6 @@ export const useDashboardStore = create((set, get) => ({
     }
   },
 
-  // Función para mostrar compras por marca
   mostrarComprasPorMarca: async () => {
     set({ loadingCompras: true });
     try {
@@ -85,7 +78,6 @@ export const useDashboardStore = create((set, get) => ({
     }
   },
 
-  // Función para mostrar productos por marca
   mostrarProductosPorMarca: async () => {
     set({ loadingProductos: true });
     try {
@@ -170,7 +162,6 @@ export const useDashboardStore = create((set, get) => ({
     }
   },
 
-  // Función para cargar todos los datos del dashboard
   cargarDatosDashboard: async () => {
     set({ loading: true });
     const {
@@ -204,7 +195,6 @@ export const useDashboardStore = create((set, get) => ({
     }
   },
 
-  // Función para refrescar datos
   refrescarDatos: async () => {
     const { cargarDatosDashboard } = get();
     await cargarDatosDashboard();

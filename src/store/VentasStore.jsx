@@ -23,15 +23,14 @@ export const useVentasStore = create((set, get) => ({
   },
 
   insertarVenta: async (p) => {
-    // Solo inserta la compra básica, sin productos
     const venta = await InsertarVenta(p);
-    if (!venta) return null; // fallo al insertar compra
+    if (!venta) return null;
 
     const { mostrarVentas } = get();
 
     await mostrarVentas();
 
-    return venta; // Devuelve el ID de la compra insertada
+    return venta;
   },
 
   insertarProductosVenta: async (venta_id, productos) => {
@@ -69,7 +68,6 @@ export const useVentasStore = create((set, get) => ({
   },
 
   eliminarVenta: async (p) => {
-    // Eliminar ayudantes primero
     await EliminarAyudantesVenta(p.id);
 
     await EliminarVenta(p);
@@ -92,9 +90,8 @@ export const useVentasStore = create((set, get) => ({
       return false;
     }
 
-    // Actualizar los datos después de eliminar
     const { mostrarDetalleVenta } = get();
-    await mostrarDetalleVenta(data[0].venta_id); // Reconsulta los detalles
+    await mostrarDetalleVenta(data[0].venta_id);
     return true;
   },
   mostrarAyudantesVenta: async (venta_id) => {
@@ -105,21 +102,17 @@ export const useVentasStore = create((set, get) => ({
 
   asignarEquipoVenta: async (venta_id, responsable_id, ayudantes_ids = []) => {
     try {
-      // 1. Actualizar responsable
       await EditarVenta({
         id: venta_id,
         usuario: responsable_id,
       });
 
-      // 2. Eliminar ayudantes existentes
       await EliminarAyudantesVenta(venta_id);
 
-      // 3. Insertar nuevos ayudantes
       if (ayudantes_ids.length > 0) {
         await InsertarAyudantesVenta(venta_id, ayudantes_ids);
       }
 
-      // 4. Actualizar datos en el store
       const { mostrarVentas, mostrarAyudantesVenta } = get();
       await mostrarVentas();
       await mostrarAyudantesVenta(venta_id);

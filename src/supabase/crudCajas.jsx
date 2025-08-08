@@ -3,11 +3,8 @@ import Swal from "sweetalert2";
 
 const tabla = "cajas";
 
-// crudCajas.js - Funciones actualizadas
-
 export async function ObtenerCajasPorProducto(producto_id) {
   try {
-    // Obtener cajas
     const { data: cajas } = await supabase
       .from("cajas")
       .select(
@@ -18,19 +15,16 @@ export async function ObtenerCajasPorProducto(producto_id) {
       )
       .eq("producto_id", producto_id);
 
-    // Obtener registros sueltos
     const { data: sueltos } = await supabase
       .from("suelto")
       .select("*")
       .eq("producto_id", producto_id);
 
-    // Obtener registros de piso
     const { data: pisos } = await supabase
       .from("piso")
       .select("*")
       .eq("producto_id", producto_id);
 
-    // Formatear datos unificados
     const cajasFormateadas = (cajas || []).map((caja) => ({
       ...caja,
       tipo: "caja",
@@ -54,13 +48,11 @@ export async function ObtenerCajasPorProducto(producto_id) {
       fecha_entrada: null,
     }));
 
-    // Combinar todos los registros
     const todosLosRegistros = [
       ...cajasFormateadas,
       ...sueltosFormateados,
       ...pisosFormateados,
     ].sort((a, b) => {
-      // Ordenar por fecha de entrada (más reciente primero)
       const fechaA = a.fecha_entrada ? new Date(a.fecha_entrada) : new Date(0);
       const fechaB = b.fecha_entrada ? new Date(b.fecha_entrada) : new Date(0);
       return fechaB - fechaA;

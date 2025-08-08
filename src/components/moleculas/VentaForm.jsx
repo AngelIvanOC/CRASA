@@ -38,32 +38,6 @@ export const VentaForm = ({ register, errors, marcas, dataSelect, accion }) => {
         </InputText>
       </article>
 
-      {/*}
-      <article>
-        <InputText icono={<v.iconoFlechabajo />}>
-          <input
-            className="form__field"
-            type="number"
-            placeholder="Cantidad (opcional)"
-            {...register("cantidad_productos")}
-          />
-          <label className="form__label">Cantidad</label>
-        </InputText>
-      </article>
-
-      <article>
-        <InputText icono={<v.iconoFlechabajo />}>
-          <input
-            className="form__field"
-            type="text"
-            placeholder="Cantidad Total"
-            {...register("cantidad_total", { required: true })}
-          />
-          <label className="form__label">Cantidad Total</label>
-          {errors.nombre?.type === "required" && <p>Campo requerido</p>}
-        </InputText>
-      </article>*/}
-
       <article>
         <InputText icono={<v.iconoFlechabajo />}>
           <input

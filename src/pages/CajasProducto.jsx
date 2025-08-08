@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useQuery, useQueryClient } from "@tanstack/react-query"; // Añade useQueryClient aquí
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { CajasProductoTemplate, Spinner } from "../index";
 import { useCajasStore } from "../store/useCajasStore";
 
@@ -14,7 +14,7 @@ export function CajasProducto() {
     queryFn: () => obtenerCajasPorProducto(productoId),
     enabled: !!productoId,
     refetchOnWindowFocus: false,
-    onSuccess: (data) => setDataCajas(data), // Mantén esto para sincronizar con el store
+    onSuccess: (data) => setDataCajas(data),
   });
 
   const refreshCajas = () => {

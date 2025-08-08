@@ -1,5 +1,3 @@
-// TablaCajas.js - Tabla actualizada
-
 import styled from "styled-components";
 import {
   ContentAccionesTabla,
@@ -122,7 +120,6 @@ export function TablaCajas({
 
     if (result.isConfirmed) {
       try {
-        // Liberar el rack si es una caja
         if (registro.tipo === "caja" && registro.rack_id) {
           await supabase
             .from("racks")
@@ -130,7 +127,6 @@ export function TablaCajas({
             .eq("id", registro.rack_id);
         }
 
-        // Eliminar según el tipo
         let tabla;
         switch (registro.tipo) {
           case "caja":

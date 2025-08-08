@@ -1,6 +1,5 @@
 import { supabase } from "../index";
 
-// Mapeo de marcas
 const mapaMarcas = {
   CRASA: 1,
   JUMEX: 2,
@@ -8,10 +7,6 @@ const mapaMarcas = {
   "CON ALIMENTOS": 4,
 };
 
-/**
- * Valida si los productos existen en la marca correspondiente.
- * Devuelve un array con los códigos no encontrados.
- */
 export const validarProductosEnMarca = async (productos) => {
   const codigosNoEncontrados = [];
 
@@ -39,10 +34,6 @@ export const validarProductosEnMarca = async (productos) => {
   return codigosNoEncontrados;
 };
 
-/**
- * Inserta productos válidos directamente en la tabla "piso".
- * Lanza error si no hay productos válidos.
- */
 export const insertDevolucionWithProducts = async (extractedData) => {
   if (!extractedData?.productos?.length) {
     throw new Error("No hay productos para procesar en la devolución");
@@ -51,9 +42,6 @@ export const insertDevolucionWithProducts = async (extractedData) => {
   await insertProductsToPiso(extractedData.productos);
 };
 
-/**
- * Inserta productos en la tabla "piso"
- */
 const insertProductsToPiso = async (productos) => {
   console.log("🔍 Insertando productos en piso desde devolución");
   console.log("📦 Total de productos a procesar:", productos.length);
@@ -92,7 +80,7 @@ const insertProductsToPiso = async (productos) => {
           producto_id: productoId,
           cantidad: producto.cantidad || 0,
           fecha_caducidad: null,
-          codigo_barras: "devolucion", // 🔥 Marca como devolución
+          codigo_barras: "devolucion",
         })
         .select("*")
         .single();

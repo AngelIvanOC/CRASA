@@ -27,7 +27,6 @@ export function TablaUsuarios({
   const { dataTodosUsuarios, eliminarUsuario } = useUsuariosStore();
   const [columnFilters, setColumnFilters] = useState([]);
 
-  // Memorizar las funciones para evitar re-renders
   const editar = useCallback(
     (data) => {
       SetopenRegistro(true);
@@ -72,7 +71,6 @@ export function TablaUsuarios({
     [eliminarUsuario]
   );
 
-  // Memorizar las columnas para evitar re-creación
   const columns = useMemo(
     () => [
       {
@@ -130,7 +128,6 @@ export function TablaUsuarios({
     [editar, eliminar]
   );
 
-  // Usar datos del store directamente, no el prop
   const tableData = useMemo(() => dataTodosUsuarios || [], [dataTodosUsuarios]);
 
   const table = useReactTable({
@@ -152,7 +149,6 @@ export function TablaUsuarios({
     },
   });
 
-  // Mostrar spinner solo si no hay datos y están cargando
   if (!tableData.length) {
     return (
       <Container>
@@ -305,16 +301,16 @@ const Container = styled.div`
 
           &:nth-child(1) {
             width: 15%;
-          } /* NOMBRE */
+          } 
           &:nth-child(2) {
             width: 12%;
-          } /* TELÉFONO */
+          }
           &:nth-child(3) {
             width: 18%;
-          } /* CORREO */
+          } 
           &:nth-child(4) {
             width: 10%;
-          } /* ROL */
+          } 
           &:nth-child(5) {
             width: 10%;
             text-align: center;
@@ -335,14 +331,14 @@ const Container = styled.div`
                 color: #c62828;
               }
             }
-          } /* ESTADO */
+          } 
           &:nth-child(6) {
             width: 13%;
-          } /* FECHA */
+          } 
           &:nth-child(7) {
             width: 10%;
             text-align: center;
-          } /* ACCIONES */
+          } 
         }
       }
     }

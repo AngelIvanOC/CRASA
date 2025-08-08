@@ -13,16 +13,15 @@ export default function SidebarMovile({ isOpen, setIsOpen }) {
   const handleLogout = () => {
     cerrarSesion();
     navigate("/login");
-    setIsOpen(false); // Cerrar el menú después del logout
+    setIsOpen(false);
   };
 
   const handleLinkClick = () => {
-    setIsOpen(false); // Cerrar el menú cuando se selecciona un enlace
+    setIsOpen(false);
   };
 
   return (
     <>
-      {/* Header con menú hamburguesa */}
       <Header>
         <LogoSection>
           <span className="logo">CRASA</span>
@@ -35,10 +34,8 @@ export default function SidebarMovile({ isOpen, setIsOpen }) {
         </HamburgerButton>
       </Header>
 
-      {/* Overlay para cerrar el menú */}
       {isOpen && <Overlay onClick={() => setIsOpen(false)} />}
 
-      {/* Menú lateral */}
       <MobileMenu $isopen={isOpen}>
         <MenuHeader>
           <div className="logo-section">
@@ -50,7 +47,6 @@ export default function SidebarMovile({ isOpen, setIsOpen }) {
         </MenuHeader>
 
         <MenuContent>
-          {/* Links principales */}
           <LinkSection>
             {LinksArray.map(({ icon, label, to }) => (
               <LinkContainer key={label}>
@@ -70,7 +66,6 @@ export default function SidebarMovile({ isOpen, setIsOpen }) {
 
           <Divider />
 
-          {/* Links secundarios */}
           <LinkSection>
             {SecondarylinksArray.map(({ icon, label, to, color }) => (
               <LinkContainer key={label}>

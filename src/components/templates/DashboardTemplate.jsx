@@ -11,7 +11,6 @@ import { CardPedidosActivos } from "../organismos/cards/CardPediosActivos";
 import { CardMovimientos } from "../organismos/cards/CardMovimientos";
 
 export function DashboardTemplate() {
-  // Estados del dashboard store
   const {
     dataVentas,
     dataRacks,
@@ -35,7 +34,6 @@ export function DashboardTemplate() {
     cargarDatosDashboard,
   } = useDashboardStore();
 
-  // Cargar datos al montar el componente
   useEffect(() => {
     cargarDatosDashboard();
   }, [cargarDatosDashboard]);

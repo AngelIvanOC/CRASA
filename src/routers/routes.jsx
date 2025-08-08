@@ -21,21 +21,14 @@ export function MyRoutes() {
   const { dataUsuarios, mostrarusuarios } = useUsuariosStore();
   const esEncargado = dataUsuarios?.id_rol === 3;
 
-  //const { mostrarempresa, dataempresa } = useEmpresaStore();
   const { isLoading, error } = useQuery({
     queryKey: "mostrar usuarios",
     queryFn: mostrarusuarios,
     refetchOnWindowFocus: false,
   });
-  /*const {} = useQuery({
-    queryKey: ["mostrar empresa", dataUsuarios?.id],
-    queryFn: () => mostrarempresa({ _id_usuario: dataUsuarios?.id }),
-    enabled: !!dataUsuarios,
-    refetchOnWindowFocus: false,
-  });*/
 
   if (loadingSession) {
-    return <Spinner />; // spinner global mientras Supabase decide
+    return <Spinner />;
   }
 
   if (isLoading) {
@@ -47,9 +40,6 @@ export function MyRoutes() {
   return (
     <Routes>
       <Route element={<ProtectedRoute user={user} redirectTo="/login" />}>
-        {/*<Route path="/configuracion" element={<Configuracion />} />
-        <Route path="/configuracion/categorias" element={<Categorias />} />*/}
-
         <Route path="/" element={<Dashboard />} />
         {!esEncargado && <Route path="/usuarios" element={<Usuarios />} />}
         <Route path="/almacen" element={<Almacen />} />

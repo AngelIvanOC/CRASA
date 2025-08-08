@@ -31,7 +31,6 @@ export const usePisoStore = create((set) => ({
   eliminarPiso: async (id) => {
     const resultado = await EliminarPiso(id);
     if (resultado) {
-      // Actualizar la lista local eliminando el elemento
       set((state) => ({
         dataPiso: state.dataPiso.filter((item) => item.id !== id),
       }));

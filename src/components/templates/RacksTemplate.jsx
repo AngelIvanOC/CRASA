@@ -29,23 +29,21 @@ export function RacksTemplate() {
   }
 
   const handleBuscar = async (valor) => {
-    console.log("handleBuscar llamado con valor:", valor); // Debug
+    console.log("handleBuscar llamado con valor:", valor);
 
     setBuscador(valor);
 
     if (valor.trim() === "") {
-      console.log("Valor vacío, mostrando todos los productos"); // Debug
-      // Si está vacío, mostrar todos los productos
+      console.log("Valor vacío, mostrando todos los productos");
       await mostrarRacks();
     } else {
-      console.log("Buscando productos con:", valor); // Debug
-      // Si hay texto, buscar
+      console.log("Buscando productos con:", valor);
       await buscarProductos({ buscador: valor });
     }
   };
 
   useEffect(() => {
-    mostrarRacks(); // ✅ Esto carga los racks con sus flags "ocupado" y "productos_info"
+    mostrarRacks();
   }, []);
 
   return (
@@ -91,7 +89,6 @@ const Container = styled.div`
   height: 100vh;
   display: flex;
   flex-direction: column;
-  //justify-content: center;
   padding: 0px 30px 0 0;
 
   .titulo {

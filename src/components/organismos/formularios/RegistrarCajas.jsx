@@ -1,5 +1,3 @@
-// RegistrarCajas.js - Formulario actualizado
-
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { v } from "../../../styles/variables";
@@ -79,10 +77,8 @@ export function RegistrarCajas({
 
       setProducto(productoData);
 
-      // Construir la consulta de racks
       let query = supabase.from("racks").select("*");
 
-      // Si está editando y tiene rack_id, incluir ese rack aunque esté ocupado
       if (accion === "Editar" && dataSelect?.rack_id) {
         query = query.or(`ocupado.eq.false,id.eq.${dataSelect.rack_id}`);
       } else {
@@ -111,13 +107,12 @@ export function RegistrarCajas({
 
   useEffect(() => {
     if (accion === "Editar" && dataSelect) {
-      // Establecer el tipo de registro basado en los datos seleccionados
       setTipoRegistro(dataSelect.tipo || "caja");
 
       reset({
         cantidad: dataSelect?.cantidad || "",
         fecha_caducidad: dataSelect?.fecha_caducidad || "",
-        rack_id: dataSelect?.rack_id ? String(dataSelect.rack_id) : "", // Convertir a string para el select
+        rack_id: dataSelect?.rack_id ? String(dataSelect.rack_id) : "",
         codigo_barras: dataSelect?.codigo_barras || "",
       });
     } else {
@@ -128,7 +123,7 @@ export function RegistrarCajas({
         codigo_barras: "",
       });
     }
-  }, [accion, dataSelect, reset, racks]); // Agregar racks como dependencia
+  }, [accion, dataSelect, reset, racks]);
 
   const getTitulo = () => {
     const tipoTexto =
@@ -158,7 +153,6 @@ export function RegistrarCajas({
             </section>
           </div>
 
-          {/* Selector de tipo de registro - solo mostrar si no está editando */}
           {accion !== "Editar" && (
             <div className="tipo-selector">
               <h3>Tipo de registro:</h3>
@@ -214,7 +208,6 @@ export function RegistrarCajas({
                 </InputText>
               </article>
 
-              {/* Solo mostrar selector de rack si es tipo "caja" */}
               {(tipoRegistro === "caja" ||
                 (accion === "Editar" && dataSelect?.tipo === "caja")) && (
                 <article>

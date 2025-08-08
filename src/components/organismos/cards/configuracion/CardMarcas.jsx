@@ -20,14 +20,6 @@ export function CardMarcas() {
     console.log("Editar marca:", marca);
   };
 
-  {
-    /*const handleDelete = (marca) => {
-    if (window.confirm("¿Estás seguro de eliminar esta marca?")) {
-      eliminarMarca(marca.id);
-    }
-  };*/
-  }
-
   const buttonConfig = {
     icono: <v.iconoagregar />,
     titulo: "Agregar Marca",

@@ -16,7 +16,6 @@ export function CardEntradas({ data, loading }) {
   const chartData = data?.data || [];
   const total = data?.total || 0;
 
-  // Componente personalizado para el tooltip
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
@@ -41,7 +40,6 @@ export function CardEntradas({ data, loading }) {
   return (
     <Container>
       <section className="content">
-        {/* Header con título */}
         <div className="header">
           <h2>Entradas</h2>
         </div>
@@ -206,7 +204,6 @@ const ChartContainer = styled.div`
     }
   }
 
-  /* Efectos hover para las secciones del pie */
   .recharts-pie-sector:hover {
     opacity: 0.8;
     transform: scale(1.02);

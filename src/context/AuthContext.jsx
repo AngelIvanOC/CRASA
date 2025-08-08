@@ -22,7 +22,7 @@ export const AuthContextProvider = ({ children }) => {
       } else {
         setUser(null);
       }
-      setLoadingSession(false); // <- ya está lista la sesión
+      setLoadingSession(false);
     };
 
     checkSession();
@@ -47,22 +47,6 @@ export const AuthContextProvider = ({ children }) => {
       if (response) {
         return;
       } else {
-        /*const responseEmpresa = await InsertarEmpresa({
-          id_auth: id_auth,
-        });
-        const responseTipoDoc = await MostrarTipoDocumentos({
-          id_empresa: responseEmpresa?.id,
-        });
-        console.log(responseTipoDoc);
-        const responseRol = await MostrarRolesXnombre({ nombre: "superadmin" });
-        const pUser = {
-          id_tipodocumento: responseTipoDoc[0]?.id,
-          id_rol: responseRol?.id,
-          correo: correo,
-          fecharegistro: new Date(),
-          id_auth: id_auth,
-        };
-        await InsertarAdmin(pUser);*/
       }
     } catch (error) {
       console.error("Error al insertar datos:", error);

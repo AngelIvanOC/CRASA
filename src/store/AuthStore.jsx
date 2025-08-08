@@ -81,7 +81,6 @@ export const useAuthStore = create((set, get) => ({
       }
 
       console.log("🔎 Buscando usuario con id_auth:", user.id);
-      // Usar MostrarUsuarioConRol si tienes tabla de roles, sino usar MostrarUsuarios
       const usuario = await MostrarUsuarios({ id_auth: user.id });
       console.log("📋 Datos del usuario encontrado:", usuario);
 

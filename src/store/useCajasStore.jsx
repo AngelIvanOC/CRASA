@@ -1,5 +1,3 @@
-// useCajasStore.js - Store actualizado
-
 import { create } from "zustand";
 import {
   ObtenerCajasPorProducto,
@@ -68,18 +66,15 @@ export const useCajasStore = create((set) => ({
       codigo_barras: dataForm.codigo_barras || null,
     };
 
-    // Solo para cajas agregamos rack_id
     if (tipoRegistro === "caja") {
       registro.rack_id = dataForm.rack_id ? parseInt(dataForm.rack_id) : null;
 
-      // Marcar rack como ocupado si se seleccionó uno
       if (dataForm.rack_id) {
         await supabase
           .from("racks")
           .update({ ocupado: true })
           .eq("id", dataForm.rack_id);
 
-        // También actualizar el producto si es nuevo
         if (accion !== "Editar") {
           await supabase
             .from("productos")
@@ -92,7 +87,6 @@ export const useCajasStore = create((set) => ({
     if (accion === "Editar") {
       registro.id = dataSelect.id;
 
-      // Determinar qué función usar según el tipo de registro
       switch (dataSelect.tipo || tipoRegistro) {
         case "caja":
           return await useCajasStore.getState().editarCaja(registro);
@@ -104,7 +98,6 @@ export const useCajasStore = create((set) => ({
           throw new Error("Tipo de registro no válido");
       }
     } else {
-      // Insertar nuevo registro según el tipo
       switch (tipoRegistro) {
         case "caja":
           return await useCajasStore.getState().insertarCaja(registro);

@@ -10,14 +10,13 @@ import {
   PdfUploader,
 } from "../../../index";
 import { v } from "../../../styles/variables";
-import { ExcelUploader } from "../../moleculas/ExcelUploader"; // Nuevo
+import { ExcelUploader } from "../../moleculas/ExcelUploader";
 
-// Importar nuevos módulos
 import { usePdfReader } from "../../../hooks/usePdfReader";
-import { useExcelReader } from "../../../hooks/useExcelReader"; // Nuevo
+import { useExcelReader } from "../../../hooks/useExcelReader";
 import {
   insertVentaWithProducts,
-  insertVentaWithExcelProducts, // Nuevo
+  insertVentaWithExcelProducts,
 } from "../../../services/ventaService";
 
 export function RegistrarVenta({
@@ -29,10 +28,9 @@ export function RegistrarVenta({
   const { insertarVenta } = useVentasStore();
   const [isPending, setIsPending] = useState(false);
   const [marcas, setMarcas] = useState([]);
-  const [uploadType, setUploadType] = useState("pdf"); // "pdf" o "excel"
+  const [uploadType, setUploadType] = useState("pdf");
   const queryClient = useQueryClient();
 
-  // Hook para PDF
   const {
     pdfFile,
     pdfPreview,
@@ -41,7 +39,6 @@ export function RegistrarVenta({
     processPdfFile,
   } = usePdfReader();
 
-  // Hook para Excel
   const {
     excelFile,
     excelPreview,
@@ -58,7 +55,6 @@ export function RegistrarVenta({
     setValue,
   } = useForm();
 
-  // Mutation para insertar con PDF
   const { mutate: doInsertarPdf } = useMutation({
     mutationFn: (data) =>
       insertVentaWithProducts({ ...data, pdfFile }, pdfData, insertarVenta),
@@ -74,7 +70,6 @@ export function RegistrarVenta({
     },
   });
 
-  // Mutation para insertar con Excel
   const { mutate: doInsertarExcel } = useMutation({
     mutationFn: (data) =>
       insertVentaWithExcelProducts(data, excelData, insertarVenta, excelFile),
@@ -98,7 +93,6 @@ export function RegistrarVenta({
     } else if (uploadType === "pdf" && pdfData) {
       doInsertarPdf(data);
     } else {
-      // Inserción manual normal
       setIsPending(false);
       console.error("No hay datos para insertar");
     }
@@ -135,7 +129,6 @@ export function RegistrarVenta({
       if (data.cantidadTotal) setValue("cantidad_total", data.cantidadTotal);
       if (data.fecha) setValue("fecha", data.fecha);
 
-      // Buscar marca
       if (marcas.length > 0 && data.marca) {
         const marcaEncontrada = marcas.find((m) =>
           m.nombre.toLowerCase().includes(data.marca.toLowerCase())
@@ -147,7 +140,6 @@ export function RegistrarVenta({
     }
   };
 
-  // Cargar marcas
   useEffect(() => {
     async function cargarMarcas() {
       const { data } = await supabase.from("marcas").select("*");
@@ -156,7 +148,6 @@ export function RegistrarVenta({
     cargarMarcas();
   }, []);
 
-  // Reset form when editing
   useEffect(() => {
     if (accion === "Editar") {
       reset({
@@ -196,7 +187,6 @@ export function RegistrarVenta({
             </section>
           </div>
 
-          {/* Selector de tipo de archivo */}
           {accion !== "Editar" && (
             <div style={{ marginBottom: "20px" }}>
               <div
@@ -234,7 +224,6 @@ export function RegistrarVenta({
                 </button>
               </div>
 
-              {/* Componentes para subir archivos */}
               {uploadType === "pdf" ? (
                 <PdfUploader
                   onFileSelect={handleFileSelect}
@@ -252,7 +241,6 @@ export function RegistrarVenta({
           )}
 
           <form className="formulario" onSubmit={handleSubmit(handlesub)}>
-            {/* Componente del formulario */}
             <VentaForm
               register={register}
               errors={errors}
@@ -292,7 +280,6 @@ export function RegistrarVenta({
 }
 
 const Container = styled.div`
-  /* Mismos estilos existentes */
   transition: 0.5s;
   top: 0;
   left: 0;

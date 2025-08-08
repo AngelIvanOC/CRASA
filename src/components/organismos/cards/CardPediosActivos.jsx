@@ -22,7 +22,7 @@ export function CardPedidosActivos({
         ) : data.length > 0 ? (
           <div className="pedidos-list">
             {data.map((item, index) => {
-              let color = "#fddcdc"; // default: En proceso
+              let color = "#fddcdc";
               if (item.estado.toLowerCase() === "en_progreso")
                 color = "#fff3b0";
 
@@ -104,10 +104,10 @@ const Container = styled.div`
     flex-direction: column;
     gap: 5px;
     overflow-y: scroll;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE 10+ */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     ::-webkit-scrollbar {
-      display: none; /* Chrome, Safari */
+      display: none;
     }
     flex-grow: 1;
   }

@@ -18,7 +18,6 @@ export async function InsertarMarca(p) {
   return true;
 }
 
-// Corrige MostrarMarcas():
 export async function MostrarMarcas() {
   const { data } = await supabase
     .from(tabla)

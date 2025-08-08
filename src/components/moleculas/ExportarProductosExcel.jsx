@@ -10,8 +10,8 @@ export function ExportarProductosExcel({ onClose }) {
   const [isLoading, setIsLoading] = useState(false);
   const [marcas, setMarcas] = useState([]);
   const [marcaSeleccionada, setMarcaSeleccionada] = useState("");
+  const [tipoExportacion, setTipoExportacion] = useState("general");
 
-  // Cargar marcas al montar el componente
   useEffect(() => {
     async function cargarMarcas() {
       const { data } = await supabase
@@ -22,6 +22,284 @@ export function ExportarProductosExcel({ onClose }) {
     }
     cargarMarcas();
   }, []);
+
+  const obtenerDatosGenerales = async (marcaId) => {
+    const { data, error } = await supabase
+      .from("productos")
+      .select(
+        `
+        codigo,
+        nombre,
+        cantidad,
+        marcas(nombre),
+        piso(cantidad),
+        cajas(id, cantidad),
+        suelto(id, cantidad)
+      `
+      )
+      .eq("marca_id", marcaId)
+      .order("codigo");
+
+    if (error) throw error;
+
+    return data.map((producto) => {
+      const cajasConCantidad = Array.isArray(producto.cajas)
+        ? producto.cajas.filter((caja) => caja.cantidad > 0).length
+        : 0;
+
+      const registrosSuelto = Array.isArray(producto.suelto)
+        ? producto.suelto.length
+        : 0;
+
+      const totalTarimas = cajasConCantidad + registrosSuelto;
+
+      const cantidadSuelto =
+        producto.suelto?.reduce(
+          (total, item) => total + (item.cantidad || 0),
+          0
+        ) || 0;
+
+      const cantidadPiso =
+        producto.piso?.reduce(
+          (total, item) => total + (item.cantidad || 0),
+          0
+        ) || 0;
+
+      const total = cantidadPiso + cantidadSuelto + producto.cantidad;
+
+      return {
+        CODIGO: producto.codigo,
+        NOMBRE: producto.nombre,
+        MARCA: producto.marcas?.nombre || "",
+        TOTAL: total,
+        TARIMAS: totalTarimas,
+        CANTIDAD_RACK: producto.cantidad || 0,
+        CANTIDAD_SUELTO: cantidadSuelto,
+        CANTIDAD_PISO: cantidadPiso,
+      };
+    });
+  };
+
+  const obtenerDatosConCajas = async (marcaId) => {
+    const { data: productos, error: errorProductos } = await supabase
+      .from("productos")
+      .select("id, codigo, nombre, cantidad, marcas(nombre)")
+      .eq("marca_id", marcaId)
+      .order("codigo");
+
+    if (errorProductos) throw errorProductos;
+
+    const datosCompletos = [];
+
+    for (const producto of productos) {
+      const [cajasResult, sueltosResult, pisosResult] = await Promise.all([
+        supabase
+          .from("cajas")
+          .select(
+            `
+            id,
+            cantidad,
+            codigo_barras,
+            fecha_caducidad,
+            fecha_entrada,
+            racks(codigo_rack)
+          `
+          )
+          .eq("producto_id", producto.id),
+
+        supabase
+          .from("suelto")
+          .select(
+            `
+            id,
+            cantidad,
+            codigo_barras,
+            fecha_caducidad,
+            fecha_entrada
+          `
+          )
+          .eq("producto_id", producto.id),
+
+        supabase
+          .from("piso")
+          .select(
+            `
+            id,
+            cantidad,
+            codigo_barras,
+            fecha_caducidad
+          `
+          )
+          .eq("producto_id", producto.id),
+      ]);
+
+      const cajas = cajasResult.data || [];
+      const sueltos = sueltosResult.data || [];
+      const pisos = pisosResult.data || [];
+
+      if (cajas.length === 0 && sueltos.length === 0 && pisos.length === 0) {
+        datosCompletos.push({
+          CODIGO: producto.codigo,
+          PRODUCTO: producto.nombre,
+          MARCA: producto.marcas?.nombre || "",
+          TIPO_REGISTRO: "RACK",
+          CANTIDAD: producto.cantidad || 0,
+          CODIGO_BARRAS: "",
+          FECHA_CADUCIDAD: "",
+          UBICACION: "",
+          FECHA_ENTRADA: "",
+        });
+      } else {
+        cajas.forEach((caja) => {
+          datosCompletos.push({
+            CODIGO: producto.codigo,
+            PRODUCTO: producto.nombre,
+            MARCA: producto.marcas?.nombre || "",
+            TIPO_REGISTRO: "CAJA",
+            CANTIDAD: caja.cantidad || 0,
+            CODIGO_BARRAS: caja.codigo_barras || "-",
+            FECHA_CADUCIDAD: caja.fecha_caducidad || "-",
+            UBICACION: caja.racks?.codigo_rack || "-",
+            FECHA_ENTRADA: caja.fecha_entrada?.split("T")[0] || "-",
+          });
+        });
+
+        sueltos.forEach((suelto) => {
+          datosCompletos.push({
+            CODIGO: producto.codigo,
+            PRODUCTO: producto.nombre,
+            MARCA: producto.marcas?.nombre || "",
+            TIPO_REGISTRO: "SUELTO",
+            CANTIDAD: suelto.cantidad || 0,
+            CODIGO_BARRAS: suelto.codigo_barras || "-",
+            FECHA_CADUCIDAD: suelto.fecha_caducidad || "-",
+            UBICACION: "SUELTO",
+            FECHA_ENTRADA: suelto.fecha_entrada?.split("T")[0] || "-",
+          });
+        });
+
+        pisos.forEach((piso) => {
+          datosCompletos.push({
+            CODIGO: producto.codigo,
+            PRODUCTO: producto.nombre,
+            MARCA: producto.marcas?.nombre || "",
+            TIPO_REGISTRO: "PISO",
+            CANTIDAD: piso.cantidad || 0,
+            CODIGO_BARRAS: piso.codigo_barras || "-",
+            FECHA_CADUCIDAD: piso.fecha_caducidad || "-",
+            UBICACION: "EN PISO",
+            FECHA_ENTRADA: "-",
+          });
+        });
+      }
+    }
+
+    return datosCompletos;
+  };
+
+  const crearExcelBonito = (datosExcel, tipoExportacion) => {
+    const ws = XLSX.utils.json_to_sheet(datosExcel);
+
+    const headerStyle = {
+      fill: { fgColor: { rgb: "1f4788" } },
+      font: { color: { rgb: "FFFFFF" }, bold: true, sz: 12 },
+      alignment: { horizontal: "center", vertical: "center" },
+      border: {
+        top: { style: "thin", color: { rgb: "000000" } },
+        bottom: { style: "thin", color: { rgb: "000000" } },
+        left: { style: "thin", color: { rgb: "000000" } },
+        right: { style: "thin", color: { rgb: "000000" } },
+      },
+    };
+
+    const dataStyle = {
+      alignment: { horizontal: "left", vertical: "center" },
+      border: {
+        top: { style: "thin", color: { rgb: "e0e0e0" } },
+        bottom: { style: "thin", color: { rgb: "e0e0e0" } },
+        left: { style: "thin", color: { rgb: "e0e0e0" } },
+        right: { style: "thin", color: { rgb: "e0e0e0" } },
+      },
+    };
+
+    const numberStyle = {
+      ...dataStyle,
+      alignment: { horizontal: "center", vertical: "center" },
+      numFmt: "#,##0",
+    };
+
+    const headers = Object.keys(datosExcel[0] || {});
+    const headerRange = XLSX.utils.encode_range({
+      s: { c: 0, r: 0 },
+      e: { c: headers.length - 1, r: 0 },
+    });
+
+    headers.forEach((header, colIndex) => {
+      const cellAddress = XLSX.utils.encode_cell({ r: 0, c: colIndex });
+      if (!ws[cellAddress]) ws[cellAddress] = {};
+      ws[cellAddress].s = headerStyle;
+    });
+
+    datosExcel.forEach((row, rowIndex) => {
+      headers.forEach((header, colIndex) => {
+        const cellAddress = XLSX.utils.encode_cell({
+          r: rowIndex + 1,
+          c: colIndex,
+        });
+        if (!ws[cellAddress]) ws[cellAddress] = {};
+
+        if (
+          header.includes("CANTIDAD") ||
+          header === "TOTAL" ||
+          header === "TARIMAS"
+        ) {
+          ws[cellAddress].s = numberStyle;
+        } else {
+          ws[cellAddress].s = dataStyle;
+        }
+
+        if (tipoExportacion === "detallado" && header === "TIPO_REGISTRO") {
+          const tipoRegistro = row[header];
+          let fillColor = "ffffff";
+
+          switch (tipoRegistro) {
+            case "CAJA":
+              fillColor = "e3f2fd";
+              break;
+            case "SUELTO":
+              fillColor = "fff3e0";
+              break;
+            case "PISO":
+              fillColor = "ffebee";
+              break;
+            case "RACK":
+              fillColor = "f3e5f5";
+              break;
+          }
+
+          ws[cellAddress].s = {
+            ...dataStyle,
+            fill: { fgColor: { rgb: fillColor } },
+          };
+        }
+      });
+    });
+
+    const colWidths = headers.map((header) => {
+      let maxWidth = header.length;
+      datosExcel.forEach((row) => {
+        const cellValue = String(row[header] || "");
+        if (cellValue.length > maxWidth) {
+          maxWidth = cellValue.length;
+        }
+      });
+      return { wch: Math.min(maxWidth + 3, 60) };
+    });
+
+    ws["!cols"] = colWidths;
+
+    return ws;
+  };
 
   const handleExportar = async () => {
     if (!marcaSeleccionada) {
@@ -36,71 +314,16 @@ export function ExportarProductosExcel({ onClose }) {
     setIsLoading(true);
 
     try {
-      // Obtener datos de productos por marca
-      const { data, error } = await supabase
-        .from("productos")
-        .select(
-          `
-          codigo,
-          nombre,
-          cantidad,
-          marcas(nombre),
-          piso(cantidad),
-          cajas(id, cantidad),
-          suelto(id, cantidad)
-        `
-        )
-        .eq("marca_id", marcaSeleccionada)
-        .order("codigo");
+      let datosExcel;
+      let nombreHoja;
 
-      if (error) throw error;
-
-      // Procesar datos para el Excel
-      const datosExcel = data.map((producto) => {
-        // Calcular tarimas (cajas con cantidad > 0 + registros suelto)
-        const cajasConCantidad = Array.isArray(producto.cajas)
-          ? producto.cajas.filter((caja) => caja.cantidad > 0).length
-          : 0;
-
-        const registrosSuelto = Array.isArray(producto.suelto)
-          ? producto.suelto.length
-          : 0;
-
-        const totalTarimas = cajasConCantidad + registrosSuelto;
-
-        // Calcular cantidad en suelto
-        const cantidadSuelto =
-          producto.suelto?.reduce(
-            (total, item) => total + (item.cantidad || 0),
-            0
-          ) || 0;
-
-        // Calcular cantidad en piso
-        const cantidadPiso =
-          producto.piso?.reduce(
-            (total, item) => total + (item.cantidad || 0),
-            0
-          ) || 0;
-
-        // AGREGAR: Calcular registros de piso
-        const registrosPiso = Array.isArray(producto.piso)
-          ? producto.piso.length
-          : 0;
-
-        // AGREGAR: Calcular total (tarimas + registros de piso)
-        const total = cantidadPiso + cantidadSuelto + producto.cantidad;
-
-        return {
-          CODIGO: producto.codigo,
-          NOMBRE: producto.nombre,
-          MARCA: producto.marcas?.nombre || "",
-          TOTAL: total,
-          TARIMAS: totalTarimas,
-          CANTIDAD_RACK: producto.cantidad || 0,
-          CANTIDAD_SUELTO: cantidadSuelto,
-          CANTIDAD_PISO: cantidadPiso,
-        };
-      });
+      if (tipoExportacion === "general") {
+        datosExcel = await obtenerDatosGenerales(marcaSeleccionada);
+        nombreHoja = "Resumen Productos";
+      } else {
+        datosExcel = await obtenerDatosConCajas(marcaSeleccionada);
+        nombreHoja = "Detalle Completo";
+      }
 
       if (datosExcel.length === 0) {
         Swal.fire({
@@ -112,59 +335,25 @@ export function ExportarProductosExcel({ onClose }) {
         return;
       }
 
-      // Crear libro de Excel
-      const ws = XLSX.utils.json_to_sheet(datosExcel);
-
-      // Configurar estilos para headers
-      const headerStyle = {
-        fill: { fgColor: { rgb: "0B5394" } }, // Color de fondo azul
-        font: { color: { rgb: "FFFFFF" }, bold: true }, // Letra blanca y bold
-        alignment: { horizontal: "center", vertical: "center" },
-      };
-
-      // Aplicar estilos a los headers (fila 1)
-      const headerCells = ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"];
-      headerCells.forEach((cell) => {
-        if (!ws[cell]) ws[cell] = {};
-        ws[cell].s = headerStyle;
-      });
-
-      // Ajustar ancho de columnas al contenido
-      const colWidths = [];
-      const headers = Object.keys(datosExcel[0] || {});
-
-      headers.forEach((header, colIndex) => {
-        let maxWidth = header.length; // Empezar con el ancho del header
-
-        datosExcel.forEach((row) => {
-          const cellValue = String(row[header] || "");
-          if (cellValue.length > maxWidth) {
-            maxWidth = cellValue.length;
-          }
-        });
-
-        colWidths.push({ wch: Math.min(maxWidth + 2, 50) }); // +2 para padding, máximo 50
-      });
-
-      ws["!cols"] = colWidths;
-
+      const ws = crearExcelBonito(datosExcel, tipoExportacion);
       const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Productos");
+      XLSX.utils.book_append_sheet(wb, ws, nombreHoja);
 
-      // Obtener nombre de la marca para el archivo
       const marcaNombre =
         marcas.find((m) => m.id == marcaSeleccionada)?.nombre || "Marca";
       const fechaHoy = new Date().toISOString().split("T")[0];
-      const nombreArchivo = `Productos_${marcaNombre}_${fechaHoy}.xlsx`;
+      const tipoSufijo = tipoExportacion === "general" ? "Resumen" : "Completo";
+      const nombreArchivo = `Inventario_${marcaNombre}_${tipoSufijo}_${fechaHoy}.xlsx`;
 
-      // Descargar archivo
       XLSX.writeFile(wb, nombreArchivo);
 
+      const tipoTexto =
+        tipoExportacion === "general" ? "resumen" : "detalle completo";
       Swal.fire({
         icon: "success",
         title: "Exportación exitosa",
-        text: `Se exportaron ${datosExcel.length} productos`,
-        timer: 2000,
+        text: `Se exportó el ${tipoTexto} con ${datosExcel.length} registros`,
+        timer: 2500,
         showConfirmButton: false,
       });
 
@@ -213,6 +402,21 @@ export function ExportarProductosExcel({ onClose }) {
                 </select>
               </div>
 
+              <div className="campo">
+                <label>Tipo de Exportación:</label>
+                <select
+                  value={tipoExportacion}
+                  onChange={(e) => setTipoExportacion(e.target.value)}
+                >
+                  <option value="general">
+                    General - Resumen por producto
+                  </option>
+                  <option value="detallado">
+                    Detallado - Incluir información de cajas
+                  </option>
+                </select>
+              </div>
+
               <div className="actions">
                 <Btnsave
                   funcion={onClose}
@@ -224,7 +428,9 @@ export function ExportarProductosExcel({ onClose }) {
                 <Btnsave
                   funcion={handleExportar}
                   bgcolor={v.colorBotones}
-                  titulo="Exportar Excel"
+                  titulo={`Exportar ${
+                    tipoExportacion === "general" ? "Resumen" : "Completo"
+                  }`}
                   icono={<v.iconoagregar />}
                   color="#fff"
                 />
@@ -251,7 +457,7 @@ const Container = styled.div`
 
   .sub-contenedor {
     position: relative;
-    width: 500px;
+    width: 600px;
     max-width: 90%;
     border-radius: 20px;
     background: ${({ theme }) => theme.bgtotal};
@@ -297,40 +503,18 @@ const Container = styled.div`
 
           select {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border: 1px solid #e5e5e5;
             border-radius: 8px;
             background: ${({ theme }) => theme.bgtotal};
             color: ${({ theme }) => theme.textprincipal};
             font-size: 14px;
+            transition: border-color 0.2s;
 
             &:focus {
               outline: none;
               border-color: ${v.colorBotones};
-            }
-          }
-        }
-
-        .info {
-          margin: 20px 0;
-          padding: 15px;
-          background: ${({ theme }) => theme.bgtotalFuerte};
-          border-radius: 8px;
-
-          p {
-            margin-bottom: 10px;
-            font-weight: 500;
-            color: ${({ theme }) => theme.textprincipal};
-          }
-
-          ul {
-            margin: 0;
-            padding-left: 20px;
-
-            li {
-              margin-bottom: 5px;
-              color: ${({ theme }) => theme.textsecundario};
-              font-size: 14px;
+              box-shadow: 0 0 0 3px ${v.colorBotones}20;
             }
           }
         }
@@ -339,7 +523,7 @@ const Container = styled.div`
           display: flex;
           gap: 15px;
           justify-content: center;
-          margin-top: 20px;
+          margin-top: 25px;
         }
       }
     }

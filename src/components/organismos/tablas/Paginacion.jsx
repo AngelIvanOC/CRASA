@@ -5,19 +5,17 @@ import { Btnpaginacion } from "../../../index";
 import { Device } from "../../../index";
 
 export const Paginacion = ({ table }) => {
-  const opciones = [10, 20, 30, 50, 100]; // Opciones de filas por página
+  const opciones = [10, 20, 30, 50, 100];
 
   return (
     <Container>
       <section className="paginacion">
-        {/* Botón ir al inicio */}
         <Btnpaginacion
           disabled={!table.getCanPreviousPage()}
           funcion={() => table.setPageIndex(0)}
           icono={<v.iconotodos />}
         />
 
-        {/* Información total de registros */}
         <div className="info-registros">
           <span>
             {table.getFilteredRowModel().rows.length} registros en total
@@ -25,9 +23,7 @@ export const Paginacion = ({ table }) => {
         </div>
       </section>
 
-      {/* Controles de paginación */}
       <section className="paginacion">
-        {/* Selector de filas por página */}
         <div className="filas-por-pagina">
           <span>Filas por pagina:</span>
           <select

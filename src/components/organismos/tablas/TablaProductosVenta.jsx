@@ -44,7 +44,7 @@ export function TablaProductosVenta({
       confirmButtonText: "Sí, eliminar",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        const ok = await eliminarProductoVenta(p.id); // p.id es el ID del registro en detalle_ventas
+        const ok = await eliminarProductoVenta(p.id);
         if (ok) {
           Swal.fire("Eliminado", "Producto eliminado con éxito", "success");
         }
@@ -101,45 +101,6 @@ export function TablaProductosVenta({
         return filterStatuses.includes(status?.id);
       },
     },
-    /*{
-      accessorKey: "productos.racks.codigo_rack",
-      header: "UBICACION",
-      cell: (info) => <span>{info.getValue()}</span>,
-      enableColumnFilter: false,
-      filterFn: (row, columnId, filterStatuses) => {
-        if (filterStatuses.length === 0) return true;
-        const status = row.getValue(columnId);
-        return filterStatuses.includes(status?.id);
-      },
-    },
-    {
-      accessorKey: "productos.fecha",
-      header: "CADUCIDAD",
-      cell: (info) => <span>{info.getValue()}</span>,
-      enableColumnFilter: false,
-      filterFn: (row, columnId, filterStatuses) => {
-        if (filterStatuses.length === 0) return true;
-        const status = row.getValue(columnId);
-        return filterStatuses.includes(status?.id);
-      },
-    },
-    {
-      accessorKey: "acciones",
-      header: "",
-      enableSorting: false,
-      cell: (info) => (
-        <ContentAccionesTabla
-          funcionEditar={() => editar(info.row.original)}
-          funcionEliminar={() => eliminar(info.row.original)}
-        />
-      ),
-      enableColumnFilter: true,
-      filterFn: (row, columnId, filterStatuses) => {
-        if (filterStatuses.length === 0) return true;
-        const status = row.getValue(columnId);
-        return filterStatuses.includes(status?.id);
-      },
-    },*/
   ];
 
   const table = useReactTable({
@@ -273,7 +234,6 @@ const Container = styled.div`
             align-items: center;
             line-height: 1;
             color: gray;
-            /* Estilos para los iconos activos */
             .active {
               color: black;
             }
@@ -288,50 +248,37 @@ const Container = styled.div`
       overflow-y: auto;
       width: 100%;
 
-      scrollbar-width: none; /* Firefox */
+      scrollbar-width: none;
       &::-webkit-scrollbar {
-        display: none; /* Chrome, Safari y Edge */
+        display: none;
       }
 
       tr {
-        display: table; /* CLAVE: Mantener comportamiento de tabla */
-        width: 100%; /* CLAVE: Forzar ancho completo */
-        table-layout: fixed; /* CLAVE: Layout fijo para distribución equitativa */
+        display: table;
+        width: 100%;
+        table-layout: fixed;
         border-bottom: 1px solid #eaecf0;
 
         td {
           padding: 9px 15px;
           text-align: left;
           color: ${(props) => props.theme.textsecundario};
-          display: table-cell; /* CLAVE: Mantener comportamiento de celda */
+          display: table-cell;
           vertical-align: middle;
 
-          /* Distribución específica por columna */
           &:nth-child(1) {
             width: 25%;
-          } /* Código */
+          }
           &:nth-child(2) {
             width: 50%;
-          } /* Nombre */
+          }
           &:nth-child(3) {
             width: 25%;
-          } /* Cantidad */
-
-          /*&:nth-child(4) {
-            width: 15%;
-          } /* Ubicación */
-          /*&:nth-child(5) {
-            width: 17%;
-          } /* Fecha Caducidad */
-          /*&:nth-child(6) {
-            width: 8%;
-            text-align: center; /* Centrar acciones */
-          //} /* Acciones */
+          }
         }
       }
     }
 
-    /* Asegurar que thead tenga la misma distribución */
     thead tr {
       display: table;
       width: 100%;
@@ -339,30 +286,17 @@ const Container = styled.div`
 
       th {
         &:nth-child(1) {
-          //width: 5%;
           width: 25%;
         }
         &:nth-child(2) {
-          //width: 40%;
           width: 50%;
         }
         &:nth-child(3) {
-          //width: 15%;
           width: 25%;
         }
-        /*&:nth-child(4) {
-          width: 15%;
-        }
-        &:nth-child(5) {
-          width: 17%;
-        }
-        &:nth-child(6) {
-          width: 8%;
-        }*/
       }
     }
 
-    /* Estilos para el resizer */
     .resizer {
       position: absolute;
       right: 0;

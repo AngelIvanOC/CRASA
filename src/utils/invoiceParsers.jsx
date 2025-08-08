@@ -11,11 +11,10 @@ export const parseInvoiceData = (text) => {
 };
 
 const parseJumex = (text) => {
-  //console.log(text);
   const pedidoMatch = text.match(/Folio [\s\n]*(\d+)/i);
   const fechaMatch = text.match(/(\d{4}-\d{2}-\d{2})T\d{2}:\d{2}:\d{2}/);
   const totalMatch = text.match(/Total[\s\n\$]*([\d,]+\.\d{2})/);
-  const marcaMatch = text.match(/JUMEX/i); // Puedes ampliar esto
+  const marcaMatch = text.match(/JUMEX/i);
 
   const pedidoNo = pedidoMatch ? pedidoMatch[1] : null;
   const fecha = fechaMatch ? fechaMatch[1] : null;
@@ -30,15 +29,12 @@ const parseJumex = (text) => {
   for (let i = 0; i < lineas.length; i++) {
     const linea = lineas[i].trim();
 
-    // Identificar líneas que contienen descripción del producto
     if (linea.match(/^\d{12,13}$/)) {
       cantidadProductos++;
     }
 
-    // Buscar líneas con números que representen la cantidad
     if (linea.match(/^\d+(\.\d+)?$/)) {
       const cantidad = parseFloat(linea);
-      // Validar que está precedida por una línea tipo "Caj XBX"
       const lineaAnterior = lineas[i + 1]?.trim();
       if (lineaAnterior && lineaAnterior.match(/^\d{8}$/)) {
         cantidadTotal += cantidad;
@@ -53,10 +49,8 @@ const parseJumex = (text) => {
   while ((match = regex.exec(text)) !== null) {
     productos.push({
       codigo: parseInt(match[3]),
-      /*ean: match[2],
-        nose: match[3],*/
+
       descripcion: match[1]?.trim() || `Producto ${match[1]}`,
-      //sepa: match[5],
       cantidad: parseInt(match[2]) || 0,
       marca: marca,
     });
@@ -75,11 +69,10 @@ const parseJumex = (text) => {
 };
 
 const parseCon = (text) => {
-  //console.log("texto extraido", text);
   const pedidoMatch = text.match(/\s*\n*\n(\d{10})/);
   const fechaMatch = text.match(/(\d{4}-\d{2}-\d{2})T\d{2}:\d{2}:\d{2}/);
   const totalMatch = text.match(/Total[\s\n\$]*([\d,]+\.\d{2})/);
-  const marcaMatch = text.match(/CON ALIMENTOS/i); // Puedes ampliar esto
+  const marcaMatch = text.match(/CON ALIMENTOS/i);
 
   const pedidoNo = pedidoMatch ? pedidoMatch[1] : null;
   const fecha = fechaMatch ? fechaMatch[1] : null;
@@ -94,7 +87,6 @@ const parseCon = (text) => {
   for (let i = 0; i < lineas.length; i++) {
     const linea = lineas[i].trim();
 
-    // Identificar líneas que contienen descripción del producto
     if (/XBX/i.test(linea)) {
       cantidadProductos++;
     }
@@ -115,10 +107,7 @@ const parseCon = (text) => {
   while ((match = regex.exec(text)) !== null) {
     productos.push({
       codigo: parseInt(match[1]),
-      /*ean: match[2],
-        nose: match[3],*/
       descripcion: match[4]?.trim() || `Producto ${match[1]}`,
-      //sepa: match[5],
       cantidad: parseInt(match[5]),
       marca: marca,
     });
@@ -141,7 +130,6 @@ const parseCrasa = (text) => {
     return str.replace(/\s+/g, " ").trim();
   };
 
-  // Extraer información básica
   const pedidoMatch = text.match(/Pedido\s+No\s*(\d+)/i);
   const fechaMatch = text.match(/(\d{4}-\d{2}-\d{2})T\d{2}:\d{2}:\d{2}/);
   const totalMatch = text.match(/Total\s*[\$]?\s*([\d,]+\.\d{2})/i);
@@ -167,7 +155,6 @@ const parseCrasa = (text) => {
 
   const regexProhibido = new RegExp(`^(${palabrasProhibidas.join("|")})`, "i");
 
-  // Dividir en líneas y limpiar
   const lineas = text
     .split("\n")
     .map((l) => l.trim())
@@ -176,52 +163,45 @@ const parseCrasa = (text) => {
   for (let i = 0; i < lineas.length; i++) {
     const linea = lineas[i];
 
-    // Patrón 1: C#### - DESCRIPCION (puede continuar en líneas siguientes)
     const patron1 = linea.match(/^C?(\d{3,7})\s*-\s*(.+)$/);
     if (patron1) {
       const codigo = parseInt(patron1[1]);
       let descripcion = patron1[2].trim();
 
-      // Verificar si la descripción continúa en líneas siguientes
       let j = i + 1;
       while (j < lineas.length) {
         const siguienteLinea = lineas[j];
 
-        // Parar si encontramos indicadores de fin de descripción
         if (
-          siguienteLinea.match(/^\d+%$/) || // Solo porcentaje
-          siguienteLinea.match(/^[\d,]+\.\d+$/) || // Solo precio
-          siguienteLinea.match(/^[\d.]+\s+Kg$/) || // Peso
-          siguienteLinea.match(/^\d{8}$/) || // Código SAT
-          siguienteLinea === "Caj XBX" || // Indicador cantidad
-          siguienteLinea.match(/^C?\d{3,7}/) || // Siguiente producto
-          siguienteLinea.includes("Obj. Imp:") // Objeto impuesto
+          siguienteLinea.match(/^\d+%$/) ||
+          siguienteLinea.match(/^[\d,]+\.\d+$/) ||
+          siguienteLinea.match(/^[\d.]+\s+Kg$/) ||
+          siguienteLinea.match(/^\d{8}$/) ||
+          siguienteLinea === "Caj XBX" ||
+          siguienteLinea.match(/^C?\d{3,7}/) ||
+          siguienteLinea.includes("Obj. Imp:")
         ) {
           break;
         }
 
-        // Si la línea parece ser continuación de descripción, agregarla
         if (siguienteLinea && siguienteLinea !== "-") {
           descripcion += " " + siguienteLinea;
         }
 
         j++;
 
-        // Límite de seguridad - máximo 3 líneas adicionales
         if (j > i + 3) break;
       }
 
-      // Limpiar la descripción eliminando datos que no son parte del nombre
       descripcion = descripcion
-        .replace(/\s*0%.*$/, "") // Quitar porcentaje y todo lo que sigue
-        .replace(/\s*[\d,]+\.\d+.*$/, "") // Quitar precios
-        .replace(/\s*\d+\.\d+\s+Kg.*$/, "") // Quitar peso
-        .replace(/\s*\d{8}.*$/, "") // Quitar códigos SAT
+        .replace(/\s*0%.*$/, "")
+        .replace(/\s*[\d,]+\.\d+.*$/, "")
+        .replace(/\s*\d+\.\d+\s+Kg.*$/, "")
+        .replace(/\s*\d{8}.*$/, "")
         .trim();
 
       const cantidad = buscarCantidad(lineas, i);
 
-      // Validar que la descripción no esté vacía ni empiece con número
       if (
         !descripcion ||
         /^\d/.test(descripcion) ||
@@ -239,12 +219,10 @@ const parseCrasa = (text) => {
       continue;
     }
 
-    // Patrón 2: C#### solo (descripción en líneas siguientes)
     const patron2 = linea.match(/^C?(\d{3,7})$/);
     if (patron2) {
       const codigo = parseInt(patron2[1]);
 
-      // Recoger descripción de las siguientes líneas hasta encontrar un delimitador
       const descripcion = construirDescripcion(lineas, i + 1);
       const cantidad = buscarCantidad(lineas, i);
 
@@ -265,7 +243,6 @@ const parseCrasa = (text) => {
     }
   }
 
-  // Función para construir descripción multilínea
   function construirDescripcion(lineas, indiceInicio) {
     const partes = [];
 
@@ -276,20 +253,18 @@ const parseCrasa = (text) => {
     ) {
       const lineaDesc = lineas[j];
 
-      // Parar si encontramos indicadores de fin de descripción
       if (
-        lineaDesc.match(/^\d+%$/) || // Solo porcentaje
-        lineaDesc.match(/^[\d,]+\.\d+$/) || // Solo precio
-        lineaDesc.match(/^[\d.]+\s+Kg$/) || // Peso
-        lineaDesc.match(/^\d{8}$/) || // Código SAT
-        lineaDesc === "Caj XBX" || // Indicador cantidad
-        lineaDesc.match(/^C\d{4,5}/) || // Siguiente producto
-        lineaDesc.includes("Obj. Imp:") // Objeto impuesto
+        lineaDesc.match(/^\d+%$/) ||
+        lineaDesc.match(/^[\d,]+\.\d+$/) ||
+        lineaDesc.match(/^[\d.]+\s+Kg$/) ||
+        lineaDesc.match(/^\d{8}$/) ||
+        lineaDesc === "Caj XBX" ||
+        lineaDesc.match(/^C\d{4,5}/) ||
+        lineaDesc.includes("Obj. Imp:")
       ) {
         break;
       }
 
-      // Agregar líneas válidas (excluyendo solo guión)
       if (lineaDesc && lineaDesc !== "-") {
         partes.push(lineaDesc);
       }
@@ -298,9 +273,7 @@ const parseCrasa = (text) => {
     return partes.join(" ");
   }
 
-  // Función para buscar cantidad
   function buscarCantidad(lineas, indiceProducto) {
-    // Buscar en las siguientes 20 líneas
     for (
       let k = indiceProducto;
       k < Math.min(indiceProducto + 20, lineas.length - 1);
@@ -313,10 +286,9 @@ const parseCrasa = (text) => {
         }
       }
     }
-    return 1; // Valor por defecto
+    return 1;
   }
 
-  // Eliminar duplicados y ordenar
   const productosUnicos = productos
     .filter(
       (producto, index, self) =>
@@ -344,23 +316,19 @@ const parseCrasa = (text) => {
 };
 
 const parseCostena = (text) => {
-  //console.log(text);
-
   const pedidoMatch = text.match(/\s*\n*\s*(\d{10})/);
   const fechaMatch = text.match(/(\d{4}-\d{2}-\d{2})T\d{2}:\d{2}:\d{2}/);
   const totalMatch = text.match(/Total[\s\n\$]*([\d,]+\.\d{2})/);
-  const marcaMatch = "LA COSTEÑA"; // Puedes ampliar esto
+  const marcaMatch = "LA COSTEÑA";
 
   const pedidoNo = pedidoMatch ? pedidoMatch[1] : null;
   const fecha = fechaMatch ? fechaMatch[1] : null;
   const total = totalMatch ? parseFloat(totalMatch[1].replace(/,/g, "")) : null;
   const marca = marcaMatch;
 
-  // Extraer número después de "TOTALES" que está en la siguiente línea (puede tener coma)
   const totalesMatch = text.match(/TOTALES\s*\n\s*([\d,]+)/i);
   let cantidadTotal = 0;
   if (totalesMatch) {
-    // totalesMatch[1] es el número con comas, por ejemplo "1,860"
     const numeroSinComas = totalesMatch[1].replace(/,/g, "");
     cantidadTotal = parseInt(numeroSinComas, 10);
   }
@@ -372,7 +340,6 @@ const parseCostena = (text) => {
   for (let i = 0; i < lineas.length; i++) {
     const linea = lineas[i].trim();
 
-    // Identificar líneas que contienen descripción del producto
     if (linea.match(/^XBX/)) {
       cantidadProductos++;
     }
@@ -385,10 +352,7 @@ const parseCostena = (text) => {
   while ((match = regex.exec(text)) !== null) {
     productos.push({
       codigo: parseInt(match[1]),
-      /*ean: match[2],
-        nose: match[3],*/
       descripcion: match[4]?.trim() || `Producto ${match[1]}`,
-      //sepa: match[5],
       cantidad: parseInt(match[6]) || 0,
       marca: marca,
     });

@@ -8,10 +8,6 @@ export function CardNotificaciones() {
   const { configuracion, obtenerConfiguracion, actualizarConfiguracion } =
     useMarcasStore();
 
-  useEffect(() => {
-    //obtenerConfiguracion();
-  }, []);
-
   const handleToggleChange = (key, value) => {
     actualizarConfiguracion({ [key]: value });
   };
