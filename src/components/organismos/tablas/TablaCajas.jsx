@@ -82,9 +82,7 @@ export function TablaCajas({
             !esEncargado ? () => editarRegistro(info.row.original) : null
           }
           funcionEliminar={
-            !esEncargado
-              ? () => () => eliminarRegistro(info.row.original)
-              : null
+            !esEncargado ? () => eliminarRegistro(info.row.original) : null
           }
         />
       ),
