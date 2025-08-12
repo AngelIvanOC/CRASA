@@ -124,6 +124,35 @@ export async function InsertarProductosVenta(p) {
 }
 
 export async function EliminarVenta(p) {
+  const { data: ventaData, error: errorVenta } = await supabase
+    .from(tabla)
+    .select("factura_url")
+    .eq("id", p.id)
+    .single();
+
+  if (errorVenta) {
+    throw errorVenta;
+  }
+
+  if (ventaData.factura_url) {
+    try {
+      const url = new URL(ventaData.factura_url);
+      const filePath = url.pathname.split(
+        "/storage/v1/object/public/facturas/"
+      )[1];
+
+      const { error: errorStorage } = await supabase.storage
+        .from("facturas")
+        .remove([filePath]);
+
+      if (errorStorage) {
+        console.error("Error eliminando archivo del storage:", errorStorage);
+      }
+    } catch (error) {
+      console.error("Error procesando URL del archivo:", error);
+    }
+  }
+
   const { error: errorDetalle } = await supabase
     .from(tablaDetalle)
     .delete()

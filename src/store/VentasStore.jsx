@@ -68,11 +68,21 @@ export const useVentasStore = create((set, get) => ({
   },
 
   eliminarVenta: async (p) => {
-    await EliminarAyudantesVenta(p.id);
-
-    await EliminarVenta(p);
-    const { mostrarVentas } = get();
-    await mostrarVentas();
+    try {
+      await EliminarAyudantesVenta(p.id);
+      await EliminarVenta(p);
+      const { mostrarVentas } = get();
+      await mostrarVentas();
+      return true;
+    } catch (error) {
+      console.error("Error eliminando venta:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error al eliminar",
+        text: "Hubo un problema al eliminar la venta o sus archivos asociados",
+      });
+      return false;
+    }
   },
 
   eliminarProductoVenta: async (id) => {
