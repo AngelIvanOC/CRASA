@@ -14,6 +14,7 @@ export function RegistrarDevolucion({ onClose, setIsExploding }) {
   const queryClient = useQueryClient();
 
   const {
+    pdfFile,
     pdfPreview,
     extractedData: pdfData,
     isProcessing: isPdfProcessing,
@@ -21,7 +22,7 @@ export function RegistrarDevolucion({ onClose, setIsExploding }) {
   } = usePdfReader();
 
   const { mutate: doInsertarDevolucion } = useMutation({
-    mutationFn: () => insertDevolucionWithProducts(pdfData),
+    mutationFn: () => insertDevolucionWithProducts(pdfData, pdfFile),
     mutationKey: "insertar devolucion piso",
     onError: (err) => {
       console.error("Error al procesar devolución:", err);
@@ -36,6 +37,7 @@ export function RegistrarDevolucion({ onClose, setIsExploding }) {
         showConfirmButton: false,
       });
 
+      queryClient.invalidateQueries(["mostrar ventas"]);
       queryClient.invalidateQueries(["mostrar piso"]);
       cerrarFormulario();
       setIsPending(false);
@@ -44,7 +46,20 @@ export function RegistrarDevolucion({ onClose, setIsExploding }) {
 
   const procesarDevolucion = async () => {
     if (!pdfData || !pdfData.productos || pdfData.productos.length === 0) {
-      console.error("No hay productos para procesar");
+      Swal.fire({
+        icon: "warning",
+        title: "No hay datos",
+        text: "Por favor, sube un PDF válido con productos para procesar.",
+      });
+      return;
+    }
+
+    if (!pdfFile) {
+      Swal.fire({
+        icon: "warning",
+        title: "Archivo requerido",
+        text: "Se necesita el archivo PDF para procesar la devolución.",
+      });
       return;
     }
 
@@ -103,6 +118,11 @@ export function RegistrarDevolucion({ onClose, setIsExploding }) {
       await processPdfFile(file);
     } catch (error) {
       console.error("Error procesando archivo PDF:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error procesando PDF",
+        text: "Hubo un problema al leer el archivo PDF. Verifica que sea un archivo válido.",
+      });
     }
   };
 
@@ -129,6 +149,33 @@ export function RegistrarDevolucion({ onClose, setIsExploding }) {
             />
           </div>
 
+          {/* ✅ Mostrar información extraída */}
+          {pdfData && pdfData.productos && (
+            <div
+              style={{
+                marginBottom: "15px",
+                padding: "10px",
+                backgroundColor: "#f8f9fa",
+                borderRadius: "5px",
+                border: "1px solid #e9ecef",
+              }}
+            >
+              <h4 style={{ margin: "0 0 10px 0", color: "#495057" }}>
+                Información extraída:
+              </h4>
+              <p style={{ margin: "5px 0", fontSize: "14px" }}>
+                <strong>Pedido:</strong> {pdfData.pedidoNo || "No detectado"}
+              </p>
+              <p style={{ margin: "5px 0", fontSize: "14px" }}>
+                <strong>Marca:</strong> {pdfData.marca || "No detectado"}
+              </p>
+              <p style={{ margin: "5px 0", fontSize: "14px" }}>
+                <strong>Productos encontrados:</strong>{" "}
+                {pdfData.productos.length}
+              </p>
+            </div>
+          )}
+
           <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
             <Btnsave
               funcion={procesarDevolucion}
@@ -136,7 +183,7 @@ export function RegistrarDevolucion({ onClose, setIsExploding }) {
               titulo="Procesar Devolución"
               bgcolor={v.colorBotones}
               color="#fff"
-              disabled={!pdfData || !pdfData.productos}
+              disabled={!pdfData || !pdfData.productos || !pdfFile}
             />
           </div>
         </div>

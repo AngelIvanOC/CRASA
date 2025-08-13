@@ -15,6 +15,7 @@ export async function MostrarVentas() {
       cantidad_total,
       fecha,
       factura_url,
+      estado,
       marcas(id, nombre),
       usuarios(id, nombres)
     `
@@ -58,6 +59,28 @@ export async function InsertarVenta(p) {
     Swal.fire({
       icon: "error",
       title: "Error al insertar",
+      text: error.message,
+    });
+    return null;
+  }
+
+  return data?.id;
+}
+
+export async function InsertarDevolucion(p) {
+  const { data, error } = await supabase
+    .from(tabla)
+    .insert({
+      ...p,
+      estado: "Devolucion",
+    })
+    .select("id")
+    .single();
+
+  if (error) {
+    Swal.fire({
+      icon: "error",
+      title: "Error al insertar devolución",
       text: error.message,
     });
     return null;

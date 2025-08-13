@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AsignarResponsable } from "../organismos/formularios/AsignarResponsable";
 import { useVentasStore } from "../../index";
-import { supabase } from "../../index"; 
+import { supabase } from "../../index";
 
 export function ProductosVentaTemplate({
   detalleVenta,

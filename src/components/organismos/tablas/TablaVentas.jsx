@@ -115,7 +115,12 @@ export function TablaVentas({
     {
       accessorKey: "usuarios.nombres",
       header: "RESPONSABLE",
-      cell: (info) => <span>{info.getValue() || "No asignado"}</span>,
+      cell: (info) => {
+        const esDevolucion = info.row.original.estado === "Devolucion";
+        return (
+          <span>{esDevolucion ? "" : info.getValue() || "No asignado"}</span>
+        );
+      },
     },
     {
       accessorKey: "factura_url",
@@ -136,18 +141,41 @@ export function TablaVentas({
         ),
     },
     {
+      accessorKey: "estado",
+      header: "ESTADO",
+      cell: (info) => {
+        const estado = info.getValue();
+        return (
+          <span
+            className={`estado-badge ${
+              estado === "Devolucion" ? "devolucion" : "normal"
+            }`}
+          >
+            {estado || "Normal"}
+          </span>
+        );
+      },
+    },
+    {
       accessorKey: "acciones",
       header: "",
       enableSorting: false,
-      cell: (info) => (
-        <ContentAccionesTabla
-          funcionEditar={!esEncargado ? () => editar(info.row.original) : null}
-          funcionEliminar={
-            !esEncargado ? () => eliminar(info.row.original) : null
-          }
-          funcionVer={() => handleVerDetalle(info.row.original)}
-        />
-      ),
+      cell: (info) => {
+        const esDevolucion = info.row.original.estado === "Devolucion";
+        const mostrarAcciones = !esEncargado && !esDevolucion;
+
+        return (
+          <ContentAccionesTabla
+            funcionEditar={
+              mostrarAcciones ? () => editar(info.row.original) : null
+            }
+            funcionEliminar={
+              mostrarAcciones ? () => eliminar(info.row.original) : null
+            }
+            funcionVer={() => handleVerDetalle(info.row.original)}
+          />
+        );
+      },
     },
   ];
 
@@ -293,53 +321,56 @@ const Container = styled.div`
       overflow-y: auto;
       width: 100%;
 
-      scrollbar-width: none; 
+      scrollbar-width: none;
       &::-webkit-scrollbar {
-        display: none; 
+        display: none;
       }
 
       tr {
         display: table;
-        width: 100%; 
-        table-layout: fixed; 
+        width: 100%;
+        table-layout: fixed;
         border-bottom: 1px solid #eaecf0;
 
         td {
           padding: 9px 15px;
           text-align: left;
           color: ${(props) => props.theme.textsecundario};
-          display: table-cell; 
+          display: table-cell;
           vertical-align: middle;
 
           &:nth-child(1) {
             width: 12.5%;
-          } 
+          }
           &:nth-child(2) {
             width: 12.5%;
-          } 
+          }
           &:nth-child(3) {
-            width: 12.5%;
-            text-align: center; 
-          } 
-          &:nth-child(4) {
-            width: 12.5%;
+            width: 10%;
             text-align: center;
-          } 
+          }
+          &:nth-child(4) {
+            width: 10%;
+            text-align: center;
+          }
           &:nth-child(5) {
-            width: 12.5%;
-          } 
+            width: 10%;
+          }
           &:nth-child(6) {
             width: 12.5%;
             text-align: center;
-          } 
+          }
           &:nth-child(7) {
-            width: 12.5%;
-            text-align: center; 
+            width: 10%;
+            text-align: center;
           }
           &:nth-child(8) {
+            width: 10%;
+          }
+          &:nth-child(9) {
             width: 12.5%;
-            text-align: center; 
-          } 
+            text-align: center;
+          }
         }
       }
     }
@@ -357,30 +388,33 @@ const Container = styled.div`
           width: 12.5%;
         }
         &:nth-child(3) {
-          width: 12.5%;
+          width: 10%;
           .header-content {
             justify-content: center;
           }
         }
         &:nth-child(4) {
-          width: 12.5%;
+          width: 10%;
           .header-content {
             justify-content: center;
           }
         }
         &:nth-child(5) {
-          width: 12.5%;
+          width: 10%;
         }
         &:nth-child(6) {
           width: 12.5%;
         }
         &:nth-child(7) {
-          width: 12.5%;
+          width: 10%;
           .header-content {
             justify-content: center;
           }
         }
         &:nth-child(8) {
+          width: 10%;
+        }
+        &:nth-child(9) {
           width: 12.5%;
         }
       }

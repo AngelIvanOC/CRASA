@@ -2,6 +2,7 @@ import { create } from "zustand";
 import {
   MostrarVentas,
   InsertarVenta,
+  InsertarDevolucion,
   MostrarDetalleVenta,
   EliminarVenta,
   EditarVenta,
@@ -31,6 +32,15 @@ export const useVentasStore = create((set, get) => ({
     await mostrarVentas();
 
     return venta;
+  },
+
+  insertarDevolucion: async (p) => {
+    const devolucion = await InsertarDevolucion(p);
+    if (!devolucion) return null;
+
+    const { mostrarVentas } = get();
+    await mostrarVentas();
+    return devolucion;
   },
 
   insertarProductosVenta: async (venta_id, productos) => {
