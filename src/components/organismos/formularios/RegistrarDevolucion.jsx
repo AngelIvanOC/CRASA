@@ -149,33 +149,6 @@ export function RegistrarDevolucion({ onClose, setIsExploding }) {
             />
           </div>
 
-          {/* ✅ Mostrar información extraída */}
-          {pdfData && pdfData.productos && (
-            <div
-              style={{
-                marginBottom: "15px",
-                padding: "10px",
-                backgroundColor: "#f8f9fa",
-                borderRadius: "5px",
-                border: "1px solid #e9ecef",
-              }}
-            >
-              <h4 style={{ margin: "0 0 10px 0", color: "#495057" }}>
-                Información extraída:
-              </h4>
-              <p style={{ margin: "5px 0", fontSize: "14px" }}>
-                <strong>Pedido:</strong> {pdfData.pedidoNo || "No detectado"}
-              </p>
-              <p style={{ margin: "5px 0", fontSize: "14px" }}>
-                <strong>Marca:</strong> {pdfData.marca || "No detectado"}
-              </p>
-              <p style={{ margin: "5px 0", fontSize: "14px" }}>
-                <strong>Productos encontrados:</strong>{" "}
-                {pdfData.productos.length}
-              </p>
-            </div>
-          )}
-
           <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
             <Btnsave
               funcion={procesarDevolucion}

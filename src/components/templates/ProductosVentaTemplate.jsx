@@ -23,6 +23,8 @@ export function ProductosVentaTemplate({
 
   const { mostrarAyudantesVenta } = useVentasStore();
 
+  const [estadoVenta, setEstadoVenta] = useState(null);
+
   useEffect(() => {
     async function cargarEquipoAsignado() {
       if (ventaId) {
@@ -33,11 +35,14 @@ export function ProductosVentaTemplate({
               `
               id,
               usuario,
+              estado,
               usuarios(id, nombres, id_auth)
             `
             )
             .eq("id", ventaId)
             .single();
+
+          setEstadoVenta(ventaData?.estado);
 
           if (ventaData?.usuarios) {
             setResponsableActual({
@@ -97,18 +102,24 @@ export function ProductosVentaTemplate({
       <section className="main">
         <section className="header">
           <Buscador />
-          <div className="header-buttons">
-            <Btnsave
-              funcion={nuevoRegistro}
-              bgcolor={v.colorBotones}
-              titulo="Asignar Equipo"
-              icono={<v.iconoagregar />}
-              color="#fff"
-            />
-          </div>
+          {estadoVenta !== "Devolucion" && (
+            <div className="header-buttons">
+              <Btnsave
+                funcion={nuevoRegistro}
+                bgcolor={v.colorBotones}
+                titulo="Asignar Equipo"
+                icono={<v.iconoagregar />}
+                color="#fff"
+              />
+            </div>
+          )}
         </section>
 
-        <section className="equipo-info">
+        <section
+          className={`equipo-info ${
+            estadoVenta === "Devolucion" ? "disabled" : ""
+          }`}
+        >
           <div className="equipo-card">
             <div className="equipo-content">
               <div className="responsable">
@@ -190,6 +201,23 @@ const Container = styled.div`
       padding: 0 20px;
       background-color: ${({ theme }) => theme.bgSecundario || "#f8f9fa"};
       border-bottom: 1px solid ${({ theme }) => theme.borde || "#dee2e6"};
+
+      &.disabled {
+        opacity: 0.6;
+        pointer-events: none;
+
+        .equipo-card {
+          background: #f0f0f0;
+          color: #999;
+
+          .responsable,
+          .ayudantes {
+            strong {
+              font-weight: 500;
+            }
+          }
+        }
+      }
 
       .equipo-card {
         background: white;
