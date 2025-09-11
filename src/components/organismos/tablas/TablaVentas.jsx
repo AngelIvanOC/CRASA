@@ -29,6 +29,7 @@ export function TablaVentas({
   SetopenRegistro,
   setdataSelect,
   setAccion,
+  buscador,
 }) {
   const { dataVentas, mostrarVentas, eliminarVenta } = useVentasStore();
   const [selectedVenta, setSelectedVenta] = useState(null);
@@ -206,6 +207,14 @@ export function TablaVentas({
         ),
     },
   });
+
+  useEffect(() => {
+    if (buscador) {
+      table.setGlobalFilter(buscador);
+    } else {
+      table.setGlobalFilter(undefined);
+    }
+  }, [buscador, table]);
 
   return (
     <Container>

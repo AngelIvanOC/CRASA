@@ -20,6 +20,7 @@ export function VentasTemplate() {
   const [dataSelect, setdataSelect] = useState([]);
   const { dataVentas } = useVentasStore();
   const [openDevolucion, setOpenDevolucion] = useState(false);
+  const [buscador, setBuscador] = useState("");
 
   const { dataUsuarios } = useUsuariosStore();
   const esEncargado = dataUsuarios?.id_rol === 3;
@@ -56,7 +57,7 @@ export function VentasTemplate() {
 
       <section className="main">
         <section className="header">
-          <Buscador />
+          <Buscador setBuscador={setBuscador} />
 
           {!esEncargado && (
             <Btnsave
@@ -79,6 +80,7 @@ export function VentasTemplate() {
 
         <TablaVentas
           data={dataVentas}
+          buscador={buscador}
           onVerDetalle={() => setModalOpen(true)}
           SetopenRegistro={SetopenRegistro}
           setdataSelect={setdataSelect}
