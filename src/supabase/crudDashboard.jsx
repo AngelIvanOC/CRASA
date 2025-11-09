@@ -131,45 +131,84 @@ export async function MostrarProductosPorMarca() {
 }
 
 export async function MostrarProximosACaducar() {
-  const { data, error } = await supabase
-    .from("cajas")
-    .select(
-      `
-    id,
-    fecha_caducidad,
-    productos (
-      nombre,
-      marcas (
-        nombre
-      )
-    )
-  `
-    )
-    .lte(
-      "fecha_caducidad",
-      new Date(new Date().setDate(new Date().getDate() + 15)).toISOString()
-    )
-    .order("fecha_caducidad", { ascending: true })
-    .limit(4);
+  try {
+    const fechaLimite = new Date();
+    fechaLimite.setDate(fechaLimite.getDate() + 15);
 
-  if (error) {
+    const [cajasRes, sueltosRes, pisosRes] = await Promise.all([
+      supabase
+        .from("cajas")
+        .select(
+          `
+          id,
+          fecha_caducidad,
+          codigo_barras,
+          productos (
+            marcas ( nombre )
+          )
+        `
+        )
+        .lte("fecha_caducidad", fechaLimite.toISOString())
+        .gt("cantidad", 0),
+
+      supabase
+        .from("suelto")
+        .select(
+          `
+          id,
+          fecha_caducidad,
+          codigo_barras,
+          productos (
+            marcas ( nombre )
+          )
+        `
+        )
+        .lte("fecha_caducidad", fechaLimite.toISOString())
+        .gt("cantidad", 0),
+
+      supabase
+        .from("piso")
+        .select(
+          `
+          id,
+          fecha_caducidad,
+          codigo_barras,
+          productos (
+            marcas ( nombre )
+          )
+        `
+        )
+        .lte("fecha_caducidad", fechaLimite.toISOString())
+        .gt("cantidad", 0),
+    ]);
+
+    const data = [
+      ...(cajasRes.data || []),
+      ...(sueltosRes.data || []),
+      ...(pisosRes.data || []),
+    ];
+
+    const hoy = new Date();
+    const procesados = data
+      .map((item) => {
+        const dias = Math.ceil(
+          (new Date(item.fecha_caducidad) - hoy) / (1000 * 60 * 60 * 24)
+        );
+        return {
+          // 👇 Así la card seguirá mostrando correctamente
+          producto: item.codigo_barras || "Sin código",
+          marca: item.productos?.marcas?.nombre || "Sin marca",
+          dias,
+        };
+      })
+      .sort((a, b) => a.dias - b.dias)
+      .slice(0, 4);
+
+    return procesados;
+  } catch (error) {
     console.error("Error al cargar próximos a caducar:", error);
     return [];
   }
-
-  const hoy = new Date();
-  const procesados = data.map((caja) => {
-    const dias = Math.ceil(
-      (new Date(caja.fecha_caducidad) - hoy) / (1000 * 60 * 60 * 24)
-    );
-    return {
-      producto: caja.productos?.nombre || "Producto sin nombre",
-      marca: caja.productos?.marcas?.nombre || "Sin marca",
-      dias,
-    };
-  });
-
-  return procesados;
 }
 
 export async function MostrarMovimientosRecientes() {

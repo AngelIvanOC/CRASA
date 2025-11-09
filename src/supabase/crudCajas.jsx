@@ -13,17 +13,20 @@ export async function ObtenerCajasPorProducto(producto_id) {
         racks (codigo_rack)
       `
       )
-      .eq("producto_id", producto_id);
+      .eq("producto_id", producto_id)
+      .gt("cantidad", 0);
 
     const { data: sueltos } = await supabase
       .from("suelto")
       .select("*")
-      .eq("producto_id", producto_id);
+      .eq("producto_id", producto_id)
+      .gt("cantidad", 0);
 
     const { data: pisos } = await supabase
       .from("piso")
       .select("*")
-      .eq("producto_id", producto_id);
+      .eq("producto_id", producto_id)
+      .gt("cantidad", 0);
 
     const cajasFormateadas = (cajas || []).map((caja) => ({
       ...caja,
