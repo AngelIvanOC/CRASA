@@ -234,14 +234,6 @@ const Container = styled.div`
               .tipo {
                 text-align: center;
                 font-size: 14px;
-
-                &.entrada {
-                  filter: hue-rotate(200deg);
-                }
-
-                &.venta {
-                  filter: hue-rotate(0deg);
-                }
               }
             }
           }
