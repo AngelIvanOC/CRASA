@@ -195,7 +195,6 @@ export async function MostrarProximosACaducar() {
           (new Date(item.fecha_caducidad) - hoy) / (1000 * 60 * 60 * 24)
         );
         return {
-          // 👇 Así la card seguirá mostrando correctamente
           producto: item.codigo_barras || "Sin código",
           marca: item.productos?.marcas?.nombre || "Sin marca",
           dias,

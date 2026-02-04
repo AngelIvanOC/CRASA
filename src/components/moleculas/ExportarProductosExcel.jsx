@@ -426,7 +426,7 @@ export function ExportarProductosExcel({ onClose }) {
                 />
 
                 <Btnsave
-                  funcion={handleExportar}
+                  //funcion={handleExportar}
                   bgcolor={v.colorBotones}
                   titulo={`Exportar ${
                     tipoExportacion === "general" ? "Resumen" : "Completo"
