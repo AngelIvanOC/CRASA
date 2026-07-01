@@ -143,26 +143,9 @@ const insertProductsFromExcelData = async (productos, ventaId) => {
     "CON ALIMENTOS": 4,
   };
 
-  console.log("🔍 Iniciando inserción de productos desde Excel");
-  console.log("📦 Total de productos a procesar:", productos.length);
-
   for (const producto of productos) {
     try {
       const codigoNumerico = parseInt(producto.codigo);
-
-      console.log("🔍 Procesando producto:");
-      console.log(
-        "  - Código original:",
-        producto.codigo,
-        typeof producto.codigo
-      );
-      console.log(
-        "  - Código numérico:",
-        codigoNumerico,
-        typeof codigoNumerico
-      );
-      console.log("  - Cantidad:", producto.cantidad);
-      console.log("  - Marca:", producto.marca);
 
       if (!codigoNumerico || isNaN(codigoNumerico)) {
         console.error("❌ Código inválido:", producto.codigo);
@@ -188,16 +171,9 @@ const insertProductsFromExcelData = async (productos, ventaId) => {
         continue;
       }
 
-      console.log("🔍 Resultado búsqueda (código + marca):", productoExistente);
-
       let productoId = productoExistente?.id;
 
-      console.log("📝 Insertando detalle de venta:");
-      console.log("  - venta_id:", ventaId);
-      console.log("  - producto_id:", productoId);
-      console.log("  - cantidad:", producto.cantidad);
-
-      const { data: detalleInsertado, error: errorDetalle } = await supabase
+      const { error: errorDetalle } = await supabase
         .from("detalle_ventas")
         .insert({
           venta_id: ventaId,
@@ -211,23 +187,11 @@ const insertProductsFromExcelData = async (productos, ventaId) => {
 
       if (errorDetalle) {
         console.error("❌ Error insertando detalle:", errorDetalle);
-        console.error("❌ Datos que se intentaron insertar:", {
-          venta_id: ventaId,
-          producto_id: productoId,
-          cantidad: producto.cantidad || 0,
-        });
-      } else {
-        console.log(
-          "✅ Detalle de venta insertado correctamente:",
-          detalleInsertado
-        );
       }
     } catch (error) {
       console.error("❌ Error procesando producto:", producto.codigo, error);
     }
   }
-
-  console.log("📋 Proceso completado");
 };
 
 export const uploadExcelToSupabase = async (excelFile) => {

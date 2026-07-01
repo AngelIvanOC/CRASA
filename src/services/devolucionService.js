@@ -83,21 +83,16 @@ export const insertDevolucionWithProducts = async (extractedData, pdfFile) => {
     throw new Error("No hay productos para procesar en la devolución");
   }
 
-  console.log("📋 Procesando devolución:", extractedData);
-
   let pdfUrl = null;
   if (pdfFile) {
     try {
       pdfUrl = await uploadDevolucionPdfToSupabase(pdfFile);
-      console.log("📎 PDF de devolución subido:", pdfUrl);
     } catch (error) {
       console.error("❌ Error subiendo PDF:", error);
     }
   }
 
   const marcaPrincipal = await detectarMarcaPrincipal(extractedData.productos);
-
-  console.log("🏷️ Marca principal detectada:", marcaPrincipal);
 
   const { insertarDevolucion } = useVentasStore.getState();
 
@@ -109,15 +104,11 @@ export const insertDevolucionWithProducts = async (extractedData, pdfFile) => {
     factura_url: pdfUrl,
   };
 
-  console.log("💾 Datos de devolución a insertar:", devolucionData);
-
   const idDevolucion = await insertarDevolucion(devolucionData);
 
   if (!idDevolucion) {
     throw new Error("No se pudo registrar la devolución en ventas");
   }
-
-  console.log("✅ Devolución registrada con ID:", idDevolucion);
 
   await insertProductsToVentas(extractedData.productos, idDevolucion);
 
@@ -127,17 +118,12 @@ export const insertDevolucionWithProducts = async (extractedData, pdfFile) => {
 };
 
 const insertProductsToVentas = async (productos, ventaId) => {
-  console.log("🔍 Insertando productos en detalle_ventas desde devolución");
-
   for (const producto of productos) {
     try {
       const codigoNumerico = parseInt(producto.codigo);
       const marcaId = mapaMarcas[producto.marca?.toUpperCase()] ?? null;
 
       if (!codigoNumerico || isNaN(codigoNumerico) || marcaId === null) {
-        console.log(
-          `⚠️ Producto omitido - código: ${producto.codigo}, marca: ${producto.marca}`
-        );
         continue;
       }
 
@@ -149,9 +135,6 @@ const insertProductsToVentas = async (productos, ventaId) => {
         .maybeSingle();
 
       if (errorBusqueda || !productoExistente) {
-        console.log(
-          `⚠️ Producto no encontrado en BD - código: ${codigoNumerico}`
-        );
         continue;
       }
 
@@ -166,12 +149,7 @@ const insertProductsToVentas = async (productos, ventaId) => {
         });
 
       if (errorDetalle) {
-        console.error(
-          "❌ Error insertando detalle de devolución:",
-          errorDetalle
-        );
-      } else {
-        console.log(`✅ Producto ${codigoNumerico} registrado en ventas`);
+        console.error("❌ Error insertando detalle de devolución:", errorDetalle);
       }
     } catch (error) {
       console.error(
@@ -184,9 +162,6 @@ const insertProductsToVentas = async (productos, ventaId) => {
 };
 
 const insertProductsToPiso = async (productos) => {
-  console.log("🔍 Insertando productos en piso desde devolución");
-  console.log("📦 Total de productos a procesar:", productos.length);
-
   for (const producto of productos) {
     try {
       const codigoNumerico = parseInt(producto.codigo);
@@ -228,16 +203,10 @@ const insertProductsToPiso = async (productos) => {
 
       if (errorPiso) {
         console.error("❌ Error insertando en piso:", errorPiso);
-      } else {
-        console.log(
-          `✅ Producto ${codigoNumerico} insertado en piso:`,
-          pisoInsertado.id
-        );
       }
     } catch (error) {
       console.error("❌ Error procesando producto:", producto.codigo, error);
     }
   }
 
-  console.log("📋 Proceso de inserción en piso completado");
 };

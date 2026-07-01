@@ -19,8 +19,7 @@ export function EditarUsuario({ onClose, dataSelect, setIsExploding }) {
   const { mutate: doEditar } = useMutation({
     mutationFn: editarUsuario,
     mutationKey: "editar_usuario",
-    onError: (err) => {
-      console.log("Error al editar usuario:", err.message);
+    onError: () => {
       setIsPending(false);
     },
     onSuccess: () => {

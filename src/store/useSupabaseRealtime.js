@@ -12,8 +12,7 @@ export function useSupabaseRealtime(tablas = []) {
         .on(
           "postgres_changes",
           { event: "*", schema: "public", table: tabla },
-          (payload) => {
-            console.log(`Realtime: cambio en ${tabla}`, payload);
+          () => {
             queryClient.invalidateQueries({ queryKey: [tabla] });
           }
         )

@@ -55,7 +55,6 @@ const parseJumex = (text) => {
       marca: marca,
     });
   }
-  console.log(productos);
 
   return {
     pedidoNo,
@@ -112,7 +111,6 @@ const parseCon = (text) => {
       marca: marca,
     });
   }
-  console.log(productos);
 
   return {
     pedidoNo,
@@ -297,11 +295,7 @@ const parseCrasa = (text) => {
     .sort((a, b) => a.codigo - b.codigo);
 
   const cantidadProductos = productosUnicos.length;
-  console.log(productosUnicos);
   const cantidadTotal = productosUnicos.reduce((sum, p) => sum + p.cantidad, 0);
-
-  console.log(`Productos extraídos: ${cantidadProductos}`);
-  console.log(`Cantidad total: ${cantidadTotal}`);
 
   return {
     pedidoNo,
@@ -357,7 +351,6 @@ const parseCostena = (text) => {
       marca: marca,
     });
   }
-  console.log(productos);
 
   return {
     pedidoNo,

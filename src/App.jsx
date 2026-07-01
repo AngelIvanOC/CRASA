@@ -78,7 +78,7 @@ function App() {
             </section>
           </Container>
         )}
-        <ReactQueryDevtools initialIsOpen={true} />
+        <ReactQueryDevtools initialIsOpen={false} />
       </AuthContextProvider>
     </ThemeProvider>
   );

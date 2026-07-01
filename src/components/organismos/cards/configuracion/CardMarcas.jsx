@@ -17,7 +17,6 @@ export function CardMarcas() {
   };
 
   const handleEdit = (marca) => {
-    console.log("Editar marca:", marca);
   };
 
   const buttonConfig = {

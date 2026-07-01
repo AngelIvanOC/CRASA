@@ -46,7 +46,6 @@ export const AuthContextProvider = ({ children }) => {
       const response = await MostrarUsuarios({ id_auth: id_auth });
       if (response) {
         return;
-      } else {
       }
     } catch (error) {
       console.error("Error al insertar datos:", error);

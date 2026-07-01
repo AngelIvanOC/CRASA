@@ -16,10 +16,6 @@ export function CardCuenta() {
     obtenerDatosCuenta();
   }, [obtenerDatosCuenta]);
 
-  useEffect(() => {
-    console.log("dataCuenta:", dataCuenta);
-  }, [dataCuenta]);
-
   const cambiarContrasena = async () => {
     const { value: nuevaContrasena } = await Swal.fire({
       title: "Cambiar Contraseña",

@@ -32,8 +32,7 @@ export function RegistrarProductos({
   const { mutate: doInsertar } = useMutation({
     mutationFn: insertar,
     mutationKey: "insertar productos",
-    onError: (err) => {
-      console.log("El error", err.message);
+    onError: () => {
       setIsPending(false);
     },
     onSuccess: () => {
@@ -88,15 +87,6 @@ export function RegistrarProductos({
 
     cargarRacks();
   }, []);
-
-  useEffect(() => {
-    console.log("Marcas cargadas:", marcas);
-    console.log("Racis cargados:", racks);
-  }, [marcas, racks]);
-
-  useEffect(() => {
-    console.log("Datos para editar:", dataSelect);
-  }, [dataSelect]);
 
   useEffect(() => {
     if (accion === "Editar") {

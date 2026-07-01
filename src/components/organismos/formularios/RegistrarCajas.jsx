@@ -39,8 +39,7 @@ export function RegistrarCajas({
         tipoRegistro,
       }),
     mutationKey: ["guardar registro", accion, dataSelect?.id, tipoRegistro],
-    onError: (err) => {
-      console.log("Error:", err.message);
+    onError: () => {
       setIsPending(false);
     },
     onSuccess: () => {

@@ -164,8 +164,6 @@ export async function EliminarRack(p) {
 }
 
 export async function EditarRack(p) {
-  console.log("Editando rack con:", p);
-
   Swal.fire({
     icon: "success",
     title: "¡Actualizado!",

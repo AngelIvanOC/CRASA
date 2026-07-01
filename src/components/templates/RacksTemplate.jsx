@@ -29,15 +29,11 @@ export function RacksTemplate() {
   }
 
   const handleBuscar = async (valor) => {
-    console.log("handleBuscar llamado con valor:", valor);
-
     setBuscador(valor);
 
     if (valor.trim() === "") {
-      console.log("Valor vacío, mostrando todos los productos");
       await mostrarRacks();
     } else {
-      console.log("Buscando productos con:", valor);
       await buscarProductos({ buscador: valor });
     }
   };

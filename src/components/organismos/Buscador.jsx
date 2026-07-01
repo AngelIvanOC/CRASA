@@ -2,11 +2,8 @@ import styled from "styled-components";
 import { v } from "../../styles/variables";
 
 export function Buscador({ setBuscador }) {
-  console.log("Buscador renderizado con setBuscador:", setBuscador);
-
   function buscar(e) {
     const valor = e.target.value;
-    console.log("Valor ingresado en buscador:", valor);
     setBuscador(valor);
   }
 

@@ -88,13 +88,10 @@ export const useExcelReader = () => {
 
             if (!isNaN(codigo) && codigo > 0) {
               productos.push({
-                codigo: codigo, 
+                codigo: codigo,
                 cantidad,
                 marca: marca.toUpperCase(),
               });
-              console.log("  ✅ Producto agregado");
-            } else {
-              console.log("  ❌ Código inválido, fila omitida");
             }
           }
 

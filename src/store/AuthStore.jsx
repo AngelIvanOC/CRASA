@@ -65,30 +65,21 @@ export const useAuthStore = create((set, get) => ({
   obtenerDatosCuenta: async () => {
     try {
       set({ loading: true });
-      console.log("🔍 Obteniendo datos de cuenta...");
 
       const {
         data: { user },
         error,
       } = await supabase.auth.getUser();
 
-      console.log("👤 Usuario de Auth:", user);
-      console.log("❌ Error de Auth:", error);
-
       if (error || !user) {
         console.error("Error al obtener usuario:", error);
         return;
       }
 
-      console.log("🔎 Buscando usuario con id_auth:", user.id);
       const usuario = await MostrarUsuarios({ id_auth: user.id });
-      console.log("📋 Datos del usuario encontrado:", usuario);
 
       if (usuario) {
         set({ dataCuenta: usuario });
-        console.log("✅ dataCuenta actualizado en el store");
-      } else {
-        console.log("❌ No se encontró usuario en la tabla");
       }
     } catch (error) {
       console.error("Error al obtener datos de cuenta:", error);

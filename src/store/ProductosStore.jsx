@@ -13,7 +13,6 @@ import { supabase } from "../index";
 export const useProductosStore = create((set, get) => ({
   buscador: "",
   setBuscador: (p) => {
-    console.log("setBuscador llamado con:", p);
     set({ buscador: p });
   },
 
@@ -108,7 +107,6 @@ export const useProductosStore = create((set, get) => ({
 
   mostrarProductosConFiltros: async () => {
     const { filtros, calcularTarimas } = get();
-    console.log("mostrarProductosConFiltros con filtros:", filtros);
 
     let query = supabase.from("productos").select(`
         id,
@@ -124,7 +122,6 @@ export const useProductosStore = create((set, get) => ({
       `);
 
     if (filtros.marca && filtros.marca !== "") {
-      console.log("Aplicando filtro de marca:", filtros.marca);
       query = query.eq("marca_id", filtros.marca);
     }
 
@@ -168,7 +165,6 @@ export const useProductosStore = create((set, get) => ({
         };
       }) || [];
 
-    console.log("Productos filtrados:", productosConCalculos);
     set({ dataProductos: productosConCalculos });
     set({ productoItemSelect: productosConCalculos[0] });
     return productosConCalculos;
@@ -209,6 +205,7 @@ export const useProductosStore = create((set, get) => ({
       console.error("Error en buscarProductosConFiltros:", error);
       return [];
     }
+
 
     const productosConPiso =
       data?.map((producto) => {
