@@ -42,7 +42,7 @@ export function LoginTemplate() {
         <ContentLogo>
           <img src={v.logo} alt="" />
         </ContentLogo>
-        <Title $paddingbottom="40px">Ingresar</Title>
+        <Title $paddingbottom="40px">Ingresarrrrrr</Title>
 
         <form onSubmit={handleSubmit}>
           <InputText2>
