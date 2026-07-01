@@ -32,7 +32,7 @@ export function LoginTemplate() {
     e.preventDefault();
     const success = await loginDirecto(formData.email, formData.password);
     if (success) {
-      navigate("/"); 
+      navigate("/");
     }
   };
 
@@ -42,7 +42,7 @@ export function LoginTemplate() {
         <ContentLogo>
           <img src={v.logo} alt="" />
         </ContentLogo>
-        <Title $paddingbottom="40px">Ingresarrrrrr</Title>
+        <Title $paddingbottom="40px">Ingresar</Title>
 
         <form onSubmit={handleSubmit}>
           <InputText2>
