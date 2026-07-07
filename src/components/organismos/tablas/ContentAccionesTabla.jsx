@@ -6,6 +6,7 @@ import { Icon } from "@iconify/react";
 export function ContentAccionesTabla({
   funcionEditar,
   funcionEliminar,
+  funcionSurtir,
   funcionVer,
 }) {
   return (
@@ -24,6 +25,14 @@ export function ContentAccionesTabla({
           fontSize="20px"
           color="#f76e8e"
           icono={<Icon icon="material-symbols:delete" />}
+        />
+      )}
+      {funcionSurtir && (
+        <AccionTabla
+          funcion={funcionSurtir}
+          fontSize="20px"
+          color={v.verde}
+          icono={<Icon icon="mdi:truck-fast" />}
         />
       )}
       {funcionVer && (

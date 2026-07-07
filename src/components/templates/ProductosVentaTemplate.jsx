@@ -24,6 +24,7 @@ export function ProductosVentaTemplate({
   const { mostrarAyudantesVenta } = useVentasStore();
 
   const [estadoVenta, setEstadoVenta] = useState(null);
+  const [codigoVenta, setCodigoVenta] = useState(null);
 
   useEffect(() => {
     async function cargarEquipoAsignado() {
@@ -36,6 +37,7 @@ export function ProductosVentaTemplate({
               id,
               usuario,
               estado,
+              codigo,
               usuarios(id, nombres, id_auth)
             `
             )
@@ -43,6 +45,7 @@ export function ProductosVentaTemplate({
             .single();
 
           setEstadoVenta(ventaData?.estado);
+          setCodigoVenta(ventaData?.codigo);
 
           if (ventaData?.usuarios) {
             setResponsableActual({
@@ -149,6 +152,9 @@ export function ProductosVentaTemplate({
           SetopenRegistro={SetopenRegistro}
           setdataSelect={setdataSelect}
           setAccion={setAccion}
+          ventaId={ventaId}
+          estadoVenta={estadoVenta}
+          codigoVenta={codigoVenta}
         />
       </section>
     </Container>

@@ -10,6 +10,8 @@ import {
   MostrarAyudantesVenta,
   InsertarAyudantesVenta,
   EliminarAyudantesVenta,
+  SurtirDetalleVenta,
+  SurtirVenta,
 } from "../index";
 import { supabase } from "../index";
 
@@ -118,6 +120,28 @@ export const useVentasStore = create((set, get) => ({
     const response = await MostrarAyudantesVenta(venta_id);
     set({ ayudantesVenta: response });
     return response;
+  },
+
+  surtirDetalleVenta: async (detalle_venta_id, venta_id) => {
+    const resultado = await SurtirDetalleVenta(detalle_venta_id);
+    if (!resultado) return null;
+
+    const { mostrarDetalleVenta, mostrarVentas } = get();
+    await mostrarDetalleVenta(venta_id);
+    await mostrarVentas();
+
+    return resultado;
+  },
+
+  surtirVenta: async (venta_id) => {
+    const resultado = await SurtirVenta(venta_id);
+    if (!resultado) return null;
+
+    const { mostrarVentas, mostrarDetalleVenta } = get();
+    await mostrarVentas();
+    await mostrarDetalleVenta(venta_id);
+
+    return resultado;
   },
 
   asignarEquipoVenta: async (venta_id, responsable_id, ayudantes_ids = []) => {

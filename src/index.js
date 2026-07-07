@@ -11,6 +11,7 @@ export * from "./routers/routes";
 export * from "./components/organismos/sidebar/Sidebar";
 export * from "./store/ThemeStore";
 export * from "./utils/dataEstatica";
+export * from "./utils/descargarOrdenSurtido";
 export * from "./components/templates/LoginTemplate";
 export * from "./pages/Login";
 export * from "./components/atomos/Title";

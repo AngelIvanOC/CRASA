@@ -4,6 +4,7 @@ import {
   Paginacion,
   ContentAccionesTabla,
   useUsuariosStore,
+  descargarOrdenSurtido,
 } from "../../../index";
 import { v } from "../../../styles/variables";
 import { useState, useEffect } from "react";
@@ -49,6 +50,52 @@ export function TablaVentas({
     SetopenRegistro(true);
     setdataSelect(data);
     setAccion("Editar");
+  }
+
+  function surtir(venta) {
+    Swal.fire({
+      title: "¿Surtir este pedido?",
+      text: "Esta acción descontará el inventario necesario para cubrir el pedido.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, surtir",
+      cancelButtonText: "Cancelar",
+    }).then(async (result) => {
+      if (!result.isConfirmed) return;
+
+      const { surtirVenta } = useVentasStore.getState();
+      const resumen = await surtirVenta(venta.id);
+      if (!resumen) return;
+
+      await descargarOrdenSurtido({
+        codigoPedido: venta.codigo,
+        fecha: venta.fecha,
+        productos: resumen.detalle,
+      });
+
+      if (resumen.incompletos === 0) {
+        Swal.fire({
+          icon: "success",
+          title: "¡Pedido surtido!",
+          text: `Se completaron los ${resumen.completados} productos del pedido.`,
+          timer: 2500,
+          showConfirmButton: false,
+        });
+      } else {
+        const listaFaltantes = resumen.faltantes
+          .map(
+            (f) => `<li>${f.codigo} - ${f.nombre}: faltan ${f.cantidad_faltante}</li>`
+          )
+          .join("");
+        Swal.fire({
+          icon: "warning",
+          title: "Surtido incompleto",
+          html: `Se completaron ${resumen.completados} de ${resumen.total_detalles_procesados} productos.<br/><br/><ul style="text-align:left">${listaFaltantes}</ul>`,
+        });
+      }
+    });
   }
 
   function eliminar(venta) {
@@ -162,8 +209,10 @@ export function TablaVentas({
       header: "",
       enableSorting: false,
       cell: (info) => {
-        const esDevolucion = info.row.original.estado === "Devolucion";
+        const estado = info.row.original.estado;
+        const esDevolucion = estado === "Devolucion";
         const mostrarAcciones = !esEncargado && !esDevolucion;
+        const puedeSurtir = estado !== "completado" && !esDevolucion;
 
         return (
           <ContentAccionesTabla
@@ -172,6 +221,9 @@ export function TablaVentas({
             }
             funcionEliminar={
               mostrarAcciones ? () => eliminar(info.row.original) : null
+            }
+            funcionSurtir={
+              puedeSurtir ? () => surtir(info.row.original) : null
             }
             funcionVer={() => handleVerDetalle(info.row.original)}
           />

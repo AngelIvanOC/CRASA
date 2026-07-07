@@ -112,14 +112,52 @@ export async function MostrarDetalleVenta(venta_id) {
       cantidad,
       fecha_caducidad,
       ubicacion,
+      estado,
+      escaneado,
+      producto_id,
       productos:producto_id(id, codigo, nombre, marca_id, racks(id, codigo_rack))
     `
     )
-    .eq("venta_id", venta_id);
+    .eq("venta_id", venta_id)
+    .order("id", { ascending: true });
 
   if (error) {
     console.error("Error fetching venta details:", error);
     throw error;
+  }
+
+  return data;
+}
+
+export async function SurtirDetalleVenta(detalle_venta_id) {
+  const { data, error } = await supabase.rpc("fn_surtir_detalle_venta", {
+    p_detalle_id: detalle_venta_id,
+  });
+
+  if (error) {
+    Swal.fire({
+      icon: "error",
+      title: "Error al surtir",
+      text: error.message,
+    });
+    return null;
+  }
+
+  return data;
+}
+
+export async function SurtirVenta(venta_id) {
+  const { data, error } = await supabase.rpc("fn_surtir_venta", {
+    p_venta_id: venta_id,
+  });
+
+  if (error) {
+    Swal.fire({
+      icon: "error",
+      title: "Error al surtir el pedido",
+      text: error.message,
+    });
+    return null;
   }
 
   return data;

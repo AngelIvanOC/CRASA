@@ -6,6 +6,7 @@ import {
   ImagenContent,
   Icono,
   useVentasStore,
+  descargarOrdenSurtido,
 } from "../../../index";
 import Swal from "sweetalert2";
 import { v } from "../../../styles/variables";
@@ -25,13 +26,63 @@ export function TablaProductosVenta({
   SetopenRegistro,
   setdataSelect,
   setAccion,
+  ventaId,
+  estadoVenta,
+  codigoVenta,
 }) {
   if (data == null) return;
   const [pagina, setPagina] = useState(1);
-  const [datas, setData] = useState(data);
   const [columnFilters, setColumnFilters] = useState([]);
 
-  const { eliminarProductoVenta } = useVentasStore();
+  const { detalleVenta, eliminarProductoVenta, surtirDetalleVenta } =
+    useVentasStore();
+  const filas = detalleVenta?.length ? detalleVenta : data;
+
+  function surtir(detalle) {
+    Swal.fire({
+      title: "¿Surtir este producto?",
+      text: "Se descontará inventario de piso, suelto y cajas (en ese orden) para cubrir la cantidad pendiente.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, surtir",
+      cancelButtonText: "Cancelar",
+    }).then(async (result) => {
+      if (!result.isConfirmed) return;
+
+      const resultado = await surtirDetalleVenta(detalle.id, ventaId);
+      if (!resultado) return;
+
+      await descargarOrdenSurtido({
+        codigoPedido: codigoVenta,
+        fecha: new Date(),
+        productos: [resultado],
+      });
+
+      if (resultado.cantidad_faltante === 0) {
+        Swal.fire({
+          icon: "success",
+          title: "Producto surtido",
+          text: "Se cubrió toda la cantidad requerida.",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      } else if (resultado.cantidad_surtida_ahora === 0) {
+        Swal.fire({
+          icon: "warning",
+          title: "Sin stock disponible",
+          text: "No hay inventario disponible en piso, suelto ni cajas para este producto.",
+        });
+      } else {
+        Swal.fire({
+          icon: "warning",
+          title: "Surtido parcial",
+          text: `Se cubrieron ${resultado.cantidad_surtida_ahora} unidades. Faltan ${resultado.cantidad_faltante}.`,
+        });
+      }
+    });
+  }
 
   function eliminar(p) {
     Swal.fire({
@@ -101,10 +152,42 @@ export function TablaProductosVenta({
         return filterStatuses.includes(status?.id);
       },
     },
+    {
+      accessorKey: "escaneado",
+      header: "SURTIDO",
+      cell: (info) => (
+        <span>{`${info.getValue() || 0} / ${info.row.original.cantidad}`}</span>
+      ),
+    },
+    {
+      accessorKey: "estado",
+      header: "ESTADO",
+      cell: (info) => (
+        <span className={`estado-badge ${info.getValue() || "incompleto"}`}>
+          {info.getValue() || "Incompleto"}
+        </span>
+      ),
+    },
+    {
+      accessorKey: "acciones",
+      header: "",
+      enableSorting: false,
+      cell: (info) => {
+        const detalle = info.row.original;
+        const puedeSurtir =
+          detalle.estado !== "completado" && estadoVenta !== "Devolucion";
+
+        return (
+          <ContentAccionesTabla
+            funcionSurtir={puedeSurtir ? () => surtir(detalle) : null}
+          />
+        );
+      },
+    },
   ];
 
   const table = useReactTable({
-    data,
+    data: filas,
     columns,
     state: {
       columnFilters,
@@ -118,19 +201,6 @@ export function TablaProductosVenta({
       pagination: {
         pageSize: 10,
       },
-    },
-    meta: {
-      updateData: (rowIndex, columnId, value) =>
-        setData((prev) =>
-          prev.map((row, index) =>
-            index === rowIndex
-              ? {
-                  ...prev[rowIndex],
-                  [columnId]: value,
-                }
-              : row
-          )
-        ),
     },
   });
 
@@ -267,13 +337,26 @@ const Container = styled.div`
           vertical-align: middle;
 
           &:nth-child(1) {
-            width: 25%;
+            width: 15%;
           }
           &:nth-child(2) {
-            width: 50%;
+            width: 30%;
           }
           &:nth-child(3) {
-            width: 25%;
+            width: 15%;
+            text-align: center;
+          }
+          &:nth-child(4) {
+            width: 15%;
+            text-align: center;
+          }
+          &:nth-child(5) {
+            width: 15%;
+            text-align: center;
+          }
+          &:nth-child(6) {
+            width: 10%;
+            text-align: center;
           }
         }
       }
@@ -286,13 +369,22 @@ const Container = styled.div`
 
       th {
         &:nth-child(1) {
-          width: 25%;
+          width: 15%;
         }
         &:nth-child(2) {
-          width: 50%;
+          width: 30%;
         }
         &:nth-child(3) {
-          width: 25%;
+          width: 15%;
+        }
+        &:nth-child(4) {
+          width: 15%;
+        }
+        &:nth-child(5) {
+          width: 15%;
+        }
+        &:nth-child(6) {
+          width: 10%;
         }
       }
     }
