@@ -101,7 +101,7 @@ export function TablaProductos({
       cell: (info) => <span>{info.getValue() || 0}</span>,
     },
     {
-      accessorKey: "cantidad",
+      accessorKey: "cantidad_rack",
       header: "EN RACK",
       cell: (info) => <span>{info.getValue() || 0}</span>,
     },

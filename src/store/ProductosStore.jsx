@@ -146,6 +146,12 @@ export const useProductosStore = create((set, get) => ({
             0
           ) || 0;
 
+        const cantidad_rack =
+          producto.cajas?.reduce(
+            (total, item) => total + (item.cantidad || 0),
+            0
+          ) || 0;
+
         const cajasConCantidad = Array.isArray(producto.cajas)
           ? producto.cajas.filter((caja) => caja.cantidad > 0).length
           : 0;
@@ -160,8 +166,9 @@ export const useProductosStore = create((set, get) => ({
           ...producto,
           cantidad_piso,
           cantidad_suelto,
+          cantidad_rack,
           tarimas: totalTarimas,
-          total: cantidad_piso + cantidad_suelto + producto.cantidad,
+          total: cantidad_piso + cantidad_suelto + cantidad_rack,
         };
       }) || [];
 
@@ -221,6 +228,12 @@ export const useProductosStore = create((set, get) => ({
             0
           ) || 0;
 
+        const cantidad_rack =
+          producto.cajas?.reduce(
+            (total, item) => total + (item.cantidad || 0),
+            0
+          ) || 0;
+
         const cajasConCantidad = Array.isArray(producto.cajas)
           ? producto.cajas.filter((caja) => caja.cantidad > 0).length
           : 0;
@@ -235,8 +248,9 @@ export const useProductosStore = create((set, get) => ({
           ...producto,
           cantidad_piso,
           cantidad_suelto,
+          cantidad_rack,
           tarimas: totalTarimas,
-          total: cantidad_piso + cantidad_suelto + producto.cantidad,
+          total: cantidad_piso + cantidad_suelto + cantidad_rack,
         };
       }) || [];
 

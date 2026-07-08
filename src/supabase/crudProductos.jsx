@@ -96,6 +96,12 @@ export async function MostrarProductos() {
           0
         ) || 0;
 
+      const cantidad_rack =
+        producto.cajas?.reduce(
+          (total, item) => total + (item.cantidad || 0),
+          0
+        ) || 0;
+
       const cajasConCantidad = Array.isArray(producto.cajas)
         ? producto.cajas.filter((caja) => caja.cantidad > 0).length
         : 0;
@@ -110,8 +116,9 @@ export async function MostrarProductos() {
         ...producto,
         cantidad_piso,
         cantidad_suelto,
+        cantidad_rack,
         tarimas: totalTarimas,
-        total: cantidad_piso + cantidad_suelto + producto.cantidad,
+        total: cantidad_piso + cantidad_suelto + cantidad_rack,
       };
     }) || [];
 
@@ -169,6 +176,12 @@ export async function BuscarProductos(p) {
           0
         ) || 0;
 
+      const cantidad_rack =
+        producto.cajas?.reduce(
+          (total, item) => total + (item.cantidad || 0),
+          0
+        ) || 0;
+
       const cajasConCantidad = Array.isArray(producto.cajas)
         ? producto.cajas.filter((caja) => caja.cantidad > 0).length
         : 0;
@@ -183,8 +196,9 @@ export async function BuscarProductos(p) {
         ...producto,
         cantidad_piso,
         cantidad_suelto,
+        cantidad_rack,
         tarimas: totalTarimas,
-        total: cantidad_piso + cantidad_suelto + producto.cantidad,
+        total: cantidad_piso + cantidad_suelto + cantidad_rack,
       };
     }) || [];
 

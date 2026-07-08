@@ -65,7 +65,13 @@ export function ExportarProductosExcel({ onClose }) {
           0
         ) || 0;
 
-      const total = cantidadPiso + cantidadSuelto + producto.cantidad;
+      const cantidadRack =
+        producto.cajas?.reduce(
+          (total, item) => total + (item.cantidad || 0),
+          0
+        ) || 0;
+
+      const total = cantidadPiso + cantidadSuelto + cantidadRack;
 
       return {
         CODIGO: producto.codigo,
@@ -73,7 +79,7 @@ export function ExportarProductosExcel({ onClose }) {
         MARCA: producto.marcas?.nombre || "",
         TOTAL: total,
         TARIMAS: totalTarimas,
-        CANTIDAD_RACK: producto.cantidad || 0,
+        CANTIDAD_RACK: cantidadRack,
         CANTIDAD_SUELTO: cantidadSuelto,
         CANTIDAD_PISO: cantidadPiso,
       };
