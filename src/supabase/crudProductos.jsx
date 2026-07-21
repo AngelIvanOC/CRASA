@@ -13,6 +13,18 @@ export async function InsertarProductos(p) {
     racks: p.racks,
   });
 
+  if (error) {
+    Swal.fire({
+      icon: "error",
+      title: error.code === "23505" ? "Código duplicado" : "Oops...",
+      text:
+        error.code === "23505"
+          ? "Ya existe un producto con este código para esta marca."
+          : error.message,
+    });
+    return false;
+  }
+
   Swal.fire({
     icon: "success",
     title: "¡Producto creado!",
@@ -20,15 +32,6 @@ export async function InsertarProductos(p) {
     timer: 2000,
     showConfirmButton: false,
   });
-
-  if (error) {
-    Swal.fire({
-      icon: "error",
-      title: "Oops...",
-      text: error.message,
-    });
-    return false;
-  }
   return true;
 }
 
@@ -37,6 +40,11 @@ export async function InsertarProductosMasivo(productos) {
 
   if (error) {
     console.error("Error en inserción masiva:", error);
+    if (error.code === "23505") {
+      throw new Error(
+        "El archivo contiene códigos duplicados para la misma marca (o ya existen en el catálogo). Corrige el archivo e intenta de nuevo."
+      );
+    }
     throw error;
   }
 

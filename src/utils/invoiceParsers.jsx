@@ -4,6 +4,8 @@ export const parseInvoiceData = (text) => {
   if (/^CRASA/i.test(primeraLinea)) return parseCrasa(text);
   if (/Con Alimentos S.A. de C.V./i.test(text)) return parseCon(text);
   if (/lacostena/i.test(text)) return parseCostena(text);
+  if (/ClaveProdServ/i.test(text) || /COMERCIALIZADORA ELORO/i.test(text))
+    return parseJumexEloro(text);
   if (/JUMEX/i.test(text)) return parseJumex(text);
 
   console.warn("Formato de factura desconocido");
@@ -55,6 +57,51 @@ const parseJumex = (text) => {
       marca: marca,
     });
   }
+
+  return {
+    pedidoNo,
+    fecha,
+    cantidadProductos,
+    cantidadTotal,
+    marca,
+    productos,
+    rawText: text,
+  };
+};
+
+const parseJumexEloro = (text) => {
+  const sinPiePagina = text.replace(
+    /ESTE DOCUMENTO ES UNA REPRESENTACION IMPRESA DE UN CFDI[\s\S]*?P[aá]gina\s*\d+\s*de\s*\d+/gi,
+    " "
+  );
+  const flat = sinPiePagina.replace(/\s+/g, " ").trim();
+
+  const pedidoMatch = flat.match(/FACTURA\s*CVA(\d+)/i);
+  const fechaMatch = flat.match(
+    /Fecha\s*Comprobante\s*:?\s*(\d{2})\/(\d{2})\/(\d{4})/i
+  );
+
+  const pedidoNo = pedidoMatch ? pedidoMatch[1] : null;
+  const fecha = fechaMatch
+    ? `${fechaMatch[3]}-${fechaMatch[2]}-${fechaMatch[1]}`
+    : null;
+  const marca = "JUMEX";
+
+  const productos = [];
+  const regex =
+    /(\d{6})\s+(\d{12,13})\s+([\d,]+\.\d+)\s+Caja\s+(.+?)\s+\$?\s*([\d,]+\.\d{2})\s+\$?\s*([\d,]+\.\d{2})\s+(?=Desc)/g;
+  let match;
+  while ((match = regex.exec(flat)) !== null) {
+    productos.push({
+      codigo: parseInt(match[1]),
+      descripcion: match[4].trim(),
+      cantidad: parseInt(match[3]),
+      marca,
+    });
+  }
+
+  const cantidadProductos = productos.length;
+  const cantidadTotal = productos.reduce((sum, p) => sum + p.cantidad, 0);
 
   return {
     pedidoNo,

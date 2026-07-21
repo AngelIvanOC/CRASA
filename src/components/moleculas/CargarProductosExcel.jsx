@@ -142,7 +142,7 @@ export function CargarProductosExcel({ onClose }) {
       Swal.fire({
         icon: "error",
         title: "Error en importación",
-        text: "Ocurrió un error durante la importación",
+        text: error.message || "Ocurrió un error durante la importación",
       });
     }
   };

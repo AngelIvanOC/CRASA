@@ -70,14 +70,26 @@ const insertProductsFromExtractedData = async (productos, ventaId) => {
         continue;
       }
 
-      const { data: productoExistente, error: errorBusqueda } = await supabase
-        .from("productos")
-        .select("id, codigo, nombre, marca_id")
-        .eq("codigo", codigoNumerico)
-        .eq("marca_id", marcaId)
-        .maybeSingle();
+      const { data: productosExistentes, error: errorBusqueda } =
+        await supabase
+          .from("productos")
+          .select("id, codigo, nombre, marca_id")
+          .eq("codigo", codigoNumerico)
+          .eq("marca_id", marcaId)
+          .order("id", { ascending: true });
 
-      let productoId = productoExistente?.id;
+      if (errorBusqueda) {
+        console.error("❌ Error en búsqueda:", errorBusqueda);
+        continue;
+      }
+
+      if (productosExistentes?.length > 1) {
+        console.warn(
+          `⚠️ Código ${producto.codigo} (marca_id ${marcaId}) tiene ${productosExistentes.length} productos duplicados en el catálogo - usando el primero (id ${productosExistentes[0].id})`
+        );
+      }
+
+      const productoId = productosExistentes?.[0]?.id;
 
       if (!productoId) {
         console.warn(
@@ -159,19 +171,33 @@ const insertProductsFromExcelData = async (productos, ventaId) => {
         continue;
       }
 
-      const { data: productoExistente, error: errorBusqueda } = await supabase
-        .from("productos")
-        .select("id, codigo, nombre, marca_id")
-        .eq("codigo", codigoNumerico)
-        .eq("marca_id", marcaId)
-        .maybeSingle();
+      const { data: productosExistentes, error: errorBusqueda } =
+        await supabase
+          .from("productos")
+          .select("id, codigo, nombre, marca_id")
+          .eq("codigo", codigoNumerico)
+          .eq("marca_id", marcaId)
+          .order("id", { ascending: true });
 
       if (errorBusqueda) {
         console.error("❌ Error en búsqueda:", errorBusqueda);
         continue;
       }
 
-      let productoId = productoExistente?.id;
+      if (productosExistentes?.length > 1) {
+        console.warn(
+          `⚠️ Código ${producto.codigo} (marca_id ${marcaId}) tiene ${productosExistentes.length} productos duplicados en el catálogo - usando el primero (id ${productosExistentes[0].id})`
+        );
+      }
+
+      const productoId = productosExistentes?.[0]?.id;
+
+      if (!productoId) {
+        console.warn(
+          `❌ Producto con código ${producto.codigo} no existe - omitiendo`
+        );
+        continue;
+      }
 
       const { error: errorDetalle } = await supabase
         .from("detalle_ventas")
