@@ -4,8 +4,7 @@ export const parseInvoiceData = (text) => {
   if (/^CRASA/i.test(primeraLinea)) return parseCrasa(text);
   if (/Con Alimentos S.A. de C.V./i.test(text)) return parseCon(text);
   if (/lacostena/i.test(text)) return parseCostena(text);
-  if (/ClaveProdServ/i.test(text) || /COMERCIALIZADORA ELORO/i.test(text))
-    return parseJumexEloro(text);
+  if (/COMERCIALIZADORA ELORO/i.test(text)) return parseJumexEloro(text);
   if (/JUMEX/i.test(text)) return parseJumex(text);
 
   console.warn("Formato de factura desconocido");
